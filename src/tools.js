@@ -1,5 +1,3 @@
-import { z } from 'zod';
-
 /**
  * Tool definitions for Recharge MCP server
  */
