@@ -1377,13 +1377,25 @@ All tools return responses in the following format:
   "content": [
     {
       "type": "text",
-      "text": "Error retrieving customer: Customer not found"
+      "text": "Error retrieving customer: Recharge API error 404: Customer not found"
     }
   ],
   "isError": true
 }
 ```
 
+### Validation Error Response
+```json
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "Error creating customer: Missing required fields: email"
+    }
+  ],
+  "isError": true
+}
+```
 ## Common Parameters
 
 ### Pagination

@@ -1480,7 +1480,7 @@ export const getCustomerAnalyticsSchema = {
       }
     }
   }
-};
+}
 
 // Order action tools
 export const updateOrderSchema = {
