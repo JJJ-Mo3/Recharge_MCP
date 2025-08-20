@@ -314,6 +314,25 @@ Recharge API has rate limits. The server doesn't implement client-side rate limi
 - Plus: 1000 requests per minute
 - Pro: 1500 requests per minute
 
+## Troubleshooting
+
+### Common Issues
+
+1. **Authentication Errors**
+   - Verify your `RECHARGE_API_KEY` is correct
+   - Ensure the API key has proper permissions
+   - Check that the API key hasn't expired
+
+2. **Rate Limiting**
+   - Implement delays between requests if hitting rate limits
+   - Use pagination to reduce large data requests
+   - Consider caching frequently accessed data
+
+3. **Network Errors**
+   - Check internet connectivity
+   - Verify Recharge API status
+   - Implement retry logic for transient failures
+
 ## License
 
 MIT License - see LICENSE file for details.
