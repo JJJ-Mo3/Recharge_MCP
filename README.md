@@ -459,6 +459,134 @@ Connect your GitHub repository to Render and it will auto-deploy.
 flyctl deploy
 ```
 
+### Kubernetes
+
+#### Prerequisites
+- Kubernetes cluster (local or cloud)
+- kubectl configured and connected to your cluster
+- Docker image built and available to your cluster
+
+#### Quick Deployment
+```bash
+# Build and tag the Docker image
+docker build -t recharge-mcp-server:v1.1.0 .
+
+# If using a remote registry, push the image
+# docker tag recharge-mcp-server:v1.1.0 your-registry/recharge-mcp-server:v1.1.0
+# docker push your-registry/recharge-mcp-server:v1.1.0
+
+# Set your API key
+export RECHARGE_API_KEY=your_api_key_here
+
+# Deploy to Kubernetes
+./scripts/k8s-deploy.sh
+
+# Deploy with ingress (for external access)
+./scripts/k8s-deploy.sh production with-ingress
+```
+
+#### Manual Deployment
+```bash
+# Apply all manifests
+kubectl apply -f k8s/
+
+# Update secret with your API key
+kubectl create secret generic recharge-mcp-secret \
+  --from-literal=RECHARGE_API_KEY=your_api_key_here \
+  -n recharge-mcp
+```
+
+#### Using Kustomize
+```bash
+# Deploy with kustomize
+kubectl apply -k k8s/
+
+# Deploy to different environment
+kubectl apply -k k8s/ --namespace=recharge-mcp-staging
+```
+
+#### Kubernetes Configuration Files
+
+The `k8s/` directory contains:
+- `namespace.yaml` - Dedicated namespace for the application
+- `configmap.yaml` - Non-sensitive configuration
+- `secret.yaml` - Sensitive configuration (API keys)
+- `deployment.yaml` - Main application deployment
+- `service.yaml` - Internal service configuration
+- `ingress.yaml` - External access configuration
+- `hpa.yaml` - Horizontal Pod Autoscaler
+- `networkpolicy.yaml` - Network security policies
+- `kustomization.yaml` - Kustomize configuration
+
+#### Kubernetes Features
+- **High Availability**: 2+ replicas with rolling updates
+- **Auto-scaling**: HPA based on CPU/memory usage (2-10 pods)
+- **Health Checks**: Liveness and readiness probes
+- **Security**: Non-root containers, network policies, resource limits
+- **Monitoring**: Prometheus annotations for metrics collection
+- **SSL/TLS**: Automatic certificate management with cert-manager
+- **Resource Management**: CPU/memory requests and limits
+- **Graceful Shutdown**: Proper termination handling
+
+#### Kubernetes Management Commands
+```bash
+# View deployment status
+kubectl get deployments -n recharge-mcp
+
+# View pods
+kubectl get pods -n recharge-mcp
+
+# View logs
+kubectl logs -f deployment/recharge-mcp-server -n recharge-mcp
+
+# Scale deployment
+kubectl scale deployment recharge-mcp-server --replicas=5 -n recharge-mcp
+
+# Port forward for local access
+kubectl port-forward service/recharge-mcp-service 8080:80 -n recharge-mcp
+
+# Update deployment image
+kubectl set image deployment/recharge-mcp-server \
+  recharge-mcp-server=recharge-mcp-server:v1.2.0 -n recharge-mcp
+
+# Rollback deployment
+kubectl rollout undo deployment/recharge-mcp-server -n recharge-mcp
+
+# Clean up everything
+./scripts/k8s-cleanup.sh
+```
+
+#### Kubernetes Troubleshooting
+```bash
+# Check pod status and events
+kubectl describe pods -n recharge-mcp
+
+# Check deployment events
+kubectl describe deployment recharge-mcp-server -n recharge-mcp
+
+# Check service endpoints
+kubectl get endpoints -n recharge-mcp
+
+# Test connectivity from within cluster
+kubectl run test-pod --image=curlimages/curl -it --rm -- \
+  curl http://recharge-mcp-service.recharge-mcp.svc.cluster.local/health
+
+# Check resource usage
+kubectl top pods -n recharge-mcp
+kubectl top nodes
+```
+
+#### Production Considerations for Kubernetes
+- **Image Registry**: Use a private registry for production images
+- **Secrets Management**: Consider using external secret management (Vault, AWS Secrets Manager)
+- **Monitoring**: Deploy Prometheus and Grafana for comprehensive monitoring
+- **Logging**: Use centralized logging (ELK stack, Fluentd)
+- **Backup**: Regular backups of configurations and persistent data
+- **Security**: Regular security scans and updates
+- **Resource Limits**: Set appropriate CPU/memory limits based on load testing
+- **Network Policies**: Implement strict network segmentation
+- **RBAC**: Use Role-Based Access Control for cluster security
+
 ### Environment Variables
 All deployment platforms require:
 - `RECHARGE_API_KEY`: Your Recharge API key

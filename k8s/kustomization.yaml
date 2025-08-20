@@ -1,0 +1,43 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+metadata:
+  name: recharge-mcp-server
+  namespace: recharge-mcp
+
+resources:
+- namespace.yaml
+- configmap.yaml
+- secret.yaml
+- deployment.yaml
+- service.yaml
+- ingress.yaml
+- hpa.yaml
+- networkpolicy.yaml
+
+commonLabels:
+  app: recharge-mcp-server
+  version: v1.1.0
+
+images:
+- name: recharge-mcp-server
+  newTag: v1.1.0
+
+replicas:
+- name: recharge-mcp-server
+  count: 2
+
+patchesStrategicMerge:
+- |-
+  apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: recharge-mcp-server
+    namespace: recharge-mcp
+  spec:
+    template:
+      metadata:
+        annotations:
+          prometheus.io/scrape: "true"
+          prometheus.io/port: "3000"
+          prometheus.io/path: "/health"

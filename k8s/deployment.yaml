@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recharge-mcp-server
+  namespace: recharge-mcp
+  labels:
+    app: recharge-mcp-server
+    version: v1.1.0
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: recharge-mcp-server
+  template:
+    metadata:
+      labels:
+        app: recharge-mcp-server
+        version: v1.1.0
+    spec:
+      containers:
+      - name: recharge-mcp-server
+        image: recharge-mcp-server:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 3000
+          name: http
+          protocol: TCP
+        env:
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: recharge-mcp-config
+              key: NODE_ENV
+        - name: RECHARGE_API_URL
+          valueFrom:
+            configMapKeyRef:
+              name: recharge-mcp-config
+              key: RECHARGE_API_URL
+        - name: PORT
+          valueFrom:
+            configMapKeyRef:
+              name: recharge-mcp-config
+              key: PORT
+        - name: RECHARGE_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: recharge-mcp-secret
+              key: RECHARGE_API_KEY
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1001
+          runAsGroup: 1001
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          capabilities:
+            drop:
+            - ALL
+      securityContext:
+        fsGroup: 1001
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
