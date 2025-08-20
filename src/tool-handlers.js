@@ -35,7 +35,6 @@ export class RechargeToolHandlers {
   async handleGetCustomers(args) {
     try {
       const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
       
       const { api_key, ...cleanArgs } = args || {};
       const client = this.getClient(api_key);
