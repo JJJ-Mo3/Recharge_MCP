@@ -139,7 +139,6 @@ class RechargeServer {
           // Analytics tools
           tools.getSubscriptionAnalyticsSchema,
           tools.getCustomerAnalyticsSchema,
-          tools.getCustomerAnalyticsSchema,
 
           // Order action tools
           tools.updateOrderSchema,
@@ -340,8 +339,6 @@ class RechargeServer {
           // Analytics tools
           case 'recharge_get_subscription_analytics':
             return await this.toolHandlers.handleGetSubscriptionAnalytics(args);
-          case 'recharge_get_customer_analytics':
-            return await this.toolHandlers.handleGetCustomerAnalytics(args);
           case 'recharge_get_customer_analytics':
             return await this.toolHandlers.handleGetCustomerAnalytics(args);
 
