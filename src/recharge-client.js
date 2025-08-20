@@ -218,7 +218,6 @@ export class RechargeClient {
     return this.request(`/metafields/${metafieldId}`, {
       method: 'DELETE'
     });
-  }
 
   // Payment method methods
   async getPaymentMethods(params = {}) {
