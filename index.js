@@ -43,10 +43,12 @@ class RechargeServer {
           // Customer tools
           tools.getCustomersSchema,
           tools.getCustomerSchema,
+          tools.updateCustomerSchema,
           tools.createCustomerSchema,
 
           // Subscription tools
           tools.getSubscriptionsSchema,
+          tools.createSubscriptionSchema,
           tools.getSubscriptionSchema,
           tools.updateSubscriptionSchema,
           tools.cancelSubscriptionSchema,
@@ -66,47 +68,73 @@ class RechargeServer {
 
           // Address tools
           tools.getAddressesSchema,
+          tools.getAddressSchema,
+          tools.updateAddressSchema,
           tools.createAddressSchema,
 
           // Discount tools
           tools.getDiscountsSchema,
+          tools.getDiscountSchema,
+          tools.updateDiscountSchema,
+          tools.deleteDiscountSchema,
           tools.createDiscountSchema,
 
           // Metafield tools
           tools.getMetafieldsSchema,
+          tools.getMetafieldSchema,
+          tools.updateMetafieldSchema,
+          tools.deleteMetafieldSchema,
           tools.createMetafieldSchema,
 
           // Webhook tools
           tools.getWebhooksSchema,
+          tools.getWebhookSchema,
+          tools.updateWebhookSchema,
+          tools.deleteWebhookSchema,
           tools.createWebhookSchema,
 
           // Payment method tools
           tools.getPaymentMethodsSchema,
+          tools.getPaymentMethodSchema,
+          tools.updatePaymentMethodSchema,
 
           // Checkout tools
+          tools.getCheckoutsSchema,
+          tools.getCheckoutSchema,
+          tools.updateCheckoutSchema,
+          tools.processCheckoutSchema,
           tools.createCheckoutSchema,
 
           // Onetime tools
           tools.getOnetimesSchema,
+          tools.getOnetimeSchema,
+          tools.updateOnetimeSchema,
+          tools.deleteOnetimeSchema,
           tools.createOnetimeSchema,
 
           // Store credit tools
+          tools.getStoreCreditsSchema,
           tools.getStoreCreditSchema,
+          tools.updateStoreCreditSchema,
           tools.createStoreCreditSchema,
 
           // Charge action tools
           tools.skipChargeSchema,
           tools.processChargeSchema,
+          tools.unskipChargeSchema,
+          tools.delayChargeSchema,
           tools.refundChargeSchema,
 
           // Subscription action tools
           tools.skipSubscriptionChargeSchema,
+          tools.unskipSubscriptionChargeSchema,
 
           // Shop tools
           tools.getShopSchema,
 
           // Collection tools
           tools.getCollectionsSchema,
+          tools.getCollectionSchema,
 
           // Analytics tools
           tools.getSubscriptionAnalyticsSchema,
@@ -126,12 +154,16 @@ class RechargeServer {
             return await this.toolHandlers.handleGetCustomers(args);
           case 'recharge_get_customer':
             return await this.toolHandlers.handleGetCustomer(args);
+          case 'recharge_update_customer':
+            return await this.toolHandlers.handleUpdateCustomer(args);
           case 'recharge_create_customer':
             return await this.toolHandlers.handleCreateCustomer(args);
 
           // Subscription tools
           case 'recharge_get_subscriptions':
             return await this.toolHandlers.handleGetSubscriptions(args);
+          case 'recharge_create_subscription':
+            return await this.toolHandlers.handleCreateSubscription(args);
           case 'recharge_get_subscription':
             return await this.toolHandlers.handleGetSubscription(args);
           case 'recharge_update_subscription':
@@ -162,44 +194,88 @@ class RechargeServer {
           // Address tools
           case 'recharge_get_addresses':
             return await this.toolHandlers.handleGetAddresses(args);
+          case 'recharge_get_address':
+            return await this.toolHandlers.handleGetAddress(args);
+          case 'recharge_update_address':
+            return await this.toolHandlers.handleUpdateAddress(args);
           case 'recharge_create_address':
             return await this.toolHandlers.handleCreateAddress(args);
 
           // Discount tools
           case 'recharge_get_discounts':
             return await this.toolHandlers.handleGetDiscounts(args);
+          case 'recharge_get_discount':
+            return await this.toolHandlers.handleGetDiscount(args);
+          case 'recharge_update_discount':
+            return await this.toolHandlers.handleUpdateDiscount(args);
+          case 'recharge_delete_discount':
+            return await this.toolHandlers.handleDeleteDiscount(args);
           case 'recharge_create_discount':
             return await this.toolHandlers.handleCreateDiscount(args);
 
           // Metafield tools
           case 'recharge_get_metafields':
             return await this.toolHandlers.handleGetMetafields(args);
+          case 'recharge_get_metafield':
+            return await this.toolHandlers.handleGetMetafield(args);
+          case 'recharge_update_metafield':
+            return await this.toolHandlers.handleUpdateMetafield(args);
+          case 'recharge_delete_metafield':
+            return await this.toolHandlers.handleDeleteMetafield(args);
           case 'recharge_create_metafield':
             return await this.toolHandlers.handleCreateMetafield(args);
 
           // Webhook tools
           case 'recharge_get_webhooks':
             return await this.toolHandlers.handleGetWebhooks(args);
+          case 'recharge_get_webhook':
+            return await this.toolHandlers.handleGetWebhook(args);
+          case 'recharge_update_webhook':
+            return await this.toolHandlers.handleUpdateWebhook(args);
+          case 'recharge_delete_webhook':
+            return await this.toolHandlers.handleDeleteWebhook(args);
           case 'recharge_create_webhook':
             return await this.toolHandlers.handleCreateWebhook(args);
 
           // Payment method tools
           case 'recharge_get_payment_methods':
             return await this.toolHandlers.handleGetPaymentMethods(args);
+          case 'recharge_get_payment_method':
+            return await this.toolHandlers.handleGetPaymentMethod(args);
+          case 'recharge_update_payment_method':
+            return await this.toolHandlers.handleUpdatePaymentMethod(args);
 
           // Checkout tools
+          case 'recharge_get_checkouts':
+            return await this.toolHandlers.handleGetCheckouts(args);
+          case 'recharge_get_checkout':
+            return await this.toolHandlers.handleGetCheckout(args);
+          case 'recharge_update_checkout':
+            return await this.toolHandlers.handleUpdateCheckout(args);
+          case 'recharge_process_checkout':
+            return await this.toolHandlers.handleProcessCheckout(args);
           case 'recharge_create_checkout':
             return await this.toolHandlers.handleCreateCheckout(args);
 
           // Onetime tools
           case 'recharge_get_onetimes':
             return await this.toolHandlers.handleGetOnetimes(args);
+          case 'recharge_get_onetime':
+            return await this.toolHandlers.handleGetOnetime(args);
+          case 'recharge_update_onetime':
+            return await this.toolHandlers.handleUpdateOnetime(args);
+          case 'recharge_delete_onetime':
+            return await this.toolHandlers.handleDeleteOnetime(args);
           case 'recharge_create_onetime':
             return await this.toolHandlers.handleCreateOnetime(args);
 
           // Store credit tools
           case 'recharge_get_store_credits':
             return await this.toolHandlers.handleGetStoreCredits(args);
+          case 'recharge_get_store_credit':
+            return await this.toolHandlers.handleGetStoreCredit(args);
+          case 'recharge_update_store_credit':
+            return await this.toolHandlers.handleUpdateStoreCredit(args);
           case 'recharge_create_store_credit':
             return await this.toolHandlers.handleCreateStoreCredit(args);
 
@@ -208,12 +284,18 @@ class RechargeServer {
             return await this.toolHandlers.handleSkipCharge(args);
           case 'recharge_process_charge':
             return await this.toolHandlers.handleProcessCharge(args);
+          case 'recharge_unskip_charge':
+            return await this.toolHandlers.handleUnskipCharge(args);
+          case 'recharge_delay_charge':
+            return await this.toolHandlers.handleDelayCharge(args);
           case 'recharge_refund_charge':
             return await this.toolHandlers.handleRefundCharge(args);
 
           // Subscription action tools
           case 'recharge_skip_subscription_charge':
             return await this.toolHandlers.handleSkipSubscriptionCharge(args);
+          case 'recharge_unskip_subscription_charge':
+            return await this.toolHandlers.handleUnskipSubscriptionCharge(args);
 
           // Shop tools
           case 'recharge_get_shop':
@@ -222,6 +304,8 @@ class RechargeServer {
           // Collection tools
           case 'recharge_get_collections':
             return await this.toolHandlers.handleGetCollections(args);
+          case 'recharge_get_collection':
+            return await this.toolHandlers.handleGetCollection(args);
 
           // Analytics tools
           case 'recharge_get_subscription_analytics':

@@ -139,10 +139,12 @@ To use this server with an MCP client, add it to your client's configuration:
 ### Customer Tools
 - `recharge_get_customers` - Retrieve customers with filtering options
 - `recharge_get_customer` - Get a specific customer by ID
+- `recharge_update_customer` - Update customer details
 - `recharge_create_customer` - Create a new customer
 
 ### Subscription Tools
 - `recharge_get_subscriptions` - Retrieve subscriptions with filtering
+- `recharge_create_subscription` - Create a new subscription
 - `recharge_get_subscription` - Get a specific subscription by ID
 - `recharge_update_subscription` - Update subscription details
 - `recharge_cancel_subscription` - Cancel a subscription
@@ -162,47 +164,73 @@ To use this server with an MCP client, add it to your client's configuration:
 
 ### Address Tools
 - `recharge_get_addresses` - Retrieve addresses with filtering
+- `recharge_get_address` - Get a specific address by ID
+- `recharge_update_address` - Update address details
 - `recharge_create_address` - Create a new address
 
 ### Discount Tools
 - `recharge_get_discounts` - Retrieve discounts with filtering
+- `recharge_get_discount` - Get a specific discount by ID
+- `recharge_update_discount` - Update discount details
+- `recharge_delete_discount` - Delete a discount
 - `recharge_create_discount` - Create a new discount
 
 ### Metafield Tools
 - `recharge_get_metafields` - Retrieve metafields with filtering
+- `recharge_get_metafield` - Get a specific metafield by ID
+- `recharge_update_metafield` - Update metafield details
+- `recharge_delete_metafield` - Delete a metafield
 - `recharge_create_metafield` - Create a new metafield
 
 ### Webhook Tools
 - `recharge_get_webhooks` - Retrieve webhooks
+- `recharge_get_webhook` - Get a specific webhook by ID
+- `recharge_update_webhook` - Update webhook details
+- `recharge_delete_webhook` - Delete a webhook
 - `recharge_create_webhook` - Create a new webhook
 
 ### Payment Method Tools
 - `recharge_get_payment_methods` - Retrieve payment methods
+- `recharge_get_payment_method` - Get a specific payment method by ID
+- `recharge_update_payment_method` - Update payment method details
 
 ### Checkout Tools
+- `recharge_get_checkouts` - Retrieve checkouts
+- `recharge_get_checkout` - Get a specific checkout by token
+- `recharge_update_checkout` - Update checkout details
+- `recharge_process_checkout` - Process a checkout to complete purchase
 - `recharge_create_checkout` - Create a new checkout
 
 ### One-time Product Tools
 - `recharge_get_onetimes` - Retrieve one-time products
+- `recharge_get_onetime` - Get a specific one-time product by ID
+- `recharge_update_onetime` - Update one-time product details
+- `recharge_delete_onetime` - Delete a one-time product
 - `recharge_create_onetime` - Create a new one-time product
 
 ### Store Credit Tools
 - `recharge_get_store_credits` - Retrieve store credits
+- `recharge_get_store_credit` - Get a specific store credit by ID
+- `recharge_update_store_credit` - Update store credit details
 - `recharge_create_store_credit` - Create a new store credit
 
 ### Charge Action Tools
 - `recharge_skip_charge` - Skip a specific charge
 - `recharge_process_charge` - Process a specific charge
+- `recharge_unskip_charge` - Unskip a previously skipped charge
+- `recharge_delay_charge` - Delay a specific charge
 - `recharge_refund_charge` - Refund a specific charge
 
 ### Subscription Action Tools
 - `recharge_skip_subscription_charge` - Skip the next charge for a subscription
+- `recharge_unskip_subscription_charge` - Unskip a previously skipped subscription charge
 
 ### Shop Tools
 - `recharge_get_shop` - Get shop information
 
 ### Collection Tools
 - `recharge_get_collections` - Retrieve product collections
+- `recharge_get_collection` - Get a specific collection by ID
 
 ### Analytics Tools
 - `recharge_get_subscription_analytics` - Get subscription analytics data

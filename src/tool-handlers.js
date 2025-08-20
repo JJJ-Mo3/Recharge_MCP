@@ -81,6 +81,31 @@ export class RechargeToolHandlers {
     }
   }
 
+  async handleUpdateCustomer(args) {
+    try {
+      const { customer_id, ...updateData } = args;
+      const result = await this.client.updateCustomer(customer_id, updateData);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error updating customer: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
   // Subscription handlers
   async handleGetSubscriptions(args) {
     try {
@@ -99,6 +124,30 @@ export class RechargeToolHandlers {
           {
             type: 'text',
             text: `Error retrieving subscriptions: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
+  async handleCreateSubscription(args) {
+    try {
+      const result = await this.client.createSubscription(args);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error creating subscription: ${error.message}`
           }
         ],
         isError: true
@@ -378,6 +427,55 @@ export class RechargeToolHandlers {
     }
   }
 
+  async handleGetAddress(args) {
+    try {
+      const result = await this.client.getAddress(args.address_id);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error retrieving address: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
+  async handleUpdateAddress(args) {
+    try {
+      const { address_id, ...updateData } = args;
+      const result = await this.client.updateAddress(address_id, updateData);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error updating address: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
   async handleCreateAddress(args) {
     try {
       const result = await this.client.createAddress(args);
@@ -420,6 +518,79 @@ export class RechargeToolHandlers {
           {
             type: 'text',
             text: `Error retrieving discounts: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
+  async handleGetDiscount(args) {
+    try {
+      const result = await this.client.getDiscount(args.discount_id);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error retrieving discount: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
+  async handleUpdateDiscount(args) {
+    try {
+      const { discount_id, ...updateData } = args;
+      const result = await this.client.updateDiscount(discount_id, updateData);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error updating discount: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
+  async handleDeleteDiscount(args) {
+    try {
+      const result = await this.client.deleteDiscount(args.discount_id);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error deleting discount: ${error.message}`
           }
         ],
         isError: true
@@ -476,6 +647,79 @@ export class RechargeToolHandlers {
     }
   }
 
+  async handleGetMetafield(args) {
+    try {
+      const result = await this.client.getMetafield(args.metafield_id);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error retrieving metafield: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
+  async handleUpdateMetafield(args) {
+    try {
+      const { metafield_id, ...updateData } = args;
+      const result = await this.client.updateMetafield(metafield_id, updateData);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error updating metafield: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
+  async handleDeleteMetafield(args) {
+    try {
+      const result = await this.client.deleteMetafield(args.metafield_id);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error deleting metafield: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
   async handleCreateMetafield(args) {
     try {
       const result = await this.client.createMetafield(args);
@@ -518,6 +762,79 @@ export class RechargeToolHandlers {
           {
             type: 'text',
             text: `Error retrieving webhooks: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
+  async handleGetWebhook(args) {
+    try {
+      const result = await this.client.getWebhook(args.webhook_id);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error retrieving webhook: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
+  async handleUpdateWebhook(args) {
+    try {
+      const { webhook_id, ...updateData } = args;
+      const result = await this.client.updateWebhook(webhook_id, updateData);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error updating webhook: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
+  async handleDeleteWebhook(args) {
+    try {
+      const result = await this.client.deleteWebhook(args.webhook_id);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error deleting webhook: ${error.message}`
           }
         ],
         isError: true
@@ -574,7 +891,153 @@ export class RechargeToolHandlers {
     }
   }
 
+  async handleGetPaymentMethod(args) {
+    try {
+      const result = await this.client.getPaymentMethod(args.payment_method_id);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error retrieving payment method: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
+  async handleUpdatePaymentMethod(args) {
+    try {
+      const { payment_method_id, ...updateData } = args;
+      const result = await this.client.updatePaymentMethod(payment_method_id, updateData);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error updating payment method: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
   // Checkout handlers
+  async handleGetCheckouts(args) {
+    try {
+      const result = await this.client.getCheckouts(args);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error retrieving checkouts: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
+  async handleGetCheckout(args) {
+    try {
+      const result = await this.client.getCheckout(args.checkout_token);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error retrieving checkout: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
+  async handleUpdateCheckout(args) {
+    try {
+      const { checkout_token, ...updateData } = args;
+      const result = await this.client.updateCheckout(checkout_token, updateData);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error updating checkout: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
+  async handleProcessCheckout(args) {
+    try {
+      const result = await this.client.processCheckout(args.checkout_token);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error processing checkout: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
   async handleCreateCheckout(args) {
     try {
       const result = await this.client.createCheckout(args);
@@ -617,6 +1080,79 @@ export class RechargeToolHandlers {
           {
             type: 'text',
             text: `Error retrieving onetimes: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
+  async handleGetOnetime(args) {
+    try {
+      const result = await this.client.getOnetime(args.onetime_id);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error retrieving onetime: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
+  async handleUpdateOnetime(args) {
+    try {
+      const { onetime_id, ...updateData } = args;
+      const result = await this.client.updateOnetime(onetime_id, updateData);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error updating onetime: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
+  async handleDeleteOnetime(args) {
+    try {
+      const result = await this.client.deleteOnetime(args.onetime_id);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error deleting onetime: ${error.message}`
           }
         ],
         isError: true
@@ -673,6 +1209,30 @@ export class RechargeToolHandlers {
     }
   }
 
+  async handleGetStoreCredit(args) {
+    try {
+      const result = await this.client.getStoreCredit(args.store_credit_id);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error retrieving store credit: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
   async handleCreateStoreCredit(args) {
     try {
       const result = await this.client.createStoreCredit(args);
@@ -690,6 +1250,31 @@ export class RechargeToolHandlers {
           {
             type: 'text',
             text: `Error creating store credit: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
+  async handleUpdateStoreCredit(args) {
+    try {
+      const { store_credit_id, ...updateData } = args;
+      const result = await this.client.updateStoreCredit(store_credit_id, updateData);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error updating store credit: ${error.message}`
           }
         ],
         isError: true
@@ -771,6 +1356,55 @@ export class RechargeToolHandlers {
     }
   }
 
+  async handleUnskipCharge(args) {
+    try {
+      const result = await this.client.unskipCharge(args.charge_id);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error unskipping charge: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
+  async handleDelayCharge(args) {
+    try {
+      const { charge_id, ...delayData } = args;
+      const result = await this.client.delayCharge(charge_id, delayData);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error delaying charge: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
   // Subscription action handlers
   async handleSkipSubscriptionCharge(args) {
     try {
@@ -789,6 +1423,30 @@ export class RechargeToolHandlers {
           {
             type: 'text',
             text: `Error skipping subscription charge: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
+  async handleUnskipSubscriptionCharge(args) {
+    try {
+      const result = await this.client.unskipSubscriptionCharge(args.subscription_id, args.charge_date);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error unskipping subscription charge: ${error.message}`
           }
         ],
         isError: true
@@ -839,6 +1497,30 @@ export class RechargeToolHandlers {
           {
             type: 'text',
             text: `Error retrieving collections: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
+  async handleGetCollection(args) {
+    try {
+      const result = await this.client.getCollection(args.collection_id);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error retrieving collection: ${error.message}`
           }
         ],
         isError: true

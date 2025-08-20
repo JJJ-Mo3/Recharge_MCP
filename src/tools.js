@@ -79,6 +79,37 @@ export const createCustomerSchema = {
   }
 };
 
+export const updateCustomerSchema = {
+  name: 'recharge_update_customer',
+  description: 'Update an existing customer',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      customer_id: {
+        type: 'string',
+        description: 'The customer ID'
+      },
+      email: {
+        type: 'string',
+        description: 'Customer email address'
+      },
+      first_name: {
+        type: 'string',
+        description: 'Customer first name'
+      },
+      last_name: {
+        type: 'string',
+        description: 'Customer last name'
+      },
+      phone: {
+        type: 'string',
+        description: 'Customer phone number'
+      }
+    },
+    required: ['customer_id']
+  }
+};
+
 // Subscription tools
 export const getSubscriptionsSchema = {
   name: 'recharge_get_subscriptions',
@@ -114,6 +145,42 @@ export const getSubscriptionsSchema = {
         description: 'Filter subscriptions created before this date (ISO 8601)'
       }
     }
+  }
+};
+
+export const createSubscriptionSchema = {
+  name: 'recharge_create_subscription',
+  description: 'Create a new subscription',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      address_id: {
+        type: 'string',
+        description: 'Address ID for the subscription'
+      },
+      next_charge_scheduled_at: {
+        type: 'string',
+        description: 'When the next charge should occur (ISO 8601)'
+      },
+      order_interval_frequency: {
+        type: 'string',
+        description: 'How often the subscription renews'
+      },
+      order_interval_unit: {
+        type: 'string',
+        enum: ['day', 'week', 'month'],
+        description: 'The unit for the interval frequency'
+      },
+      quantity: {
+        type: 'number',
+        description: 'Subscription quantity'
+      },
+      shopify_variant_id: {
+        type: 'string',
+        description: 'Shopify variant ID'
+      }
+    },
+    required: ['address_id', 'next_charge_scheduled_at', 'order_interval_frequency', 'order_interval_unit', 'quantity', 'shopify_variant_id']
   }
 };
 
@@ -363,6 +430,72 @@ export const getAddressesSchema = {
   }
 };
 
+export const getAddressSchema = {
+  name: 'recharge_get_address',
+  description: 'Retrieve a specific address by ID',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      address_id: {
+        type: 'string',
+        description: 'The address ID'
+      }
+    },
+    required: ['address_id']
+  }
+};
+
+export const updateAddressSchema = {
+  name: 'recharge_update_address',
+  description: 'Update an existing address',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      address_id: {
+        type: 'string',
+        description: 'The address ID'
+      },
+      first_name: {
+        type: 'string',
+        description: 'First name'
+      },
+      last_name: {
+        type: 'string',
+        description: 'Last name'
+      },
+      address1: {
+        type: 'string',
+        description: 'Address line 1'
+      },
+      address2: {
+        type: 'string',
+        description: 'Address line 2'
+      },
+      city: {
+        type: 'string',
+        description: 'City'
+      },
+      province: {
+        type: 'string',
+        description: 'Province/State'
+      },
+      country_code: {
+        type: 'string',
+        description: 'Country code (e.g., US, CA, GB)'
+      },
+      zip: {
+        type: 'string',
+        description: 'Postal/ZIP code'
+      },
+      phone: {
+        type: 'string',
+        description: 'Phone number'
+      }
+    },
+    required: ['address_id']
+  }
+};
+
 export const createAddressSchema = {
   name: 'recharge_create_address',
   description: 'Create a new address for a customer',
@@ -440,6 +573,78 @@ export const getDiscountsSchema = {
   }
 };
 
+export const getDiscountSchema = {
+  name: 'recharge_get_discount',
+  description: 'Retrieve a specific discount by ID',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      discount_id: {
+        type: 'string',
+        description: 'The discount ID'
+      }
+    },
+    required: ['discount_id']
+  }
+};
+
+export const updateDiscountSchema = {
+  name: 'recharge_update_discount',
+  description: 'Update an existing discount',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      discount_id: {
+        type: 'string',
+        description: 'The discount ID'
+      },
+      code: {
+        type: 'string',
+        description: 'Discount code'
+      },
+      value: {
+        type: 'number',
+        description: 'Discount value'
+      },
+      value_type: {
+        type: 'string',
+        enum: ['percentage', 'fixed_amount'],
+        description: 'Type of discount value'
+      },
+      status: {
+        type: 'string',
+        enum: ['enabled', 'disabled'],
+        description: 'Discount status'
+      },
+      usage_limit: {
+        type: 'number',
+        description: 'Maximum number of times discount can be used'
+      },
+      applies_to: {
+        type: 'string',
+        enum: ['checkout', 'recurring'],
+        description: 'Where the discount applies'
+      }
+    },
+    required: ['discount_id']
+  }
+};
+
+export const deleteDiscountSchema = {
+  name: 'recharge_delete_discount',
+  description: 'Delete a discount',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      discount_id: {
+        type: 'string',
+        description: 'The discount ID'
+      }
+    },
+    required: ['discount_id']
+  }
+};
+
 export const createDiscountSchema = {
   name: 'recharge_create_discount',
   description: 'Create a new discount in Recharge',
@@ -504,6 +709,68 @@ export const getMetafieldsSchema = {
   }
 };
 
+export const getMetafieldSchema = {
+  name: 'recharge_get_metafield',
+  description: 'Retrieve a specific metafield by ID',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      metafield_id: {
+        type: 'string',
+        description: 'The metafield ID'
+      }
+    },
+    required: ['metafield_id']
+  }
+};
+
+export const updateMetafieldSchema = {
+  name: 'recharge_update_metafield',
+  description: 'Update an existing metafield',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      metafield_id: {
+        type: 'string',
+        description: 'The metafield ID'
+      },
+      namespace: {
+        type: 'string',
+        description: 'Metafield namespace'
+      },
+      key: {
+        type: 'string',
+        description: 'Metafield key'
+      },
+      value: {
+        type: 'string',
+        description: 'Metafield value'
+      },
+      value_type: {
+        type: 'string',
+        enum: ['string', 'integer', 'json_string'],
+        description: 'Type of the metafield value'
+      }
+    },
+    required: ['metafield_id']
+  }
+};
+
+export const deleteMetafieldSchema = {
+  name: 'recharge_delete_metafield',
+  description: 'Delete a metafield',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      metafield_id: {
+        type: 'string',
+        description: 'The metafield ID'
+      }
+    },
+    required: ['metafield_id']
+  }
+};
+
 export const createMetafieldSchema = {
   name: 'recharge_create_metafield',
   description: 'Create a new metafield',
@@ -558,6 +825,59 @@ export const getWebhooksSchema = {
   }
 };
 
+export const getWebhookSchema = {
+  name: 'recharge_get_webhook',
+  description: 'Retrieve a specific webhook by ID',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      webhook_id: {
+        type: 'string',
+        description: 'The webhook ID'
+      }
+    },
+    required: ['webhook_id']
+  }
+};
+
+export const updateWebhookSchema = {
+  name: 'recharge_update_webhook',
+  description: 'Update an existing webhook',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      webhook_id: {
+        type: 'string',
+        description: 'The webhook ID'
+      },
+      address: {
+        type: 'string',
+        description: 'Webhook endpoint URL'
+      },
+      topic: {
+        type: 'string',
+        description: 'Webhook topic/event'
+      }
+    },
+    required: ['webhook_id']
+  }
+};
+
+export const deleteWebhookSchema = {
+  name: 'recharge_delete_webhook',
+  description: 'Delete a webhook',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      webhook_id: {
+        type: 'string',
+        description: 'The webhook ID'
+      }
+    },
+    required: ['webhook_id']
+  }
+};
+
 export const createWebhookSchema = {
   name: 'recharge_create_webhook',
   description: 'Create a new webhook',
@@ -598,6 +918,40 @@ export const getPaymentMethodsSchema = {
   }
 };
 
+export const getPaymentMethodSchema = {
+  name: 'recharge_get_payment_method',
+  description: 'Retrieve a specific payment method by ID',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      payment_method_id: {
+        type: 'string',
+        description: 'The payment method ID'
+      }
+    },
+    required: ['payment_method_id']
+  }
+};
+
+export const updatePaymentMethodSchema = {
+  name: 'recharge_update_payment_method',
+  description: 'Update an existing payment method',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      payment_method_id: {
+        type: 'string',
+        description: 'The payment method ID'
+      },
+      billing_address: {
+        type: 'object',
+        description: 'Billing address information'
+      }
+    },
+    required: ['payment_method_id']
+  }
+};
+
 // Checkout tools
 export const createCheckoutSchema = {
   name: 'recharge_create_checkout',
@@ -632,6 +986,89 @@ export const createCheckoutSchema = {
   }
 };
 
+export const getCheckoutsSchema = {
+  name: 'recharge_get_checkouts',
+  description: 'Retrieve checkouts from Recharge',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      limit: {
+        type: 'number',
+        description: 'Number of checkouts to retrieve (max 250)',
+        minimum: 1,
+        maximum: 250
+      }
+    }
+  }
+};
+
+export const getCheckoutSchema = {
+  name: 'recharge_get_checkout',
+  description: 'Retrieve a specific checkout by token',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      checkout_token: {
+        type: 'string',
+        description: 'The checkout token'
+      }
+    },
+    required: ['checkout_token']
+  }
+};
+
+export const updateCheckoutSchema = {
+  name: 'recharge_update_checkout',
+  description: 'Update an existing checkout',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      checkout_token: {
+        type: 'string',
+        description: 'The checkout token'
+      },
+      line_items: {
+        type: 'array',
+        description: 'Array of line items for the checkout',
+        items: {
+          type: 'object',
+          properties: {
+            variant_id: {
+              type: 'string',
+              description: 'Product variant ID'
+            },
+            quantity: {
+              type: 'number',
+              description: 'Quantity of the item'
+            }
+          },
+          required: ['variant_id', 'quantity']
+        }
+      },
+      email: {
+        type: 'string',
+        description: 'Customer email'
+      }
+    },
+    required: ['checkout_token']
+  }
+};
+
+export const processCheckoutSchema = {
+  name: 'recharge_process_checkout',
+  description: 'Process a checkout to complete the purchase',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      checkout_token: {
+        type: 'string',
+        description: 'The checkout token'
+      }
+    },
+    required: ['checkout_token']
+  }
+};
+
 // Onetime tools
 export const getOnetimesSchema = {
   name: 'recharge_get_onetimes',
@@ -650,6 +1087,71 @@ export const getOnetimesSchema = {
         description: 'Filter onetimes by address ID'
       }
     }
+  }
+};
+
+export const getOnetimeSchema = {
+  name: 'recharge_get_onetime',
+  description: 'Retrieve a specific one-time product by ID',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      onetime_id: {
+        type: 'string',
+        description: 'The one-time product ID'
+      }
+    },
+    required: ['onetime_id']
+  }
+};
+
+export const updateOnetimeSchema = {
+  name: 'recharge_update_onetime',
+  description: 'Update an existing one-time product',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      onetime_id: {
+        type: 'string',
+        description: 'The one-time product ID'
+      },
+      next_charge_scheduled_at: {
+        type: 'string',
+        description: 'When to charge for this one-time product (ISO 8601)'
+      },
+      product_title: {
+        type: 'string',
+        description: 'Product title'
+      },
+      variant_title: {
+        type: 'string',
+        description: 'Variant title'
+      },
+      price: {
+        type: 'string',
+        description: 'Product price'
+      },
+      quantity: {
+        type: 'number',
+        description: 'Quantity'
+      }
+    },
+    required: ['onetime_id']
+  }
+};
+
+export const deleteOnetimeSchema = {
+  name: 'recharge_delete_onetime',
+  description: 'Delete a one-time product',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      onetime_id: {
+        type: 'string',
+        description: 'The one-time product ID'
+      }
+    },
+    required: ['onetime_id']
   }
 };
 
@@ -693,7 +1195,7 @@ export const createOnetimeSchema = {
 };
 
 // Store credit tools
-export const getStoreCreditSchema = {
+export const getStoreCreditsSchema = {
   name: 'recharge_get_store_credits',
   description: 'Retrieve store credits from Recharge',
   inputSchema: {
@@ -710,6 +1212,21 @@ export const getStoreCreditSchema = {
         description: 'Filter store credits by customer ID'
       }
     }
+  }
+};
+
+export const getStoreCreditSchema = {
+  name: 'recharge_get_store_credit',
+  description: 'Retrieve a specific store credit by ID',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      store_credit_id: {
+        type: 'string',
+        description: 'The store credit ID'
+      }
+    },
+    required: ['store_credit_id']
   }
 };
 
@@ -733,6 +1250,29 @@ export const createStoreCreditSchema = {
       }
     },
     required: ['amount', 'customer_id']
+  }
+};
+
+export const updateStoreCreditSchema = {
+  name: 'recharge_update_store_credit',
+  description: 'Update an existing store credit',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      store_credit_id: {
+        type: 'string',
+        description: 'The store credit ID'
+      },
+      amount: {
+        type: 'string',
+        description: 'Store credit amount'
+      },
+      note: {
+        type: 'string',
+        description: 'Note about the store credit'
+      }
+    },
+    required: ['store_credit_id']
   }
 };
 
@@ -790,6 +1330,40 @@ export const refundChargeSchema = {
   }
 };
 
+export const unskipChargeSchema = {
+  name: 'recharge_unskip_charge',
+  description: 'Unskip a previously skipped charge',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      charge_id: {
+        type: 'string',
+        description: 'The charge ID to unskip'
+      }
+    },
+    required: ['charge_id']
+  }
+};
+
+export const delayChargeSchema = {
+  name: 'recharge_delay_charge',
+  description: 'Delay a specific charge',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      charge_id: {
+        type: 'string',
+        description: 'The charge ID to delay'
+      },
+      date: {
+        type: 'string',
+        description: 'New date for the charge (ISO 8601)'
+      }
+    },
+    required: ['charge_id', 'date']
+  }
+};
+
 // Subscription action tools
 export const skipSubscriptionChargeSchema = {
   name: 'recharge_skip_subscription_charge',
@@ -804,6 +1378,25 @@ export const skipSubscriptionChargeSchema = {
       charge_date: {
         type: 'string',
         description: 'Date of the charge to skip (ISO 8601)'
+      }
+    },
+    required: ['subscription_id', 'charge_date']
+  }
+};
+
+export const unskipSubscriptionChargeSchema = {
+  name: 'recharge_unskip_subscription_charge',
+  description: 'Unskip a previously skipped subscription charge',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      subscription_id: {
+        type: 'string',
+        description: 'The subscription ID'
+      },
+      charge_date: {
+        type: 'string',
+        description: 'Date of the charge to unskip (ISO 8601)'
       }
     },
     required: ['subscription_id', 'charge_date']
@@ -834,6 +1427,21 @@ export const getCollectionsSchema = {
         maximum: 250
       }
     }
+  }
+};
+
+export const getCollectionSchema = {
+  name: 'recharge_get_collection',
+  description: 'Retrieve a specific collection by ID',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      collection_id: {
+        type: 'string',
+        description: 'The collection ID'
+      }
+    },
+    required: ['collection_id']
   }
 };
 
