@@ -524,36 +524,4 @@ export class RechargeClient {
       body: JSON.stringify(refundData)
     });
   }
-
-  // Order methods (additional)
-  async updateOrder(orderId, orderData) {
-    return this.request(`/orders/${orderId}`, {
-      method: 'PUT',
-      body: JSON.stringify(orderData)
-    });
-  }
-
-  async deleteOrder(orderId) {
-    return this.request(`/orders/${orderId}`, {
-      method: 'DELETE'
-    });
-  }
-
-  async cloneOrder(orderId) {
-    return this.request(`/orders/${orderId}/clone`, {
-      method: 'POST'
-    });
-  }
-
-  // Customer portal methods
-  async getCustomerPortalSession(customerId) {
-    return this.request(`/customers/${customerId}/portal_session`);
-  }
-
-  async createCustomerPortalSession(customerId, sessionData) {
-    return this.request(`/customers/${customerId}/portal_session`, {
-      method: 'POST',
-      body: JSON.stringify(sessionData)
-    });
-  }
 }
