@@ -4,8 +4,8 @@ import { RechargeClient } from './recharge-client.js';
  * Tool handlers for Recharge MCP server
  */
 export class RechargeToolHandlers {
-  constructor() {
-    this.client = new RechargeClient();
+  constructor(apiKey = null) {
+    this.client = new RechargeClient(apiKey);
   }
 
   // Customer handlers

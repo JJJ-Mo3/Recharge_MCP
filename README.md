@@ -112,9 +112,9 @@ A comprehensive Model Context Protocol (MCP) server that provides tools for inte
    cp .env.example .env
    ```
    
-   Edit `.env` and add your Recharge API credentials:
+   Edit `.env` and add your Recharge API credentials (optional if clients provide their own keys):
    ```
-   RECHARGE_API_KEY=your_recharge_api_key_here
+   RECHARGE_API_KEY=your_default_recharge_api_key_here
    RECHARGE_API_URL=https://api.rechargeapps.com
    ```
 
@@ -124,6 +124,28 @@ A comprehensive Model Context Protocol (MCP) server that provides tools for inte
    - Create a new private app or use an existing one
    - Copy the API access token
 
+## API Key Configuration
+
+The MCP server supports two methods for API key configuration:
+
+### Method 1: Environment Variable (Server-wide)
+Set `RECHARGE_API_KEY` in your environment or `.env` file. This key will be used for all requests when no client-specific key is provided.
+
+### Method 2: Client-provided API Key (Per-request)
+Clients can provide their own API key with each tool call by including an `api_key` parameter:
+
+```json
+{
+  "tool": "recharge_get_customers",
+  "arguments": {
+    "api_key": "your_client_specific_api_key",
+    "limit": 10,
+    "email": "customer@example.com"
+  }
+}
+```
+
+**Note:** The client-provided API key takes precedence over the environment variable, allowing multiple clients to use their own Recharge accounts through the same MCP server instance.
 ## Usage
 
 ### Running the server

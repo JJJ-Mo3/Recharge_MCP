@@ -9,6 +9,10 @@ export const getCustomersSchema = {
   inputSchema: {
     type: 'object',
     properties: {
+      api_key: {
+        type: 'string',
+        description: 'Recharge API key (optional if set in environment)'
+      },
       limit: {
         type: 'number',
         description: 'Number of customers to retrieve (max 250)',
@@ -41,6 +45,10 @@ export const getCustomerSchema = {
   inputSchema: {
     type: 'object',
     properties: {
+      api_key: {
+        type: 'string',
+        description: 'Recharge API key (optional if set in environment)'
+      },
       customer_id: {
         type: 'string',
         description: 'The customer ID'

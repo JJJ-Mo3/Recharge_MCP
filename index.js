@@ -39,9 +39,15 @@ class RechargeServer {
       }
     );
 
+    // Initialize with default handlers (using env var)
     this.toolHandlers = new RechargeToolHandlers();
     this.setupToolHandlers();
     this.setupErrorHandling();
+  }
+
+  // Method to create handlers with specific API key
+  createHandlersWithApiKey(apiKey) {
+    return new RechargeToolHandlers(apiKey);
   }
 
   setupToolHandlers() {
@@ -185,217 +191,227 @@ class RechargeServer {
     this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
       const { name, arguments: args } = request.params;
 
+      // Check if API key is provided in arguments
+      let handlers = this.toolHandlers;
+      if (args && args.api_key) {
+        // Create new handlers with the provided API key
+        const { api_key, ...cleanArgs } = args;
+        handlers = this.createHandlersWithApiKey(api_key);
+        // Update args to remove api_key before passing to handlers
+        request.params.arguments = cleanArgs;
+      }
+
       try {
         switch (name) {
           // Customer tools
           case 'recharge_get_customers':
-            return await this.toolHandlers.handleGetCustomers(args);
+            return await handlers.handleGetCustomers(request.params.arguments);
           case 'recharge_get_customer':
-            return await this.toolHandlers.handleGetCustomer(args);
+            return await handlers.handleGetCustomer(request.params.arguments);
           case 'recharge_update_customer':
-            return await this.toolHandlers.handleUpdateCustomer(args);
+            return await handlers.handleUpdateCustomer(request.params.arguments);
           case 'recharge_create_customer':
-            return await this.toolHandlers.handleCreateCustomer(args);
+            return await handlers.handleCreateCustomer(request.params.arguments);
 
           // Subscription tools
           case 'recharge_get_subscriptions':
-            return await this.toolHandlers.handleGetSubscriptions(args);
+            return await handlers.handleGetSubscriptions(request.params.arguments);
           case 'recharge_create_subscription':
-            return await this.toolHandlers.handleCreateSubscription(args);
+            return await handlers.handleCreateSubscription(request.params.arguments);
           case 'recharge_get_subscription':
-            return await this.toolHandlers.handleGetSubscription(args);
+            return await handlers.handleGetSubscription(request.params.arguments);
           case 'recharge_update_subscription':
-            return await this.toolHandlers.handleUpdateSubscription(args);
+            return await handlers.handleUpdateSubscription(request.params.arguments);
           case 'recharge_cancel_subscription':
-            return await this.toolHandlers.handleCancelSubscription(args);
+            return await handlers.handleCancelSubscription(request.params.arguments);
           case 'recharge_activate_subscription':
-            return await this.toolHandlers.handleActivateSubscription(args);
+            return await handlers.handleActivateSubscription(request.params.arguments);
 
           // Product tools
           case 'recharge_get_products':
-            return await this.toolHandlers.handleGetProducts(args);
+            return await handlers.handleGetProducts(request.params.arguments);
           case 'recharge_get_product':
-            return await this.toolHandlers.handleGetProduct(args);
+            return await handlers.handleGetProduct(request.params.arguments);
 
           // Order tools
           case 'recharge_get_orders':
-            return await this.toolHandlers.handleGetOrders(args);
+            return await handlers.handleGetOrders(request.params.arguments);
           case 'recharge_get_order':
-            return await this.toolHandlers.handleGetOrder(args);
+            return await handlers.handleGetOrder(request.params.arguments);
 
           // Charge tools
           case 'recharge_get_charges':
-            return await this.toolHandlers.handleGetCharges(args);
+            return await handlers.handleGetCharges(request.params.arguments);
           case 'recharge_get_charge':
-            return await this.toolHandlers.handleGetCharge(args);
+            return await handlers.handleGetCharge(request.params.arguments);
 
           // Address tools
           case 'recharge_get_addresses':
-            return await this.toolHandlers.handleGetAddresses(args);
+            return await handlers.handleGetAddresses(request.params.arguments);
           case 'recharge_get_address':
-            return await this.toolHandlers.handleGetAddress(args);
+            return await handlers.handleGetAddress(request.params.arguments);
           case 'recharge_update_address':
-            return await this.toolHandlers.handleUpdateAddress(args);
+            return await handlers.handleUpdateAddress(request.params.arguments);
           case 'recharge_create_address':
-            return await this.toolHandlers.handleCreateAddress(args);
+            return await handlers.handleCreateAddress(request.params.arguments);
 
           // Discount tools
           case 'recharge_get_discounts':
-            return await this.toolHandlers.handleGetDiscounts(args);
+            return await handlers.handleGetDiscounts(request.params.arguments);
           case 'recharge_get_discount':
-            return await this.toolHandlers.handleGetDiscount(args);
+            return await handlers.handleGetDiscount(request.params.arguments);
           case 'recharge_update_discount':
-            return await this.toolHandlers.handleUpdateDiscount(args);
+            return await handlers.handleUpdateDiscount(request.params.arguments);
           case 'recharge_delete_discount':
-            return await this.toolHandlers.handleDeleteDiscount(args);
+            return await handlers.handleDeleteDiscount(request.params.arguments);
           case 'recharge_create_discount':
-            return await this.toolHandlers.handleCreateDiscount(args);
+            return await handlers.handleCreateDiscount(request.params.arguments);
 
           // Metafield tools
           case 'recharge_get_metafields':
-            return await this.toolHandlers.handleGetMetafields(args);
+            return await handlers.handleGetMetafields(request.params.arguments);
           case 'recharge_get_metafield':
-            return await this.toolHandlers.handleGetMetafield(args);
+            return await handlers.handleGetMetafield(request.params.arguments);
           case 'recharge_update_metafield':
-            return await this.toolHandlers.handleUpdateMetafield(args);
+            return await handlers.handleUpdateMetafield(request.params.arguments);
           case 'recharge_delete_metafield':
-            return await this.toolHandlers.handleDeleteMetafield(args);
+            return await handlers.handleDeleteMetafield(request.params.arguments);
           case 'recharge_create_metafield':
-            return await this.toolHandlers.handleCreateMetafield(args);
+            return await handlers.handleCreateMetafield(request.params.arguments);
 
           // Webhook tools
           case 'recharge_get_webhooks':
-            return await this.toolHandlers.handleGetWebhooks(args);
+            return await handlers.handleGetWebhooks(request.params.arguments);
           case 'recharge_get_webhook':
-            return await this.toolHandlers.handleGetWebhook(args);
+            return await handlers.handleGetWebhook(request.params.arguments);
           case 'recharge_update_webhook':
-            return await this.toolHandlers.handleUpdateWebhook(args);
+            return await handlers.handleUpdateWebhook(request.params.arguments);
           case 'recharge_delete_webhook':
-            return await this.toolHandlers.handleDeleteWebhook(args);
+            return await handlers.handleDeleteWebhook(request.params.arguments);
           case 'recharge_create_webhook':
-            return await this.toolHandlers.handleCreateWebhook(args);
+            return await handlers.handleCreateWebhook(request.params.arguments);
 
           // Payment method tools
           case 'recharge_get_payment_methods':
-            return await this.toolHandlers.handleGetPaymentMethods(args);
+            return await handlers.handleGetPaymentMethods(request.params.arguments);
           case 'recharge_get_payment_method':
-            return await this.toolHandlers.handleGetPaymentMethod(args);
+            return await handlers.handleGetPaymentMethod(request.params.arguments);
           case 'recharge_update_payment_method':
-            return await this.toolHandlers.handleUpdatePaymentMethod(args);
+            return await handlers.handleUpdatePaymentMethod(request.params.arguments);
 
           // Checkout tools
           case 'recharge_get_checkouts':
-            return await this.toolHandlers.handleGetCheckouts(args);
+            return await handlers.handleGetCheckouts(request.params.arguments);
           case 'recharge_get_checkout':
-            return await this.toolHandlers.handleGetCheckout(args);
+            return await handlers.handleGetCheckout(request.params.arguments);
           case 'recharge_update_checkout':
-            return await this.toolHandlers.handleUpdateCheckout(args);
+            return await handlers.handleUpdateCheckout(request.params.arguments);
           case 'recharge_process_checkout':
-            return await this.toolHandlers.handleProcessCheckout(args);
+            return await handlers.handleProcessCheckout(request.params.arguments);
           case 'recharge_create_checkout':
-            return await this.toolHandlers.handleCreateCheckout(args);
+            return await handlers.handleCreateCheckout(request.params.arguments);
 
           // Onetime tools
           case 'recharge_get_onetimes':
-            return await this.toolHandlers.handleGetOnetimes(args);
+            return await handlers.handleGetOnetimes(request.params.arguments);
           case 'recharge_get_onetime':
-            return await this.toolHandlers.handleGetOnetime(args);
+            return await handlers.handleGetOnetime(request.params.arguments);
           case 'recharge_update_onetime':
-            return await this.toolHandlers.handleUpdateOnetime(args);
+            return await handlers.handleUpdateOnetime(request.params.arguments);
           case 'recharge_delete_onetime':
-            return await this.toolHandlers.handleDeleteOnetime(args);
+            return await handlers.handleDeleteOnetime(request.params.arguments);
           case 'recharge_create_onetime':
-            return await this.toolHandlers.handleCreateOnetime(args);
+            return await handlers.handleCreateOnetime(request.params.arguments);
 
           // Store credit tools
           case 'recharge_get_store_credits':
-            return await this.toolHandlers.handleGetStoreCredits(args);
+            return await handlers.handleGetStoreCredits(request.params.arguments);
           case 'recharge_get_store_credit':
-            return await this.toolHandlers.handleGetStoreCredit(args);
+            return await handlers.handleGetStoreCredit(request.params.arguments);
           case 'recharge_update_store_credit':
-            return await this.toolHandlers.handleUpdateStoreCredit(args);
+            return await handlers.handleUpdateStoreCredit(request.params.arguments);
           case 'recharge_create_store_credit':
-            return await this.toolHandlers.handleCreateStoreCredit(args);
+            return await handlers.handleCreateStoreCredit(request.params.arguments);
 
           // Charge action tools
           case 'recharge_skip_charge':
-            return await this.toolHandlers.handleSkipCharge(args);
+            return await handlers.handleSkipCharge(request.params.arguments);
           case 'recharge_process_charge':
-            return await this.toolHandlers.handleProcessCharge(args);
+            return await handlers.handleProcessCharge(request.params.arguments);
           case 'recharge_unskip_charge':
-            return await this.toolHandlers.handleUnskipCharge(args);
+            return await handlers.handleUnskipCharge(request.params.arguments);
           case 'recharge_delay_charge':
-            return await this.toolHandlers.handleDelayCharge(args);
+            return await handlers.handleDelayCharge(request.params.arguments);
           case 'recharge_refund_charge':
-            return await this.toolHandlers.handleRefundCharge(args);
+            return await handlers.handleRefundCharge(request.params.arguments);
 
           // Subscription action tools
           case 'recharge_skip_subscription_charge':
-            return await this.toolHandlers.handleSkipSubscriptionCharge(args);
+            return await handlers.handleSkipSubscriptionCharge(request.params.arguments);
           case 'recharge_unskip_subscription_charge':
-            return await this.toolHandlers.handleUnskipSubscriptionCharge(args);
+            return await handlers.handleUnskipSubscriptionCharge(request.params.arguments);
 
           // Shop tools
           case 'recharge_get_shop':
-            return await this.toolHandlers.handleGetShop(args);
+            return await handlers.handleGetShop(request.params.arguments);
 
           // Collection tools
           case 'recharge_get_collections':
-            return await this.toolHandlers.handleGetCollections(args);
+            return await handlers.handleGetCollections(request.params.arguments);
           case 'recharge_get_collection':
-            return await this.toolHandlers.handleGetCollection(args);
+            return await handlers.handleGetCollection(request.params.arguments);
 
           // Analytics tools
           case 'recharge_get_subscription_analytics':
-            return await this.toolHandlers.handleGetSubscriptionAnalytics(args);
+            return await handlers.handleGetSubscriptionAnalytics(request.params.arguments);
           case 'recharge_get_customer_analytics':
-            return await this.toolHandlers.handleGetCustomerAnalytics(args);
+            return await handlers.handleGetCustomerAnalytics(request.params.arguments);
 
           // Order action tools
           case 'recharge_update_order':
-            return await this.toolHandlers.handleUpdateOrder(args);
+            return await handlers.handleUpdateOrder(request.params.arguments);
           case 'recharge_delete_order':
-            return await this.toolHandlers.handleDeleteOrder(args);
+            return await handlers.handleDeleteOrder(request.params.arguments);
           case 'recharge_clone_order':
-            return await this.toolHandlers.handleCloneOrder(args);
+            return await handlers.handleCloneOrder(request.params.arguments);
 
           // Customer portal tools
           case 'recharge_get_customer_portal_session':
-            return await this.toolHandlers.handleGetCustomerPortalSession(args);
+            return await handlers.handleGetCustomerPortalSession(request.params.arguments);
           case 'recharge_create_customer_portal_session':
-            return await this.toolHandlers.handleCreateCustomerPortalSession(args);
+            return await handlers.handleCreateCustomerPortalSession(request.params.arguments);
 
           // Bundle selection tools
           case 'recharge_get_bundle_selections':
-            return await this.toolHandlers.handleGetBundleSelections(args);
+            return await handlers.handleGetBundleSelections(request.params.arguments);
           case 'recharge_get_bundle_selection':
-            return await this.toolHandlers.handleGetBundleSelection(args);
+            return await handlers.handleGetBundleSelection(request.params.arguments);
           case 'recharge_create_bundle_selection':
-            return await this.toolHandlers.handleCreateBundleSelection(args);
+            return await handlers.handleCreateBundleSelection(request.params.arguments);
           case 'recharge_update_bundle_selection':
-            return await this.toolHandlers.handleUpdateBundleSelection(args);
+            return await handlers.handleUpdateBundleSelection(request.params.arguments);
           case 'recharge_delete_bundle_selection':
-            return await this.toolHandlers.handleDeleteBundleSelection(args);
+            return await handlers.handleDeleteBundleSelection(request.params.arguments);
 
           // Retention strategy tools
           case 'recharge_get_retention_strategies':
-            return await this.toolHandlers.handleGetRetentionStrategies(args);
+            return await handlers.handleGetRetentionStrategies(request.params.arguments);
           case 'recharge_get_retention_strategy':
-            return await this.toolHandlers.handleGetRetentionStrategy(args);
+            return await handlers.handleGetRetentionStrategy(request.params.arguments);
 
           // Async batch tools
           case 'recharge_get_async_batches':
-            return await this.toolHandlers.handleGetAsyncBatches(args);
+            return await handlers.handleGetAsyncBatches(request.params.arguments);
           case 'recharge_get_async_batch':
-            return await this.toolHandlers.handleGetAsyncBatch(args);
+            return await handlers.handleGetAsyncBatch(request.params.arguments);
           case 'recharge_create_async_batch':
-            return await this.toolHandlers.handleCreateAsyncBatch(args);
+            return await handlers.handleCreateAsyncBatch(request.params.arguments);
 
           // Notification tools
           case 'recharge_get_notifications':
-            return await this.toolHandlers.handleGetNotifications(args);
+            return await handlers.handleGetNotifications(request.params.arguments);
           case 'recharge_get_notification':
-            return await this.toolHandlers.handleGetNotification(args);
+            return await handlers.handleGetNotification(request.params.arguments);
 
           default:
             throw new Error(`Unknown tool: ${name}`);
