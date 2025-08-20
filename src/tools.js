@@ -1788,3 +1788,97 @@ export const getNotificationSchema = {
     required: ['notification_id']
   }
 };
+
+// Add missing api_key parameter to all tool schemas
+const addApiKeyParameter = (schema) => {
+  if (!schema.inputSchema.properties.api_key) {
+    schema.inputSchema.properties.api_key = {
+      type: 'string',
+      description: 'Optional API key to override the default server API key'
+    };
+  }
+  return schema;
+};
+
+// Apply api_key parameter to all schemas
+export const getCustomersSchemaWithApiKey = addApiKeyParameter(getCustomersSchema);
+export const getCustomerSchemaWithApiKey = addApiKeyParameter(getCustomerSchema);
+export const createCustomerSchemaWithApiKey = addApiKeyParameter(createCustomerSchema);
+export const updateCustomerSchemaWithApiKey = addApiKeyParameter(updateCustomerSchema);
+export const getSubscriptionsSchemaWithApiKey = addApiKeyParameter(getSubscriptionsSchema);
+export const createSubscriptionSchemaWithApiKey = addApiKeyParameter(createSubscriptionSchema);
+export const getSubscriptionSchemaWithApiKey = addApiKeyParameter(getSubscriptionSchema);
+export const updateSubscriptionSchemaWithApiKey = addApiKeyParameter(updateSubscriptionSchema);
+export const cancelSubscriptionSchemaWithApiKey = addApiKeyParameter(cancelSubscriptionSchema);
+export const activateSubscriptionSchemaWithApiKey = addApiKeyParameter(activateSubscriptionSchema);
+export const getProductsSchemaWithApiKey = addApiKeyParameter(getProductsSchema);
+export const getProductSchemaWithApiKey = addApiKeyParameter(getProductSchema);
+export const getOrdersSchemaWithApiKey = addApiKeyParameter(getOrdersSchema);
+export const getOrderSchemaWithApiKey = addApiKeyParameter(getOrderSchema);
+export const getChargesSchemaWithApiKey = addApiKeyParameter(getChargesSchema);
+export const getChargeSchemaWithApiKey = addApiKeyParameter(getChargeSchema);
+export const getAddressesSchemaWithApiKey = addApiKeyParameter(getAddressesSchema);
+export const getAddressSchemaWithApiKey = addApiKeyParameter(getAddressSchema);
+export const updateAddressSchemaWithApiKey = addApiKeyParameter(updateAddressSchema);
+export const createAddressSchemaWithApiKey = addApiKeyParameter(createAddressSchema);
+export const getDiscountsSchemaWithApiKey = addApiKeyParameter(getDiscountsSchema);
+export const getDiscountSchemaWithApiKey = addApiKeyParameter(getDiscountSchema);
+export const updateDiscountSchemaWithApiKey = addApiKeyParameter(updateDiscountSchema);
+export const deleteDiscountSchemaWithApiKey = addApiKeyParameter(deleteDiscountSchema);
+export const createDiscountSchemaWithApiKey = addApiKeyParameter(createDiscountSchema);
+export const getMetafieldsSchemaWithApiKey = addApiKeyParameter(getMetafieldsSchema);
+export const getMetafieldSchemaWithApiKey = addApiKeyParameter(getMetafieldSchema);
+export const updateMetafieldSchemaWithApiKey = addApiKeyParameter(updateMetafieldSchema);
+export const deleteMetafieldSchemaWithApiKey = addApiKeyParameter(deleteMetafieldSchema);
+export const createMetafieldSchemaWithApiKey = addApiKeyParameter(createMetafieldSchema);
+export const getWebhooksSchemaWithApiKey = addApiKeyParameter(getWebhooksSchema);
+export const getWebhookSchemaWithApiKey = addApiKeyParameter(getWebhookSchema);
+export const updateWebhookSchemaWithApiKey = addApiKeyParameter(updateWebhookSchema);
+export const deleteWebhookSchemaWithApiKey = addApiKeyParameter(deleteWebhookSchema);
+export const createWebhookSchemaWithApiKey = addApiKeyParameter(createWebhookSchema);
+export const getPaymentMethodsSchemaWithApiKey = addApiKeyParameter(getPaymentMethodsSchema);
+export const getPaymentMethodSchemaWithApiKey = addApiKeyParameter(getPaymentMethodSchema);
+export const updatePaymentMethodSchemaWithApiKey = addApiKeyParameter(updatePaymentMethodSchema);
+export const createCheckoutSchemaWithApiKey = addApiKeyParameter(createCheckoutSchema);
+export const getCheckoutsSchemaWithApiKey = addApiKeyParameter(getCheckoutsSchema);
+export const getCheckoutSchemaWithApiKey = addApiKeyParameter(getCheckoutSchema);
+export const updateCheckoutSchemaWithApiKey = addApiKeyParameter(updateCheckoutSchema);
+export const processCheckoutSchemaWithApiKey = addApiKeyParameter(processCheckoutSchema);
+export const getOnetimesSchemaWithApiKey = addApiKeyParameter(getOnetimesSchema);
+export const getOnetimeSchemaWithApiKey = addApiKeyParameter(getOnetimeSchema);
+export const updateOnetimeSchemaWithApiKey = addApiKeyParameter(updateOnetimeSchema);
+export const deleteOnetimeSchemaWithApiKey = addApiKeyParameter(deleteOnetimeSchema);
+export const createOnetimeSchemaWithApiKey = addApiKeyParameter(createOnetimeSchema);
+export const getStoreCreditsSchemaWithApiKey = addApiKeyParameter(getStoreCreditsSchema);
+export const getStoreCreditSchemaWithApiKey = addApiKeyParameter(getStoreCreditSchema);
+export const createStoreCreditSchemaWithApiKey = addApiKeyParameter(createStoreCreditSchema);
+export const updateStoreCreditSchemaWithApiKey = addApiKeyParameter(updateStoreCreditSchema);
+export const skipChargeSchemaWithApiKey = addApiKeyParameter(skipChargeSchema);
+export const processChargeSchemaWithApiKey = addApiKeyParameter(processChargeSchema);
+export const refundChargeSchemaWithApiKey = addApiKeyParameter(refundChargeSchema);
+export const unskipChargeSchemaWithApiKey = addApiKeyParameter(unskipChargeSchema);
+export const delayChargeSchemaWithApiKey = addApiKeyParameter(delayChargeSchema);
+export const skipSubscriptionChargeSchemaWithApiKey = addApiKeyParameter(skipSubscriptionChargeSchema);
+export const unskipSubscriptionChargeSchemaWithApiKey = addApiKeyParameter(unskipSubscriptionChargeSchema);
+export const getShopSchemaWithApiKey = addApiKeyParameter(getShopSchema);
+export const getCollectionsSchemaWithApiKey = addApiKeyParameter(getCollectionsSchema);
+export const getCollectionSchemaWithApiKey = addApiKeyParameter(getCollectionSchema);
+export const getSubscriptionAnalyticsSchemaWithApiKey = addApiKeyParameter(getSubscriptionAnalyticsSchema);
+export const getCustomerAnalyticsSchemaWithApiKey = addApiKeyParameter(getCustomerAnalyticsSchema);
+export const updateOrderSchemaWithApiKey = addApiKeyParameter(updateOrderSchema);
+export const deleteOrderSchemaWithApiKey = addApiKeyParameter(deleteOrderSchema);
+export const cloneOrderSchemaWithApiKey = addApiKeyParameter(cloneOrderSchema);
+export const getCustomerPortalSessionSchemaWithApiKey = addApiKeyParameter(getCustomerPortalSessionSchema);
+export const createCustomerPortalSessionSchemaWithApiKey = addApiKeyParameter(createCustomerPortalSessionSchema);
+export const getBundleSelectionsSchemaWithApiKey = addApiKeyParameter(getBundleSelectionsSchema);
+export const getBundleSelectionSchemaWithApiKey = addApiKeyParameter(getBundleSelectionSchema);
+export const createBundleSelectionSchemaWithApiKey = addApiKeyParameter(createBundleSelectionSchema);
+export const updateBundleSelectionSchemaWithApiKey = addApiKeyParameter(updateBundleSelectionSchema);
+export const deleteBundleSelectionSchemaWithApiKey = addApiKeyParameter(deleteBundleSelectionSchema);
+export const getRetentionStrategiesSchemaWithApiKey = addApiKeyParameter(getRetentionStrategiesSchema);
+export const getRetentionStrategySchemaWithApiKey = addApiKeyParameter(getRetentionStrategySchema);
+export const getAsyncBatchesSchemaWithApiKey = addApiKeyParameter(getAsyncBatchesSchema);
+export const getAsyncBatchSchemaWithApiKey = addApiKeyParameter(getAsyncBatchSchema);
+export const createAsyncBatchSchemaWithApiKey = addApiKeyParameter(createAsyncBatchSchema);
+export const getNotificationsSchemaWithApiKey = addApiKeyParameter(getNotificationsSchema);
+export const getNotificationSchemaWithApiKey = addApiKeyParameter(getNotificationSchema);
