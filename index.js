@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-import { createRequire } from 'module';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { 
@@ -10,8 +9,6 @@ import {
 
 import { RechargeToolHandlers } from './src/tool-handlers.js';
 import * as tools from './src/tools.js';
-
-const require = createRequire(import.meta.url);
 
 // Health check endpoint for deployment platforms
 const healthCheck = () => {
