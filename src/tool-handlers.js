@@ -34,10 +34,8 @@ export class RechargeToolHandlers {
   // Customer handlers
   async handleGetCustomers(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
+      const { api_key: clientApiKey, ...cleanArgs } = args || {};
+      const client = this.getClient(clientApiKey);
       
       // Validate pagination parameters
       if (cleanArgs.limit && (cleanArgs.limit < 1 || cleanArgs.limit > 250)) {
@@ -89,11 +87,13 @@ export class RechargeToolHandlers {
   }
   async handleGetCustomer(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
+      const { api_key: clientApiKey, customer_id, ...cleanArgs } = args || {};
       
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
+      if (!customer_id) {
+        throw new Error('Missing required field: customer_id');
+      }
+
+      const client = this.getClient(clientApiKey);
       
       const result = await client.getCustomer(cleanArgs.customer_id);
       return {
@@ -119,11 +119,13 @@ export class RechargeToolHandlers {
 
   async handleCreateCustomer(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
+      const { api_key: clientApiKey, ...customerData } = args || {};
       
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
+      if (!customerData.email) {
+        throw new Error('Missing required field: email');
+      }
+
+      const client = this.getClient(clientApiKey);
       
       this.validateRequiredFields(cleanArgs, ['email']);
       
@@ -157,11 +159,13 @@ export class RechargeToolHandlers {
 
   async handleUpdateCustomer(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
+      const { api_key: clientApiKey, customer_id, ...customerData } = args || {};
       
-      const { api_key, customer_id, ...updateData } = args || {};
-      const client = this.getClient(api_key);
+      if (!customer_id) {
+        throw new Error('Missing required field: customer_id');
+      }
+
+      const client = this.getClient(clientApiKey);
       
       const result = await client.updateCustomer(customer_id, updateData);
       return {
@@ -188,11 +192,8 @@ export class RechargeToolHandlers {
   // Subscription handlers
   async handleGetSubscriptions(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
+      const { api_key: clientApiKey, ...cleanArgs } = args || {};
+      const client = this.getClient(clientApiKey);
       
       const result = await client.getSubscriptions(cleanArgs);
       return {
@@ -218,11 +219,15 @@ export class RechargeToolHandlers {
 
   async handleCreateSubscription(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
+      const { api_key: clientApiKey, ...subscriptionData } = args || {};
       
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
+      const requiredFields = ['address_id', 'next_charge_scheduled_at', 'order_interval_frequency', 'order_interval_unit', 'quantity', 'shopify_variant_id'];
+      const missingFields = requiredFields.filter(field => !subscriptionData[field]);
+      if (missingFields.length > 0) {
+        throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
+      }
+
+      const client = this.getClient(clientApiKey);
       
       this.validateRequiredFields(cleanArgs, [
         'address_id', 
@@ -273,11 +278,13 @@ export class RechargeToolHandlers {
 
   async handleGetSubscription(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
+      const { api_key: clientApiKey, subscription_id, ...cleanArgs } = args || {};
       
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
+      if (!subscription_id) {
+        throw new Error('Missing required field: subscription_id');
+      }
+
+      const client = this.getClient(clientApiKey);
       
       const result = await client.getSubscription(cleanArgs.subscription_id);
       return {
@@ -303,8 +310,13 @@ export class RechargeToolHandlers {
 
   async handleUpdateSubscription(args) {
     try {
-      const { api_key, subscription_id, ...updateData } = args || {};
-      const client = this.getClient(api_key);
+      const { api_key: clientApiKey, subscription_id, ...subscriptionData } = args || {};
+      
+      if (!subscription_id) {
+        throw new Error('Missing required field: subscription_id');
+      }
+
+      const client = this.getClient(clientApiKey);
       
       const result = await client.updateSubscription(subscription_id, updateData);
       const { subscription_id, ...updateData } = args;
@@ -332,8 +344,13 @@ export class RechargeToolHandlers {
 
   async handleCancelSubscription(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
+      const { api_key: clientApiKey, subscription_id, cancellation_reason, ...cleanArgs } = args || {};
+      
+      if (!subscription_id) {
+        throw new Error('Missing required field: subscription_id');
+      }
+
+      const client = this.getClient(clientApiKey);
       
       const result = await client.cancelSubscription(
         cleanArgs.subscription_id, 
@@ -364,8 +381,13 @@ export class RechargeToolHandlers {
 
   async handleActivateSubscription(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
+      const { api_key: clientApiKey, subscription_id, ...cleanArgs } = args || {};
+      
+      if (!subscription_id) {
+        throw new Error('Missing required field: subscription_id');
+      }
+
+      const client = this.getClient(clientApiKey);
       
       const result = await client.activateSubscription(cleanArgs.subscription_id);
       const client = this.getClient(api_key);
