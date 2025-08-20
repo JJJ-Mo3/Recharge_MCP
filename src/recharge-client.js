@@ -24,6 +24,7 @@ export class RechargeClient {
       'X-Recharge-Access-Token': this.apiKey,
       'Content-Type': 'application/json',
       'Accept': 'application/json',
+      'X-Recharge-Version': '2021-11',
       ...options.headers
     };
 
@@ -378,6 +379,37 @@ export class RechargeClient {
     return this.request(`/notifications/${notificationId}`);
   }
 
+  // Order methods (additional)
+  async updateOrder(orderId, orderData) {
+    return this.request(`/orders/${orderId}`, {
+      method: 'PUT',
+      body: JSON.stringify(orderData)
+    });
+  }
+
+  async deleteOrder(orderId) {
+    return this.request(`/orders/${orderId}`, {
+      method: 'DELETE'
+    });
+  }
+
+  async cloneOrder(orderId) {
+    return this.request(`/orders/${orderId}/clone`, {
+      method: 'POST'
+    });
+  }
+
+  // Customer portal methods
+  async getCustomerPortalSession(customerId) {
+    return this.request(`/customers/${customerId}/portal_session`);
+  }
+
+  async createCustomerPortalSession(customerId, sessionData) {
+    return this.request(`/customers/${customerId}/portal_session`, {
+      method: 'POST',
+      body: JSON.stringify(sessionData)
+    });
+  }
   // Onetimes methods
   async getOnetimes(params = {}) {
     const searchParams = new URLSearchParams(params);

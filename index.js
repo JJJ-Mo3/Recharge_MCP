@@ -139,6 +139,35 @@ class RechargeServer {
           // Analytics tools
           tools.getSubscriptionAnalyticsSchema,
           tools.getCustomerAnalyticsSchema,
+
+          // Order action tools
+          tools.updateOrderSchema,
+          tools.deleteOrderSchema,
+          tools.cloneOrderSchema,
+
+          // Customer portal tools
+          tools.getCustomerPortalSessionSchema,
+          tools.createCustomerPortalSessionSchema,
+
+          // Bundle selection tools
+          tools.getBundleSelectionsSchema,
+          tools.getBundleSelectionSchema,
+          tools.createBundleSelectionSchema,
+          tools.updateBundleSelectionSchema,
+          tools.deleteBundleSelectionSchema,
+
+          // Retention strategy tools
+          tools.getRetentionStrategiesSchema,
+          tools.getRetentionStrategySchema,
+
+          // Async batch tools
+          tools.getAsyncBatchesSchema,
+          tools.getAsyncBatchSchema,
+          tools.createAsyncBatchSchema,
+
+          // Notification tools
+          tools.getNotificationsSchema,
+          tools.getNotificationSchema,
         ],
       };
     });
@@ -312,6 +341,52 @@ class RechargeServer {
             return await this.toolHandlers.handleGetSubscriptionAnalytics(args);
           case 'recharge_get_customer_analytics':
             return await this.toolHandlers.handleGetCustomerAnalytics(args);
+
+          // Order action tools
+          case 'recharge_update_order':
+            return await this.toolHandlers.handleUpdateOrder(args);
+          case 'recharge_delete_order':
+            return await this.toolHandlers.handleDeleteOrder(args);
+          case 'recharge_clone_order':
+            return await this.toolHandlers.handleCloneOrder(args);
+
+          // Customer portal tools
+          case 'recharge_get_customer_portal_session':
+            return await this.toolHandlers.handleGetCustomerPortalSession(args);
+          case 'recharge_create_customer_portal_session':
+            return await this.toolHandlers.handleCreateCustomerPortalSession(args);
+
+          // Bundle selection tools
+          case 'recharge_get_bundle_selections':
+            return await this.toolHandlers.handleGetBundleSelections(args);
+          case 'recharge_get_bundle_selection':
+            return await this.toolHandlers.handleGetBundleSelection(args);
+          case 'recharge_create_bundle_selection':
+            return await this.toolHandlers.handleCreateBundleSelection(args);
+          case 'recharge_update_bundle_selection':
+            return await this.toolHandlers.handleUpdateBundleSelection(args);
+          case 'recharge_delete_bundle_selection':
+            return await this.toolHandlers.handleDeleteBundleSelection(args);
+
+          // Retention strategy tools
+          case 'recharge_get_retention_strategies':
+            return await this.toolHandlers.handleGetRetentionStrategies(args);
+          case 'recharge_get_retention_strategy':
+            return await this.toolHandlers.handleGetRetentionStrategy(args);
+
+          // Async batch tools
+          case 'recharge_get_async_batches':
+            return await this.toolHandlers.handleGetAsyncBatches(args);
+          case 'recharge_get_async_batch':
+            return await this.toolHandlers.handleGetAsyncBatch(args);
+          case 'recharge_create_async_batch':
+            return await this.toolHandlers.handleCreateAsyncBatch(args);
+
+          // Notification tools
+          case 'recharge_get_notifications':
+            return await this.toolHandlers.handleGetNotifications(args);
+          case 'recharge_get_notification':
+            return await this.toolHandlers.handleGetNotification(args);
 
           default:
             throw new Error(`Unknown tool: ${name}`);

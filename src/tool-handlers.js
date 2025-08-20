@@ -1576,4 +1576,421 @@ export class RechargeToolHandlers {
       };
     }
   }
+
+  // Order action handlers
+  async handleUpdateOrder(args) {
+    try {
+      const { order_id, ...updateData } = args;
+      const result = await this.client.updateOrder(order_id, updateData);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error updating order: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
+  async handleDeleteOrder(args) {
+    try {
+      const result = await this.client.deleteOrder(args.order_id);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error deleting order: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
+  async handleCloneOrder(args) {
+    try {
+      const result = await this.client.cloneOrder(args.order_id);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error cloning order: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
+  // Customer portal handlers
+  async handleGetCustomerPortalSession(args) {
+    try {
+      const result = await this.client.getCustomerPortalSession(args.customer_id);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error retrieving customer portal session: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
+  async handleCreateCustomerPortalSession(args) {
+    try {
+      const { customer_id, ...sessionData } = args;
+      const result = await this.client.createCustomerPortalSession(customer_id, sessionData);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error creating customer portal session: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
+  // Bundle selection handlers
+  async handleGetBundleSelections(args) {
+    try {
+      const result = await this.client.getBundleSelections(args);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error retrieving bundle selections: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
+  async handleGetBundleSelection(args) {
+    try {
+      const result = await this.client.getBundleSelection(args.bundle_selection_id);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error retrieving bundle selection: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
+  async handleCreateBundleSelection(args) {
+    try {
+      const result = await this.client.createBundleSelection(args);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error creating bundle selection: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
+  async handleUpdateBundleSelection(args) {
+    try {
+      const { bundle_selection_id, ...updateData } = args;
+      const result = await this.client.updateBundleSelection(bundle_selection_id, updateData);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error updating bundle selection: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
+  async handleDeleteBundleSelection(args) {
+    try {
+      const result = await this.client.deleteBundleSelection(args.bundle_selection_id);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error deleting bundle selection: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
+  // Retention strategy handlers
+  async handleGetRetentionStrategies(args) {
+    try {
+      const result = await this.client.getRetentionStrategies(args);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error retrieving retention strategies: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
+  async handleGetRetentionStrategy(args) {
+    try {
+      const result = await this.client.getRetentionStrategy(args.retention_strategy_id);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error retrieving retention strategy: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
+  // Async batch handlers
+  async handleGetAsyncBatches(args) {
+    try {
+      const result = await this.client.getAsyncBatches(args);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error retrieving async batches: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
+  async handleGetAsyncBatch(args) {
+    try {
+      const result = await this.client.getAsyncBatch(args.async_batch_id);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error retrieving async batch: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
+  async handleCreateAsyncBatch(args) {
+    try {
+      const result = await this.client.createAsyncBatch(args);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error creating async batch: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
+  // Notification handlers
+  async handleGetNotifications(args) {
+    try {
+      const result = await this.client.getNotifications(args);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error retrieving notifications: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
+  async handleGetNotification(args) {
+    try {
+      const result = await this.client.getNotification(args.notification_id);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error retrieving notification: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
 }

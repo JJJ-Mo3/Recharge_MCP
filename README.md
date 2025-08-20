@@ -1,6 +1,6 @@
 # Recharge Payments MCP Server
 
-A Model Context Protocol (MCP) server that provides tools for interacting with the Recharge Payments API. This server enables AI assistants to manage subscriptions, customers, orders, charges, and other Recharge resources.
+A comprehensive Model Context Protocol (MCP) server that provides tools for interacting with the Recharge Payments API v2021-11. This server enables AI assistants to manage subscriptions, customers, orders, charges, and other Recharge resources with full CRUD operations and advanced features.
 
 ## Features
 
@@ -75,6 +75,30 @@ A Model Context Protocol (MCP) server that provides tools for interacting with t
 ### Analytics
 - Get subscription analytics
 - Get customer analytics
+
+### Order Actions
+- Update order details
+- Delete orders
+- Clone existing orders
+
+### Customer Portal
+- Get customer portal session information
+- Create customer portal sessions
+
+### Bundle Selections
+- Get bundle selections for subscriptions
+- Create and manage bundle selections
+
+### Retention Strategies
+- Get retention strategies and configurations
+
+### Async Batches
+- Create and manage batch operations
+- Monitor batch processing status
+
+### Notifications
+- Get customer notifications
+- Retrieve notification details
 
 ## Setup
 
@@ -235,6 +259,35 @@ To use this server with an MCP client, add it to your client's configuration:
 ### Analytics Tools
 - `recharge_get_subscription_analytics` - Get subscription analytics data
 - `recharge_get_customer_analytics` - Get customer analytics data
+
+### Order Action Tools
+- `recharge_update_order` - Update order details
+- `recharge_delete_order` - Delete an order
+- `recharge_clone_order` - Clone an existing order
+
+### Customer Portal Tools
+- `recharge_get_customer_portal_session` - Get customer portal session information
+- `recharge_create_customer_portal_session` - Create a customer portal session
+
+### Bundle Selection Tools
+- `recharge_get_bundle_selections` - Retrieve bundle selections
+- `recharge_get_bundle_selection` - Get a specific bundle selection by ID
+- `recharge_create_bundle_selection` - Create a new bundle selection
+- `recharge_update_bundle_selection` - Update bundle selection details
+- `recharge_delete_bundle_selection` - Delete a bundle selection
+
+### Retention Strategy Tools
+- `recharge_get_retention_strategies` - Retrieve retention strategies
+- `recharge_get_retention_strategy` - Get a specific retention strategy by ID
+
+### Async Batch Tools
+- `recharge_get_async_batches` - Retrieve async batches
+- `recharge_get_async_batch` - Get a specific async batch by ID
+- `recharge_create_async_batch` - Create a new async batch
+
+### Notification Tools
+- `recharge_get_notifications` - Retrieve notifications
+- `recharge_get_notification` - Get a specific notification by ID
 
 ## API Documentation
 
@@ -1051,6 +1104,221 @@ Below are examples of how to use each tool with sample parameters and expected r
 }
 ```
 
+### Order Actions
+
+#### Update Order
+```json
+{
+  "tool": "recharge_update_order",
+  "arguments": {
+    "order_id": "111222",
+    "note": "Updated order note",
+    "shipping_address": {
+      "first_name": "Jane",
+      "last_name": "Smith",
+      "address1": "456 Oak Ave",
+      "city": "Los Angeles",
+      "province": "CA",
+      "country_code": "US",
+      "zip": "90210"
+    }
+  }
+}
+```
+
+#### Delete Order
+```json
+{
+  "tool": "recharge_delete_order",
+  "arguments": {
+    "order_id": "111222"
+  }
+}
+```
+
+#### Clone Order
+```json
+{
+  "tool": "recharge_clone_order",
+  "arguments": {
+    "order_id": "111222"
+  }
+}
+```
+
+### Customer Portal Management
+
+#### Get Customer Portal Session
+```json
+{
+  "tool": "recharge_get_customer_portal_session",
+  "arguments": {
+    "customer_id": "123456"
+  }
+}
+```
+
+#### Create Customer Portal Session
+```json
+{
+  "tool": "recharge_create_customer_portal_session",
+  "arguments": {
+    "customer_id": "123456",
+    "return_url": "https://mystore.com/account"
+  }
+}
+```
+
+### Bundle Selection Management
+
+#### Get Bundle Selections
+```json
+{
+  "tool": "recharge_get_bundle_selections",
+  "arguments": {
+    "limit": 25,
+    "subscription_id": "456789"
+  }
+}
+```
+
+#### Get Single Bundle Selection
+```json
+{
+  "tool": "recharge_get_bundle_selection",
+  "arguments": {
+    "bundle_selection_id": "999888"
+  }
+}
+```
+
+#### Create Bundle Selection
+```json
+{
+  "tool": "recharge_create_bundle_selection",
+  "arguments": {
+    "subscription_id": "456789",
+    "external_product_id": "prod_123",
+    "external_variant_id": "var_456",
+    "quantity": 2
+  }
+}
+```
+
+#### Update Bundle Selection
+```json
+{
+  "tool": "recharge_update_bundle_selection",
+  "arguments": {
+    "bundle_selection_id": "999888",
+    "quantity": 3
+  }
+}
+```
+
+#### Delete Bundle Selection
+```json
+{
+  "tool": "recharge_delete_bundle_selection",
+  "arguments": {
+    "bundle_selection_id": "999888"
+  }
+}
+```
+
+### Retention Strategy Management
+
+#### Get Retention Strategies
+```json
+{
+  "tool": "recharge_get_retention_strategies",
+  "arguments": {
+    "limit": 20
+  }
+}
+```
+
+#### Get Single Retention Strategy
+```json
+{
+  "tool": "recharge_get_retention_strategy",
+  "arguments": {
+    "retention_strategy_id": "ret_123"
+  }
+}
+```
+
+### Async Batch Management
+
+#### Get Async Batches
+```json
+{
+  "tool": "recharge_get_async_batches",
+  "arguments": {
+    "limit": 15
+  }
+}
+```
+
+#### Get Single Async Batch
+```json
+{
+  "tool": "recharge_get_async_batch",
+  "arguments": {
+    "async_batch_id": "batch_456"
+  }
+}
+```
+
+#### Create Async Batch
+```json
+{
+  "tool": "recharge_create_async_batch",
+  "arguments": {
+    "batch_type": "subscription_update",
+    "requests": [
+      {
+        "method": "PUT",
+        "path": "/subscriptions/123",
+        "body": {
+          "quantity": 2
+        }
+      },
+      {
+        "method": "PUT",
+        "path": "/subscriptions/456",
+        "body": {
+          "quantity": 3
+        }
+      }
+    ]
+  }
+}
+```
+
+### Notification Management
+
+#### Get Notifications
+```json
+{
+  "tool": "recharge_get_notifications",
+  "arguments": {
+    "limit": 30,
+    "customer_id": "123456"
+  }
+}
+```
+
+#### Get Single Notification
+```json
+{
+  "tool": "recharge_get_notification",
+  "arguments": {
+    "notification_id": "notif_789"
+  }
+}
+```
+
 ## Response Format
 
 All tools return responses in the following format:
@@ -1104,3 +1372,7 @@ Resources with status fields support filtering:
 4. **Handle errors gracefully** - check the `isError` field in responses
 5. **Validate required fields** before making tool calls
 6. **Use specific IDs** when retrieving individual resources for better performance
+7. **Monitor rate limits** - Recharge has API rate limits that vary by plan
+8. **Use async batches** for bulk operations to improve performance
+9. **Implement proper error handling** for network timeouts and API errors
+10. **Cache frequently accessed data** like product information to reduce API calls

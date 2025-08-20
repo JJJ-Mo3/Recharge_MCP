@@ -1464,6 +1464,311 @@ export const getSubscriptionAnalyticsSchema = {
   }
 };
 
+// Order action tools
+export const updateOrderSchema = {
+  name: 'recharge_update_order',
+  description: 'Update an existing order',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      order_id: {
+        type: 'string',
+        description: 'The order ID'
+      },
+      shipping_address: {
+        type: 'object',
+        description: 'Updated shipping address'
+      },
+      note: {
+        type: 'string',
+        description: 'Order note'
+      }
+    },
+    required: ['order_id']
+  }
+};
+
+export const deleteOrderSchema = {
+  name: 'recharge_delete_order',
+  description: 'Delete an order',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      order_id: {
+        type: 'string',
+        description: 'The order ID'
+      }
+    },
+    required: ['order_id']
+  }
+};
+
+export const cloneOrderSchema = {
+  name: 'recharge_clone_order',
+  description: 'Clone an existing order',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      order_id: {
+        type: 'string',
+        description: 'The order ID to clone'
+      }
+    },
+    required: ['order_id']
+  }
+};
+
+// Customer portal tools
+export const getCustomerPortalSessionSchema = {
+  name: 'recharge_get_customer_portal_session',
+  description: 'Get customer portal session information',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      customer_id: {
+        type: 'string',
+        description: 'The customer ID'
+      }
+    },
+    required: ['customer_id']
+  }
+};
+
+export const createCustomerPortalSessionSchema = {
+  name: 'recharge_create_customer_portal_session',
+  description: 'Create a customer portal session',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      customer_id: {
+        type: 'string',
+        description: 'The customer ID'
+      },
+      return_url: {
+        type: 'string',
+        description: 'URL to redirect to after portal session'
+      }
+    },
+    required: ['customer_id']
+  }
+};
+
+// Bundle selection tools
+export const getBundleSelectionsSchema = {
+  name: 'recharge_get_bundle_selections',
+  description: 'Retrieve bundle selections',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      limit: {
+        type: 'number',
+        description: 'Number of bundle selections to retrieve (max 250)',
+        minimum: 1,
+        maximum: 250
+      },
+      subscription_id: {
+        type: 'string',
+        description: 'Filter by subscription ID'
+      }
+    }
+  }
+};
+
+export const getBundleSelectionSchema = {
+  name: 'recharge_get_bundle_selection',
+  description: 'Retrieve a specific bundle selection by ID',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      bundle_selection_id: {
+        type: 'string',
+        description: 'The bundle selection ID'
+      }
+    },
+    required: ['bundle_selection_id']
+  }
+};
+
+export const createBundleSelectionSchema = {
+  name: 'recharge_create_bundle_selection',
+  description: 'Create a new bundle selection',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      subscription_id: {
+        type: 'string',
+        description: 'The subscription ID'
+      },
+      external_product_id: {
+        type: 'string',
+        description: 'External product ID'
+      },
+      external_variant_id: {
+        type: 'string',
+        description: 'External variant ID'
+      },
+      quantity: {
+        type: 'number',
+        description: 'Quantity'
+      }
+    },
+    required: ['subscription_id', 'external_product_id', 'external_variant_id', 'quantity']
+  }
+};
+
+export const updateBundleSelectionSchema = {
+  name: 'recharge_update_bundle_selection',
+  description: 'Update an existing bundle selection',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      bundle_selection_id: {
+        type: 'string',
+        description: 'The bundle selection ID'
+      },
+      quantity: {
+        type: 'number',
+        description: 'Updated quantity'
+      }
+    },
+    required: ['bundle_selection_id']
+  }
+};
+
+export const deleteBundleSelectionSchema = {
+  name: 'recharge_delete_bundle_selection',
+  description: 'Delete a bundle selection',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      bundle_selection_id: {
+        type: 'string',
+        description: 'The bundle selection ID'
+      }
+    },
+    required: ['bundle_selection_id']
+  }
+};
+
+// Retention strategy tools
+export const getRetentionStrategiesSchema = {
+  name: 'recharge_get_retention_strategies',
+  description: 'Retrieve retention strategies',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      limit: {
+        type: 'number',
+        description: 'Number of retention strategies to retrieve (max 250)',
+        minimum: 1,
+        maximum: 250
+      }
+    }
+  }
+};
+
+export const getRetentionStrategySchema = {
+  name: 'recharge_get_retention_strategy',
+  description: 'Retrieve a specific retention strategy by ID',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      retention_strategy_id: {
+        type: 'string',
+        description: 'The retention strategy ID'
+      }
+    },
+    required: ['retention_strategy_id']
+  }
+};
+
+// Async batch tools
+export const getAsyncBatchesSchema = {
+  name: 'recharge_get_async_batches',
+  description: 'Retrieve async batches',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      limit: {
+        type: 'number',
+        description: 'Number of async batches to retrieve (max 250)',
+        minimum: 1,
+        maximum: 250
+      }
+    }
+  }
+};
+
+export const getAsyncBatchSchema = {
+  name: 'recharge_get_async_batch',
+  description: 'Retrieve a specific async batch by ID',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      async_batch_id: {
+        type: 'string',
+        description: 'The async batch ID'
+      }
+    },
+    required: ['async_batch_id']
+  }
+};
+
+export const createAsyncBatchSchema = {
+  name: 'recharge_create_async_batch',
+  description: 'Create a new async batch',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      batch_type: {
+        type: 'string',
+        description: 'Type of batch operation'
+      },
+      requests: {
+        type: 'array',
+        description: 'Array of batch requests'
+      }
+    },
+    required: ['batch_type', 'requests']
+  }
+};
+
+// Notification tools
+export const getNotificationsSchema = {
+  name: 'recharge_get_notifications',
+  description: 'Retrieve notifications',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      limit: {
+        type: 'number',
+        description: 'Number of notifications to retrieve (max 250)',
+        minimum: 1,
+        maximum: 250
+      },
+      customer_id: {
+        type: 'string',
+        description: 'Filter by customer ID'
+      }
+    }
+  }
+};
+
+export const getNotificationSchema = {
+  name: 'recharge_get_notification',
+  description: 'Retrieve a specific notification by ID',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      notification_id: {
+        type: 'string',
+        description: 'The notification ID'
+      }
+    },
+    required: ['notification_id']
+  }
+};
+
 export const getCustomerAnalyticsSchema = {
   name: 'recharge_get_customer_analytics',
   description: 'Retrieve customer analytics',
@@ -1480,4 +1785,3 @@ export const getCustomerAnalyticsSchema = {
       }
     }
   }
-};
