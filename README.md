@@ -262,6 +262,63 @@ You can also add the MCP server configuration to your workspace settings by crea
 
 **Note**: Make sure to use the absolute path to the `index.js` file in your Cursor configuration.
 
+### VSCode with GitHub Copilot Configuration
+
+VSCode with GitHub Copilot supports MCP servers through the Copilot extension. Here's how to configure it:
+
+1. **Install GitHub Copilot Extension**: Make sure you have the GitHub Copilot extension installed and activated in VSCode
+
+2. **Open VSCode Settings**: Go to `File > Preferences > Settings` (Windows/Linux) or `Code > Settings > Settings` (macOS)
+
+3. **Navigate to Copilot Settings**: Search for "copilot" in the settings search bar
+
+4. **Configure MCP Servers**: Look for "GitHub Copilot: MCP Servers" or similar setting, or edit your `settings.json` directly
+
+5. **Add Server Configuration** in your VSCode `settings.json`:
+```json
+{
+  "github.copilot.mcpServers": {
+    "recharge": {
+      "command": "node",
+      "args": ["/absolute/path/to/recharge-mcp-server/index.js"],
+      "env": {
+        "RECHARGE_API_KEY": "your_api_key_here"
+      }
+    }
+  }
+}
+```
+
+6. **Alternative: Workspace Configuration**
+
+You can also add the configuration to your workspace settings by creating or editing `.vscode/settings.json` in your project root:
+
+```json
+{
+  "github.copilot.mcpServers": {
+    "recharge": {
+      "command": "node",
+      "args": ["/absolute/path/to/recharge-mcp-server/index.js"],
+      "env": {
+        "RECHARGE_API_KEY": "your_api_key_here"
+      }
+    }
+  }
+}
+```
+
+7. **Restart VSCode**: After adding the configuration, restart VSCode to ensure the MCP server is properly loaded
+
+8. **Verify Configuration**: You can verify the MCP server is working by:
+   - Opening the Command Palette (`Ctrl+Shift+P` or `Cmd+Shift+P`)
+   - Looking for Copilot-related commands that might show MCP server status
+   - Checking the Output panel for any MCP-related logs
+
+**Notes**: 
+- Make sure to use the absolute path to the `index.js` file
+- The exact setting name may vary depending on your Copilot extension version
+- Some versions of the Copilot extension may use different configuration keys
+
 ### Other MCP Clients
 
 For other MCP-compatible clients, configure them to run this server as a local process using the Node.js command with the path to `index.js`.
