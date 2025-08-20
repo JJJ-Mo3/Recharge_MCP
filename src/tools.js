@@ -1785,4 +1785,4 @@ export const getCustomerAnalyticsSchema = {
       }
     }
   }
-}
+};
