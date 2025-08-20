@@ -1786,21 +1786,3 @@ export const getNotificationSchema = {
     required: ['notification_id']
   }
 };
-
-export const getCustomerAnalyticsSchema = {
-  name: 'recharge_get_customer_analytics',
-  description: 'Retrieve customer analytics',
-  inputSchema: {
-    type: 'object',
-    properties: {
-      start_date: {
-        type: 'string',
-        description: 'Start date for analytics (YYYY-MM-DD)'
-      },
-      end_date: {
-        type: 'string',
-        description: 'End date for analytics (YYYY-MM-DD)'
-      }
-    }
-  }
-};
