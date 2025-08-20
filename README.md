@@ -264,3 +264,843 @@ Recharge API has rate limits. The server doesn't implement client-side rate limi
 ## License
 
 MIT License - see LICENSE file for details.
+
+## Sample Usage
+
+Below are examples of how to use each tool with sample parameters and expected responses.
+
+### Customer Management
+
+#### Get Customers
+```json
+{
+  "tool": "recharge_get_customers",
+  "arguments": {
+    "limit": 10,
+    "email": "customer@example.com",
+    "created_at_min": "2024-01-01T00:00:00Z"
+  }
+}
+```
+
+#### Get Single Customer
+```json
+{
+  "tool": "recharge_get_customer",
+  "arguments": {
+    "customer_id": "123456"
+  }
+}
+```
+
+#### Create Customer
+```json
+{
+  "tool": "recharge_create_customer",
+  "arguments": {
+    "email": "newcustomer@example.com",
+    "first_name": "John",
+    "last_name": "Doe",
+    "phone": "+1234567890"
+  }
+}
+```
+
+#### Update Customer
+```json
+{
+  "tool": "recharge_update_customer",
+  "arguments": {
+    "customer_id": "123456",
+    "first_name": "Jane",
+    "phone": "+0987654321"
+  }
+}
+```
+
+### Subscription Management
+
+#### Get Subscriptions
+```json
+{
+  "tool": "recharge_get_subscriptions",
+  "arguments": {
+    "limit": 25,
+    "customer_id": "123456",
+    "status": "active"
+  }
+}
+```
+
+#### Create Subscription
+```json
+{
+  "tool": "recharge_create_subscription",
+  "arguments": {
+    "address_id": "789012",
+    "next_charge_scheduled_at": "2024-02-01T00:00:00Z",
+    "order_interval_frequency": "1",
+    "order_interval_unit": "month",
+    "quantity": 2,
+    "shopify_variant_id": "345678"
+  }
+}
+```
+
+#### Get Single Subscription
+```json
+{
+  "tool": "recharge_get_subscription",
+  "arguments": {
+    "subscription_id": "456789"
+  }
+}
+```
+
+#### Update Subscription
+```json
+{
+  "tool": "recharge_update_subscription",
+  "arguments": {
+    "subscription_id": "456789",
+    "quantity": 3,
+    "order_interval_frequency": "2",
+    "next_charge_scheduled_at": "2024-03-01T00:00:00Z"
+  }
+}
+```
+
+#### Cancel Subscription
+```json
+{
+  "tool": "recharge_cancel_subscription",
+  "arguments": {
+    "subscription_id": "456789",
+    "cancellation_reason": "Customer requested cancellation"
+  }
+}
+```
+
+#### Activate Subscription
+```json
+{
+  "tool": "recharge_activate_subscription",
+  "arguments": {
+    "subscription_id": "456789"
+  }
+}
+```
+
+### Product Management
+
+#### Get Products
+```json
+{
+  "tool": "recharge_get_products",
+  "arguments": {
+    "limit": 50,
+    "title": "Coffee Subscription"
+  }
+}
+```
+
+#### Get Single Product
+```json
+{
+  "tool": "recharge_get_product",
+  "arguments": {
+    "product_id": "987654"
+  }
+}
+```
+
+### Order Management
+
+#### Get Orders
+```json
+{
+  "tool": "recharge_get_orders",
+  "arguments": {
+    "limit": 20,
+    "customer_id": "123456",
+    "status": "success",
+    "created_at_min": "2024-01-01T00:00:00Z"
+  }
+}
+```
+
+#### Get Single Order
+```json
+{
+  "tool": "recharge_get_order",
+  "arguments": {
+    "order_id": "111222"
+  }
+}
+```
+
+### Charge Management
+
+#### Get Charges
+```json
+{
+  "tool": "recharge_get_charges",
+  "arguments": {
+    "limit": 30,
+    "customer_id": "123456",
+    "subscription_id": "456789",
+    "status": "success"
+  }
+}
+```
+
+#### Get Single Charge
+```json
+{
+  "tool": "recharge_get_charge",
+  "arguments": {
+    "charge_id": "333444"
+  }
+}
+```
+
+### Address Management
+
+#### Get Addresses
+```json
+{
+  "tool": "recharge_get_addresses",
+  "arguments": {
+    "limit": 15,
+    "customer_id": "123456"
+  }
+}
+```
+
+#### Get Single Address
+```json
+{
+  "tool": "recharge_get_address",
+  "arguments": {
+    "address_id": "789012"
+  }
+}
+```
+
+#### Create Address
+```json
+{
+  "tool": "recharge_create_address",
+  "arguments": {
+    "customer_id": "123456",
+    "first_name": "John",
+    "last_name": "Doe",
+    "address1": "123 Main St",
+    "city": "New York",
+    "province": "NY",
+    "country_code": "US",
+    "zip": "10001",
+    "phone": "+1234567890"
+  }
+}
+```
+
+#### Update Address
+```json
+{
+  "tool": "recharge_update_address",
+  "arguments": {
+    "address_id": "789012",
+    "address1": "456 Oak Ave",
+    "city": "Los Angeles",
+    "province": "CA",
+    "zip": "90210"
+  }
+}
+```
+
+### Discount Management
+
+#### Get Discounts
+```json
+{
+  "tool": "recharge_get_discounts",
+  "arguments": {
+    "limit": 25,
+    "status": "enabled"
+  }
+}
+```
+
+#### Get Single Discount
+```json
+{
+  "tool": "recharge_get_discount",
+  "arguments": {
+    "discount_id": "555666"
+  }
+}
+```
+
+#### Create Discount
+```json
+{
+  "tool": "recharge_create_discount",
+  "arguments": {
+    "code": "SAVE20",
+    "value": 20,
+    "value_type": "percentage",
+    "status": "enabled",
+    "usage_limit": 100,
+    "applies_to": "checkout"
+  }
+}
+```
+
+#### Update Discount
+```json
+{
+  "tool": "recharge_update_discount",
+  "arguments": {
+    "discount_id": "555666",
+    "value": 25,
+    "usage_limit": 50,
+    "status": "disabled"
+  }
+}
+```
+
+#### Delete Discount
+```json
+{
+  "tool": "recharge_delete_discount",
+  "arguments": {
+    "discount_id": "555666"
+  }
+}
+```
+
+### Metafield Management
+
+#### Get Metafields
+```json
+{
+  "tool": "recharge_get_metafields",
+  "arguments": {
+    "limit": 20,
+    "owner_resource": "customer",
+    "owner_id": "123456"
+  }
+}
+```
+
+#### Get Single Metafield
+```json
+{
+  "tool": "recharge_get_metafield",
+  "arguments": {
+    "metafield_id": "777888"
+  }
+}
+```
+
+#### Create Metafield
+```json
+{
+  "tool": "recharge_create_metafield",
+  "arguments": {
+    "namespace": "custom",
+    "key": "preferred_delivery_time",
+    "value": "morning",
+    "value_type": "string",
+    "owner_resource": "customer",
+    "owner_id": "123456"
+  }
+}
+```
+
+#### Update Metafield
+```json
+{
+  "tool": "recharge_update_metafield",
+  "arguments": {
+    "metafield_id": "777888",
+    "value": "evening",
+    "key": "preferred_delivery_time"
+  }
+}
+```
+
+#### Delete Metafield
+```json
+{
+  "tool": "recharge_delete_metafield",
+  "arguments": {
+    "metafield_id": "777888"
+  }
+}
+```
+
+### Webhook Management
+
+#### Get Webhooks
+```json
+{
+  "tool": "recharge_get_webhooks",
+  "arguments": {
+    "limit": 10
+  }
+}
+```
+
+#### Get Single Webhook
+```json
+{
+  "tool": "recharge_get_webhook",
+  "arguments": {
+    "webhook_id": "999000"
+  }
+}
+```
+
+#### Create Webhook
+```json
+{
+  "tool": "recharge_create_webhook",
+  "arguments": {
+    "address": "https://myapp.com/webhooks/recharge",
+    "topic": "subscription/created"
+  }
+}
+```
+
+#### Update Webhook
+```json
+{
+  "tool": "recharge_update_webhook",
+  "arguments": {
+    "webhook_id": "999000",
+    "address": "https://myapp.com/webhooks/recharge/v2",
+    "topic": "subscription/updated"
+  }
+}
+```
+
+#### Delete Webhook
+```json
+{
+  "tool": "recharge_delete_webhook",
+  "arguments": {
+    "webhook_id": "999000"
+  }
+}
+```
+
+### Payment Method Management
+
+#### Get Payment Methods
+```json
+{
+  "tool": "recharge_get_payment_methods",
+  "arguments": {
+    "limit": 15,
+    "customer_id": "123456"
+  }
+}
+```
+
+#### Get Single Payment Method
+```json
+{
+  "tool": "recharge_get_payment_method",
+  "arguments": {
+    "payment_method_id": "111333"
+  }
+}
+```
+
+#### Update Payment Method
+```json
+{
+  "tool": "recharge_update_payment_method",
+  "arguments": {
+    "payment_method_id": "111333",
+    "billing_address": {
+      "first_name": "Jane",
+      "last_name": "Smith",
+      "address1": "789 Pine St",
+      "city": "Seattle",
+      "province": "WA",
+      "country_code": "US",
+      "zip": "98101"
+    }
+  }
+}
+```
+
+### Checkout Management
+
+#### Get Checkouts
+```json
+{
+  "tool": "recharge_get_checkouts",
+  "arguments": {
+    "limit": 20
+  }
+}
+```
+
+#### Get Single Checkout
+```json
+{
+  "tool": "recharge_get_checkout",
+  "arguments": {
+    "checkout_token": "abc123def456"
+  }
+}
+```
+
+#### Create Checkout
+```json
+{
+  "tool": "recharge_create_checkout",
+  "arguments": {
+    "line_items": [
+      {
+        "variant_id": "345678",
+        "quantity": 2
+      },
+      {
+        "variant_id": "987654",
+        "quantity": 1
+      }
+    ],
+    "email": "customer@example.com"
+  }
+}
+```
+
+#### Update Checkout
+```json
+{
+  "tool": "recharge_update_checkout",
+  "arguments": {
+    "checkout_token": "abc123def456",
+    "line_items": [
+      {
+        "variant_id": "345678",
+        "quantity": 3
+      }
+    ],
+    "email": "updated@example.com"
+  }
+}
+```
+
+#### Process Checkout
+```json
+{
+  "tool": "recharge_process_checkout",
+  "arguments": {
+    "checkout_token": "abc123def456"
+  }
+}
+```
+
+### One-time Product Management
+
+#### Get One-time Products
+```json
+{
+  "tool": "recharge_get_onetimes",
+  "arguments": {
+    "limit": 25,
+    "address_id": "789012"
+  }
+}
+```
+
+#### Get Single One-time Product
+```json
+{
+  "tool": "recharge_get_onetime",
+  "arguments": {
+    "onetime_id": "222444"
+  }
+}
+```
+
+#### Create One-time Product
+```json
+{
+  "tool": "recharge_create_onetime",
+  "arguments": {
+    "address_id": "789012",
+    "next_charge_scheduled_at": "2024-02-15T00:00:00Z",
+    "product_title": "Special Edition Coffee",
+    "variant_title": "Medium Roast",
+    "price": "24.99",
+    "quantity": 1,
+    "shopify_variant_id": "567890"
+  }
+}
+```
+
+#### Update One-time Product
+```json
+{
+  "tool": "recharge_update_onetime",
+  "arguments": {
+    "onetime_id": "222444",
+    "quantity": 2,
+    "price": "19.99",
+    "next_charge_scheduled_at": "2024-03-01T00:00:00Z"
+  }
+}
+```
+
+#### Delete One-time Product
+```json
+{
+  "tool": "recharge_delete_onetime",
+  "arguments": {
+    "onetime_id": "222444"
+  }
+}
+```
+
+### Store Credit Management
+
+#### Get Store Credits
+```json
+{
+  "tool": "recharge_get_store_credits",
+  "arguments": {
+    "limit": 30,
+    "customer_id": "123456"
+  }
+}
+```
+
+#### Get Single Store Credit
+```json
+{
+  "tool": "recharge_get_store_credit",
+  "arguments": {
+    "store_credit_id": "666777"
+  }
+}
+```
+
+#### Create Store Credit
+```json
+{
+  "tool": "recharge_create_store_credit",
+  "arguments": {
+    "amount": "50.00",
+    "customer_id": "123456",
+    "note": "Refund for damaged product"
+  }
+}
+```
+
+#### Update Store Credit
+```json
+{
+  "tool": "recharge_update_store_credit",
+  "arguments": {
+    "store_credit_id": "666777",
+    "amount": "75.00",
+    "note": "Updated refund amount"
+  }
+}
+```
+
+### Charge Actions
+
+#### Skip Charge
+```json
+{
+  "tool": "recharge_skip_charge",
+  "arguments": {
+    "charge_id": "333444"
+  }
+}
+```
+
+#### Process Charge
+```json
+{
+  "tool": "recharge_process_charge",
+  "arguments": {
+    "charge_id": "333444"
+  }
+}
+```
+
+#### Unskip Charge
+```json
+{
+  "tool": "recharge_unskip_charge",
+  "arguments": {
+    "charge_id": "333444"
+  }
+}
+```
+
+#### Delay Charge
+```json
+{
+  "tool": "recharge_delay_charge",
+  "arguments": {
+    "charge_id": "333444",
+    "date": "2024-03-15T00:00:00Z"
+  }
+}
+```
+
+#### Refund Charge
+```json
+{
+  "tool": "recharge_refund_charge",
+  "arguments": {
+    "charge_id": "333444",
+    "amount": "25.99",
+    "reason": "Product defect"
+  }
+}
+```
+
+### Subscription Actions
+
+#### Skip Subscription Charge
+```json
+{
+  "tool": "recharge_skip_subscription_charge",
+  "arguments": {
+    "subscription_id": "456789",
+    "charge_date": "2024-02-01T00:00:00Z"
+  }
+}
+```
+
+#### Unskip Subscription Charge
+```json
+{
+  "tool": "recharge_unskip_subscription_charge",
+  "arguments": {
+    "subscription_id": "456789",
+    "charge_date": "2024-02-01T00:00:00Z"
+  }
+}
+```
+
+### Shop Information
+
+#### Get Shop
+```json
+{
+  "tool": "recharge_get_shop",
+  "arguments": {}
+}
+```
+
+### Collection Management
+
+#### Get Collections
+```json
+{
+  "tool": "recharge_get_collections",
+  "arguments": {
+    "limit": 40
+  }
+}
+```
+
+#### Get Single Collection
+```json
+{
+  "tool": "recharge_get_collection",
+  "arguments": {
+    "collection_id": "888999"
+  }
+}
+```
+
+### Analytics
+
+#### Get Subscription Analytics
+```json
+{
+  "tool": "recharge_get_subscription_analytics",
+  "arguments": {
+    "start_date": "2024-01-01",
+    "end_date": "2024-01-31"
+  }
+}
+```
+
+#### Get Customer Analytics
+```json
+{
+  "tool": "recharge_get_customer_analytics",
+  "arguments": {
+    "start_date": "2024-01-01",
+    "end_date": "2024-01-31"
+  }
+}
+```
+
+## Response Format
+
+All tools return responses in the following format:
+
+### Success Response
+```json
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\"customer\": {\"id\": 123456, \"email\": \"customer@example.com\", ...}}"
+    }
+  ]
+}
+```
+
+### Error Response
+```json
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "Error retrieving customer: Customer not found"
+    }
+  ],
+  "isError": true
+}
+```
+
+## Common Parameters
+
+### Pagination
+Most list endpoints support pagination:
+- `limit`: Number of items to return (max 250)
+- `page`: Page number for pagination
+
+### Date Filtering
+Many endpoints support date filtering:
+- `created_at_min`: Filter items created after this date (ISO 8601)
+- `created_at_max`: Filter items created before this date (ISO 8601)
+
+### Status Filtering
+Resources with status fields support filtering:
+- `status`: Filter by status (varies by resource type)
+
+## Best Practices
+
+1. **Use pagination** for large datasets to avoid timeouts
+2. **Filter by customer_id** when possible to reduce response size
+3. **Use date ranges** for analytics and reporting queries
+4. **Handle errors gracefully** - check the `isError` field in responses
+5. **Validate required fields** before making tool calls
+6. **Use specific IDs** when retrieving individual resources for better performance
