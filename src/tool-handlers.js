@@ -4,53 +4,38 @@ import { RechargeClient } from './recharge-client.js';
  * Tool handlers for Recharge MCP server
  */
 export class RechargeToolHandlers {
-  constructor(apiKey = null) {
-    try {
-      this.client = new RechargeClient(apiKey);
-    } catch (error) {
-      // If no API key is provided, we'll create the client when needed
-      this.client = null;
-      this.apiKey = apiKey;
-    }
+  constructor(defaultApiKey = null) {
+    this.defaultApiKey = defaultApiKey;
   }
 
-  // Helper method to ensure we have a valid client
-  getClient(providedApiKey = null) {
-    const keyToUse = providedApiKey || this.apiKey || process.env.RECHARGE_API_KEY;
-    
-    if (!keyToUse) {
-      throw new Error('API key is required. Provide it via api_key parameter, constructor, or RECHARGE_API_KEY environment variable');
+  /**
+   * Get or create a Recharge client with the appropriate API key
+   */
+  getClient(clientApiKey = null) {
+    const apiKey = clientApiKey || this.defaultApiKey;
+    if (!apiKey) {
+      throw new Error('API key is required. Provide it via constructor parameter, RECHARGE_API_KEY environment variable, or as api_key parameter in tool calls');
     }
+    return new RechargeClient(apiKey);
+  }
 
-    // If we have a client and the key matches, reuse it
-    if (this.client && this.client.apiKey === keyToUse) {
-      return this.client;
+  /**
+   * Validate required fields
+   */
+  validateRequired(args, requiredFields) {
+    const missing = requiredFields.filter(field => !args[field]);
+    if (missing.length > 0) {
+      throw new Error(`Missing required fields: ${missing.join(', ')}`);
     }
-
-    // Create new client with the provided key
-    return new RechargeClient(keyToUse);
   }
 
   // Customer handlers
   async handleGetCustomers(args) {
     try {
-      const { api_key: clientApiKey, ...cleanArgs } = args || {};
+      const { api_key: clientApiKey, ...params } = args;
       const client = this.getClient(clientApiKey);
+      const result = await client.getCustomers(params);
       
-      // Validate pagination parameters
-      if (cleanArgs.limit && (cleanArgs.limit < 1 || cleanArgs.limit > 250)) {
-        throw new Error('Limit must be between 1 and 250');
-      }
-      
-      // Validate date format if provided
-      if (cleanArgs.created_at_min && !this.isValidISODate(cleanArgs.created_at_min)) {
-        throw new Error('created_at_min must be in ISO 8601 format');
-      }
-      if (cleanArgs.created_at_max && !this.isValidISODate(cleanArgs.created_at_max)) {
-        throw new Error('created_at_max must be in ISO 8601 format');
-      }
-      
-      const result = await client.getCustomers(cleanArgs);
       return {
         content: [
           {
@@ -72,30 +57,13 @@ export class RechargeToolHandlers {
     }
   }
 
-  // Helper method to validate ISO date format
-  isValidISODate(dateString) {
-    const date = new Date(dateString);
-    return date instanceof Date && !isNaN(date) && dateString.includes('T');
-  }
-
-  // Helper method to validate required fields
-  validateRequiredFields(args, requiredFields) {
-    const missing = requiredFields.filter(field => !args[field]);
-    if (missing.length > 0) {
-      throw new Error(`Missing required fields: ${missing.join(', ')}`);
-    }
-  }
   async handleGetCustomer(args) {
     try {
-      const { api_key: clientApiKey, customer_id, ...cleanArgs } = args || {};
-      
-      if (!customer_id) {
-        throw new Error('Missing required field: customer_id');
-      }
-
+      this.validateRequired(args, ['customer_id']);
+      const { api_key: clientApiKey, ...params } = args;
       const client = this.getClient(clientApiKey);
+      const result = await client.getCustomer(params.customer_id);
       
-      const result = await client.getCustomer(cleanArgs.customer_id);
       return {
         content: [
           {
@@ -119,23 +87,11 @@ export class RechargeToolHandlers {
 
   async handleCreateCustomer(args) {
     try {
-      const { api_key: clientApiKey, ...customerData } = args || {};
-      
-      if (!customerData.email) {
-        throw new Error('Missing required field: email');
-      }
-
+      this.validateRequired(args, ['email']);
+      const { api_key: clientApiKey, ...customerData } = args;
       const client = this.getClient(clientApiKey);
+      const result = await client.createCustomer(customerData);
       
-      this.validateRequiredFields(cleanArgs, ['email']);
-      
-      // Validate email format
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(cleanArgs.email)) {
-        throw new Error('Invalid email format');
-      }
-      
-      const result = await client.createCustomer(cleanArgs);
       return {
         content: [
           {
@@ -159,15 +115,11 @@ export class RechargeToolHandlers {
 
   async handleUpdateCustomer(args) {
     try {
-      const { api_key: clientApiKey, customer_id, ...customerData } = args || {};
-      
-      if (!customer_id) {
-        throw new Error('Missing required field: customer_id');
-      }
-
+      this.validateRequired(args, ['customer_id']);
+      const { api_key: clientApiKey, customer_id, ...customerData } = args;
       const client = this.getClient(clientApiKey);
+      const result = await client.updateCustomer(customer_id, customerData);
       
-      const result = await client.updateCustomer(customer_id, updateData);
       return {
         content: [
           {
@@ -192,10 +144,10 @@ export class RechargeToolHandlers {
   // Subscription handlers
   async handleGetSubscriptions(args) {
     try {
-      const { api_key: clientApiKey, ...cleanArgs } = args || {};
+      const { api_key: clientApiKey, ...params } = args;
       const client = this.getClient(clientApiKey);
+      const result = await client.getSubscriptions(params);
       
-      const result = await client.getSubscriptions(cleanArgs);
       return {
         content: [
           {
@@ -219,42 +171,11 @@ export class RechargeToolHandlers {
 
   async handleCreateSubscription(args) {
     try {
-      const { api_key: clientApiKey, ...subscriptionData } = args || {};
-      
-      const requiredFields = ['address_id', 'next_charge_scheduled_at', 'order_interval_frequency', 'order_interval_unit', 'quantity', 'shopify_variant_id'];
-      const missingFields = requiredFields.filter(field => !subscriptionData[field]);
-      if (missingFields.length > 0) {
-        throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
-      }
-
+      this.validateRequired(args, ['address_id', 'next_charge_scheduled_at', 'order_interval_frequency', 'order_interval_unit', 'quantity', 'shopify_variant_id']);
+      const { api_key: clientApiKey, ...subscriptionData } = args;
       const client = this.getClient(clientApiKey);
+      const result = await client.createSubscription(subscriptionData);
       
-      this.validateRequiredFields(cleanArgs, [
-        'address_id', 
-        'next_charge_scheduled_at', 
-        'order_interval_frequency', 
-        'order_interval_unit', 
-        'quantity', 
-        'shopify_variant_id'
-      ]);
-      
-      // Validate interval unit
-      const validUnits = ['day', 'week', 'month'];
-      if (!validUnits.includes(cleanArgs.order_interval_unit)) {
-        throw new Error(`Invalid order_interval_unit. Must be one of: ${validUnits.join(', ')}`);
-      }
-      
-      // Validate quantity
-      if (cleanArgs.quantity < 1) {
-        throw new Error('Quantity must be at least 1');
-      }
-      
-      // Validate date format
-      if (!this.isValidISODate(cleanArgs.next_charge_scheduled_at)) {
-        throw new Error('next_charge_scheduled_at must be in ISO 8601 format');
-      }
-      
-      const result = await client.createSubscription(cleanArgs);
       return {
         content: [
           {
@@ -278,15 +199,11 @@ export class RechargeToolHandlers {
 
   async handleGetSubscription(args) {
     try {
-      const { api_key: clientApiKey, subscription_id, ...cleanArgs } = args || {};
-      
-      if (!subscription_id) {
-        throw new Error('Missing required field: subscription_id');
-      }
-
+      this.validateRequired(args, ['subscription_id']);
+      const { api_key: clientApiKey, ...params } = args;
       const client = this.getClient(clientApiKey);
+      const result = await client.getSubscription(params.subscription_id);
       
-      const result = await client.getSubscription(cleanArgs.subscription_id);
       return {
         content: [
           {
@@ -310,17 +227,11 @@ export class RechargeToolHandlers {
 
   async handleUpdateSubscription(args) {
     try {
-      const { api_key: clientApiKey, subscription_id, ...subscriptionData } = args || {};
-      
-      if (!subscription_id) {
-        throw new Error('Missing required field: subscription_id');
-      }
-
+      this.validateRequired(args, ['subscription_id']);
+      const { api_key: clientApiKey, subscription_id, ...subscriptionData } = args;
       const client = this.getClient(clientApiKey);
+      const result = await client.updateSubscription(subscription_id, subscriptionData);
       
-      const result = await client.updateSubscription(subscription_id, updateData);
-      const { subscription_id, ...updateData } = args;
-      const result = await client.updateSubscription(subscription_id, updateData);
       return {
         content: [
           {
@@ -344,20 +255,11 @@ export class RechargeToolHandlers {
 
   async handleCancelSubscription(args) {
     try {
-      const { api_key: clientApiKey, subscription_id, cancellation_reason, ...cleanArgs } = args || {};
-      
-      if (!subscription_id) {
-        throw new Error('Missing required field: subscription_id');
-      }
-
+      this.validateRequired(args, ['subscription_id']);
+      const { api_key: clientApiKey, subscription_id, cancellation_reason = '' } = args;
       const client = this.getClient(clientApiKey);
+      const result = await client.cancelSubscription(subscription_id, cancellation_reason);
       
-      const result = await client.cancelSubscription(
-        cleanArgs.subscription_id, 
-        cleanArgs.cancellation_reason || ''
-        cleanArgs.subscription_id, 
-        cleanArgs.cancellation_reason || ''
-      );
       return {
         content: [
           {
@@ -381,17 +283,11 @@ export class RechargeToolHandlers {
 
   async handleActivateSubscription(args) {
     try {
-      const { api_key: clientApiKey, subscription_id, ...cleanArgs } = args || {};
-      
-      if (!subscription_id) {
-        throw new Error('Missing required field: subscription_id');
-      }
-
+      this.validateRequired(args, ['subscription_id']);
+      const { api_key: clientApiKey, subscription_id } = args;
       const client = this.getClient(clientApiKey);
+      const result = await client.activateSubscription(subscription_id);
       
-      const result = await client.activateSubscription(cleanArgs.subscription_id);
-      const client = this.getClient(api_key);
-      const result = await client.activateSubscription(cleanArgs.subscription_id);
       return {
         content: [
           {
@@ -416,9 +312,10 @@ export class RechargeToolHandlers {
   // Product handlers
   async handleGetProducts(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.getProducts(args);
+      const { api_key: clientApiKey, ...params } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.getProducts(params);
+      
       return {
         content: [
           {
@@ -442,9 +339,11 @@ export class RechargeToolHandlers {
 
   async handleGetProduct(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.getProduct(cleanArgs.product_id);
+      this.validateRequired(args, ['product_id']);
+      const { api_key: clientApiKey, ...params } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.getProduct(params.product_id);
+      
       return {
         content: [
           {
@@ -469,9 +368,10 @@ export class RechargeToolHandlers {
   // Order handlers
   async handleGetOrders(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.getOrders(args);
+      const { api_key: clientApiKey, ...params } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.getOrders(params);
+      
       return {
         content: [
           {
@@ -495,9 +395,11 @@ export class RechargeToolHandlers {
 
   async handleGetOrder(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.getOrder(cleanArgs.order_id);
+      this.validateRequired(args, ['order_id']);
+      const { api_key: clientApiKey, ...params } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.getOrder(params.order_id);
+      
       return {
         content: [
           {
@@ -519,12 +421,97 @@ export class RechargeToolHandlers {
     }
   }
 
+  async handleUpdateOrder(args) {
+    try {
+      this.validateRequired(args, ['order_id']);
+      const { api_key: clientApiKey, order_id, ...orderData } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.updateOrder(order_id, orderData);
+      
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error updating order: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
+  async handleDeleteOrder(args) {
+    try {
+      this.validateRequired(args, ['order_id']);
+      const { api_key: clientApiKey, order_id } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.deleteOrder(order_id);
+      
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error deleting order: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
+  async handleCloneOrder(args) {
+    try {
+      this.validateRequired(args, ['order_id']);
+      const { api_key: clientApiKey, order_id } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.cloneOrder(order_id);
+      
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error cloning order: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
   // Charge handlers
   async handleGetCharges(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.getCharges(args);
+      const { api_key: clientApiKey, ...params } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.getCharges(params);
+      
       return {
         content: [
           {
@@ -548,9 +535,11 @@ export class RechargeToolHandlers {
 
   async handleGetCharge(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.getCharge(cleanArgs.charge_id);
+      this.validateRequired(args, ['charge_id']);
+      const { api_key: clientApiKey, ...params } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.getCharge(params.charge_id);
+      
       return {
         content: [
           {
@@ -572,12 +561,155 @@ export class RechargeToolHandlers {
     }
   }
 
+  async handleSkipCharge(args) {
+    try {
+      this.validateRequired(args, ['charge_id']);
+      const { api_key: clientApiKey, charge_id } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.skipCharge(charge_id);
+      
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error skipping charge: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
+  async handleProcessCharge(args) {
+    try {
+      this.validateRequired(args, ['charge_id']);
+      const { api_key: clientApiKey, charge_id } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.processCharge(charge_id);
+      
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error processing charge: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
+  async handleUnskipCharge(args) {
+    try {
+      this.validateRequired(args, ['charge_id']);
+      const { api_key: clientApiKey, charge_id } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.unskipCharge(charge_id);
+      
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error unskipping charge: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
+  async handleDelayCharge(args) {
+    try {
+      this.validateRequired(args, ['charge_id', 'date']);
+      const { api_key: clientApiKey, charge_id, date } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.delayCharge(charge_id, { date });
+      
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error delaying charge: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
+  async handleRefundCharge(args) {
+    try {
+      this.validateRequired(args, ['charge_id', 'amount']);
+      const { api_key: clientApiKey, charge_id, amount, reason } = args;
+      const client = this.getClient(clientApiKey);
+      const refundData = { amount };
+      if (reason) refundData.reason = reason;
+      const result = await client.refundCharge(charge_id, refundData);
+      
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error refunding charge: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
   // Address handlers
   async handleGetAddresses(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.getAddresses(args);
+      const { api_key: clientApiKey, ...params } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.getAddresses(params);
+      
       return {
         content: [
           {
@@ -601,9 +733,11 @@ export class RechargeToolHandlers {
 
   async handleGetAddress(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.getAddress(cleanArgs.address_id);
+      this.validateRequired(args, ['address_id']);
+      const { api_key: clientApiKey, ...params } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.getAddress(params.address_id);
+      
       return {
         content: [
           {
@@ -625,38 +759,13 @@ export class RechargeToolHandlers {
     }
   }
 
-  async handleUpdateAddress(args) {
-    try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const { address_id, ...updateData } = args;
-      const result = await client.updateAddress(address_id, updateData);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2)
-          }
-        ]
-      };
-    } catch (error) {
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `Error updating address: ${error.message}`
-          }
-        ],
-        isError: true
-      };
-    }
-  }
-
   async handleCreateAddress(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.createAddress(args);
+      this.validateRequired(args, ['customer_id', 'first_name', 'last_name', 'address1', 'city', 'province', 'country_code', 'zip']);
+      const { api_key: clientApiKey, ...addressData } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.createAddress(addressData);
+      
       return {
         content: [
           {
@@ -678,12 +787,41 @@ export class RechargeToolHandlers {
     }
   }
 
+  async handleUpdateAddress(args) {
+    try {
+      this.validateRequired(args, ['address_id']);
+      const { api_key: clientApiKey, address_id, ...addressData } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.updateAddress(address_id, addressData);
+      
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error updating address: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
   // Discount handlers
   async handleGetDiscounts(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.getDiscounts(args);
+      const { api_key: clientApiKey, ...params } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.getDiscounts(params);
+      
       return {
         content: [
           {
@@ -707,9 +845,11 @@ export class RechargeToolHandlers {
 
   async handleGetDiscount(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.getDiscount(cleanArgs.discount_id);
+      this.validateRequired(args, ['discount_id']);
+      const { api_key: clientApiKey, ...params } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.getDiscount(params.discount_id);
+      
       return {
         content: [
           {
@@ -731,12 +871,41 @@ export class RechargeToolHandlers {
     }
   }
 
+  async handleCreateDiscount(args) {
+    try {
+      this.validateRequired(args, ['code', 'value', 'value_type']);
+      const { api_key: clientApiKey, ...discountData } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.createDiscount(discountData);
+      
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error creating discount: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
   async handleUpdateDiscount(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const { discount_id, ...updateData } = args;
-      const result = await client.updateDiscount(discount_id, updateData);
+      this.validateRequired(args, ['discount_id']);
+      const { api_key: clientApiKey, discount_id, ...discountData } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.updateDiscount(discount_id, discountData);
+      
       return {
         content: [
           {
@@ -760,9 +929,11 @@ export class RechargeToolHandlers {
 
   async handleDeleteDiscount(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.deleteDiscount(cleanArgs.discount_id);
+      this.validateRequired(args, ['discount_id']);
+      const { api_key: clientApiKey, discount_id } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.deleteDiscount(discount_id);
+      
       return {
         content: [
           {
@@ -784,38 +955,13 @@ export class RechargeToolHandlers {
     }
   }
 
-  async handleCreateDiscount(args) {
-    try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.createDiscount(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2)
-          }
-        ]
-      };
-    } catch (error) {
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `Error creating discount: ${error.message}`
-          }
-        ],
-        isError: true
-      };
-    }
-  }
-
   // Metafield handlers
   async handleGetMetafields(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.getMetafields(args);
+      const { api_key: clientApiKey, ...params } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.getMetafields(params);
+      
       return {
         content: [
           {
@@ -839,9 +985,11 @@ export class RechargeToolHandlers {
 
   async handleGetMetafield(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.getMetafield(cleanArgs.metafield_id);
+      this.validateRequired(args, ['metafield_id']);
+      const { api_key: clientApiKey, ...params } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.getMetafield(params.metafield_id);
+      
       return {
         content: [
           {
@@ -863,12 +1011,41 @@ export class RechargeToolHandlers {
     }
   }
 
+  async handleCreateMetafield(args) {
+    try {
+      this.validateRequired(args, ['namespace', 'key', 'value', 'value_type', 'owner_resource', 'owner_id']);
+      const { api_key: clientApiKey, ...metafieldData } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.createMetafield(metafieldData);
+      
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error creating metafield: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
   async handleUpdateMetafield(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const { metafield_id, ...updateData } = args;
-      const result = await client.updateMetafield(metafield_id, updateData);
+      this.validateRequired(args, ['metafield_id']);
+      const { api_key: clientApiKey, metafield_id, ...metafieldData } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.updateMetafield(metafield_id, metafieldData);
+      
       return {
         content: [
           {
@@ -892,9 +1069,11 @@ export class RechargeToolHandlers {
 
   async handleDeleteMetafield(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.deleteMetafield(cleanArgs.metafield_id);
+      this.validateRequired(args, ['metafield_id']);
+      const { api_key: clientApiKey, metafield_id } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.deleteMetafield(metafield_id);
+      
       return {
         content: [
           {
@@ -916,38 +1095,13 @@ export class RechargeToolHandlers {
     }
   }
 
-  async handleCreateMetafield(args) {
-    try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.createMetafield(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2)
-          }
-        ]
-      };
-    } catch (error) {
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `Error creating metafield: ${error.message}`
-          }
-        ],
-        isError: true
-      };
-    }
-  }
-
   // Webhook handlers
   async handleGetWebhooks(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.getWebhooks(args);
+      const { api_key: clientApiKey, ...params } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.getWebhooks(params);
+      
       return {
         content: [
           {
@@ -971,9 +1125,11 @@ export class RechargeToolHandlers {
 
   async handleGetWebhook(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.getWebhook(cleanArgs.webhook_id);
+      this.validateRequired(args, ['webhook_id']);
+      const { api_key: clientApiKey, ...params } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.getWebhook(params.webhook_id);
+      
       return {
         content: [
           {
@@ -995,12 +1151,41 @@ export class RechargeToolHandlers {
     }
   }
 
+  async handleCreateWebhook(args) {
+    try {
+      this.validateRequired(args, ['address', 'topic']);
+      const { api_key: clientApiKey, ...webhookData } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.createWebhook(webhookData);
+      
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error creating webhook: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
   async handleUpdateWebhook(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const { webhook_id, ...updateData } = args;
-      const result = await client.updateWebhook(webhook_id, updateData);
+      this.validateRequired(args, ['webhook_id']);
+      const { api_key: clientApiKey, webhook_id, ...webhookData } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.updateWebhook(webhook_id, webhookData);
+      
       return {
         content: [
           {
@@ -1024,9 +1209,11 @@ export class RechargeToolHandlers {
 
   async handleDeleteWebhook(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.deleteWebhook(cleanArgs.webhook_id);
+      this.validateRequired(args, ['webhook_id']);
+      const { api_key: clientApiKey, webhook_id } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.deleteWebhook(webhook_id);
+      
       return {
         content: [
           {
@@ -1048,38 +1235,13 @@ export class RechargeToolHandlers {
     }
   }
 
-  async handleCreateWebhook(args) {
-    try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.createWebhook(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2)
-          }
-        ]
-      };
-    } catch (error) {
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `Error creating webhook: ${error.message}`
-          }
-        ],
-        isError: true
-      };
-    }
-  }
-
   // Payment method handlers
   async handleGetPaymentMethods(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.getPaymentMethods(args);
+      const { api_key: clientApiKey, ...params } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.getPaymentMethods(params);
+      
       return {
         content: [
           {
@@ -1103,9 +1265,11 @@ export class RechargeToolHandlers {
 
   async handleGetPaymentMethod(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.getPaymentMethod(cleanArgs.payment_method_id);
+      this.validateRequired(args, ['payment_method_id']);
+      const { api_key: clientApiKey, ...params } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.getPaymentMethod(params.payment_method_id);
+      
       return {
         content: [
           {
@@ -1129,10 +1293,11 @@ export class RechargeToolHandlers {
 
   async handleUpdatePaymentMethod(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const { payment_method_id, ...updateData } = args;
-      const result = await client.updatePaymentMethod(payment_method_id, updateData);
+      this.validateRequired(args, ['payment_method_id']);
+      const { api_key: clientApiKey, payment_method_id, ...paymentMethodData } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.updatePaymentMethod(payment_method_id, paymentMethodData);
+      
       return {
         content: [
           {
@@ -1157,9 +1322,10 @@ export class RechargeToolHandlers {
   // Checkout handlers
   async handleGetCheckouts(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.getCheckouts(args);
+      const { api_key: clientApiKey, ...params } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.getCheckouts(params);
+      
       return {
         content: [
           {
@@ -1183,9 +1349,11 @@ export class RechargeToolHandlers {
 
   async handleGetCheckout(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.getCheckout(cleanArgs.checkout_token);
+      this.validateRequired(args, ['checkout_token']);
+      const { api_key: clientApiKey, ...params } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.getCheckout(params.checkout_token);
+      
       return {
         content: [
           {
@@ -1207,12 +1375,41 @@ export class RechargeToolHandlers {
     }
   }
 
+  async handleCreateCheckout(args) {
+    try {
+      this.validateRequired(args, ['line_items']);
+      const { api_key: clientApiKey, ...checkoutData } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.createCheckout(checkoutData);
+      
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error creating checkout: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
   async handleUpdateCheckout(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const { checkout_token, ...updateData } = args;
-      const result = await client.updateCheckout(checkout_token, updateData);
+      this.validateRequired(args, ['checkout_token']);
+      const { api_key: clientApiKey, checkout_token, ...checkoutData } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.updateCheckout(checkout_token, checkoutData);
+      
       return {
         content: [
           {
@@ -1236,9 +1433,11 @@ export class RechargeToolHandlers {
 
   async handleProcessCheckout(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.processCheckout(cleanArgs.checkout_token);
+      this.validateRequired(args, ['checkout_token']);
+      const { api_key: clientApiKey, checkout_token } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.processCheckout(checkout_token);
+      
       return {
         content: [
           {
@@ -1260,38 +1459,13 @@ export class RechargeToolHandlers {
     }
   }
 
-  async handleCreateCheckout(args) {
-    try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.createCheckout(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2)
-          }
-        ]
-      };
-    } catch (error) {
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `Error creating checkout: ${error.message}`
-          }
-        ],
-        isError: true
-      };
-    }
-  }
-
   // Onetime handlers
   async handleGetOnetimes(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.getOnetimes(args);
+      const { api_key: clientApiKey, ...params } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.getOnetimes(params);
+      
       return {
         content: [
           {
@@ -1315,9 +1489,11 @@ export class RechargeToolHandlers {
 
   async handleGetOnetime(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.getOnetime(cleanArgs.onetime_id);
+      this.validateRequired(args, ['onetime_id']);
+      const { api_key: clientApiKey, ...params } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.getOnetime(params.onetime_id);
+      
       return {
         content: [
           {
@@ -1339,12 +1515,41 @@ export class RechargeToolHandlers {
     }
   }
 
+  async handleCreateOnetime(args) {
+    try {
+      this.validateRequired(args, ['address_id', 'next_charge_scheduled_at', 'product_title', 'price', 'quantity', 'shopify_variant_id']);
+      const { api_key: clientApiKey, ...onetimeData } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.createOnetime(onetimeData);
+      
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error creating onetime: ${error.message}`
+          }
+        ],
+        isError: true
+      };
+    }
+  }
+
   async handleUpdateOnetime(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const { onetime_id, ...updateData } = args;
-      const result = await client.updateOnetime(onetime_id, updateData);
+      this.validateRequired(args, ['onetime_id']);
+      const { api_key: clientApiKey, onetime_id, ...onetimeData } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.updateOnetime(onetime_id, onetimeData);
+      
       return {
         content: [
           {
@@ -1368,9 +1573,11 @@ export class RechargeToolHandlers {
 
   async handleDeleteOnetime(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.deleteOnetime(cleanArgs.onetime_id);
+      this.validateRequired(args, ['onetime_id']);
+      const { api_key: clientApiKey, onetime_id } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.deleteOnetime(onetime_id);
+      
       return {
         content: [
           {
@@ -1392,38 +1599,13 @@ export class RechargeToolHandlers {
     }
   }
 
-  async handleCreateOnetime(args) {
-    try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.createOnetime(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2)
-          }
-        ]
-      };
-    } catch (error) {
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `Error creating onetime: ${error.message}`
-          }
-        ],
-        isError: true
-      };
-    }
-  }
-
   // Store credit handlers
   async handleGetStoreCredits(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.getStoreCredits(args);
+      const { api_key: clientApiKey, ...params } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.getStoreCredits(params);
+      
       return {
         content: [
           {
@@ -1447,9 +1629,11 @@ export class RechargeToolHandlers {
 
   async handleGetStoreCredit(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.getStoreCredit(cleanArgs.store_credit_id);
+      this.validateRequired(args, ['store_credit_id']);
+      const { api_key: clientApiKey, ...params } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.getStoreCredit(params.store_credit_id);
+      
       return {
         content: [
           {
@@ -1473,9 +1657,11 @@ export class RechargeToolHandlers {
 
   async handleCreateStoreCredit(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.createStoreCredit(args);
+      this.validateRequired(args, ['amount', 'customer_id']);
+      const { api_key: clientApiKey, ...storeCreditData } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.createStoreCredit(storeCreditData);
+      
       return {
         content: [
           {
@@ -1499,10 +1685,11 @@ export class RechargeToolHandlers {
 
   async handleUpdateStoreCredit(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const { store_credit_id, ...updateData } = args;
-      const result = await client.updateStoreCredit(store_credit_id, updateData);
+      this.validateRequired(args, ['store_credit_id']);
+      const { api_key: clientApiKey, store_credit_id, ...storeCreditData } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.updateStoreCredit(store_credit_id, storeCreditData);
+      
       return {
         content: [
           {
@@ -1524,145 +1711,14 @@ export class RechargeToolHandlers {
     }
   }
 
-  // Charge action handlers
-  async handleSkipCharge(args) {
-    try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.skipCharge(cleanArgs.charge_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2)
-          }
-        ]
-      };
-    } catch (error) {
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `Error skipping charge: ${error.message}`
-          }
-        ],
-        isError: true
-      };
-    }
-  }
-
-  async handleProcessCharge(args) {
-    try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.processCharge(cleanArgs.charge_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2)
-          }
-        ]
-      };
-    } catch (error) {
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `Error processing charge: ${error.message}`
-          }
-        ],
-        isError: true
-      };
-    }
-  }
-
-  async handleRefundCharge(args) {
-    try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const { charge_id, ...refundData } = args;
-      const result = await client.refundCharge(charge_id, refundData);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2)
-          }
-        ]
-      };
-    } catch (error) {
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `Error refunding charge: ${error.message}`
-          }
-        ],
-        isError: true
-      };
-    }
-  }
-
-  async handleUnskipCharge(args) {
-    try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.unskipCharge(cleanArgs.charge_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2)
-          }
-        ]
-      };
-    } catch (error) {
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `Error unskipping charge: ${error.message}`
-          }
-        ],
-        isError: true
-      };
-    }
-  }
-
-  async handleDelayCharge(args) {
-    try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const { charge_id, ...delayData } = args;
-      const result = await client.delayCharge(charge_id, delayData);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2)
-          }
-        ]
-      };
-    } catch (error) {
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `Error delaying charge: ${error.message}`
-          }
-        ],
-        isError: true
-      };
-    }
-  }
-
   // Subscription action handlers
   async handleSkipSubscriptionCharge(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.skipSubscriptionCharge(cleanArgs.subscription_id, cleanArgs.charge_date);
+      this.validateRequired(args, ['subscription_id', 'charge_date']);
+      const { api_key: clientApiKey, subscription_id, charge_date } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.skipSubscriptionCharge(subscription_id, charge_date);
+      
       return {
         content: [
           {
@@ -1686,9 +1742,11 @@ export class RechargeToolHandlers {
 
   async handleUnskipSubscriptionCharge(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.unskipSubscriptionCharge(cleanArgs.subscription_id, cleanArgs.charge_date);
+      this.validateRequired(args, ['subscription_id', 'charge_date']);
+      const { api_key: clientApiKey, subscription_id, charge_date } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.unskipSubscriptionCharge(subscription_id, charge_date);
+      
       return {
         content: [
           {
@@ -1713,9 +1771,10 @@ export class RechargeToolHandlers {
   // Shop handlers
   async handleGetShop(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
+      const { api_key: clientApiKey } = args;
+      const client = this.getClient(clientApiKey);
       const result = await client.getShop();
+      
       return {
         content: [
           {
@@ -1740,9 +1799,10 @@ export class RechargeToolHandlers {
   // Collection handlers
   async handleGetCollections(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.getCollections(args);
+      const { api_key: clientApiKey, ...params } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.getCollections(params);
+      
       return {
         content: [
           {
@@ -1766,9 +1826,11 @@ export class RechargeToolHandlers {
 
   async handleGetCollection(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.getCollection(cleanArgs.collection_id);
+      this.validateRequired(args, ['collection_id']);
+      const { api_key: clientApiKey, ...params } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.getCollection(params.collection_id);
+      
       return {
         content: [
           {
@@ -1793,9 +1855,10 @@ export class RechargeToolHandlers {
   // Analytics handlers
   async handleGetSubscriptionAnalytics(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.getSubscriptionAnalytics(args);
+      const { api_key: clientApiKey, ...params } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.getSubscriptionAnalytics(params);
+      
       return {
         content: [
           {
@@ -1819,9 +1882,10 @@ export class RechargeToolHandlers {
 
   async handleGetCustomerAnalytics(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.getCustomerAnalytics(args);
+      const { api_key: clientApiKey, ...params } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.getCustomerAnalytics(params);
+      
       return {
         content: [
           {
@@ -1843,92 +1907,14 @@ export class RechargeToolHandlers {
     }
   }
 
-  // Order action handlers
-  async handleUpdateOrder(args) {
-    try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const { order_id, ...updateData } = args;
-      const result = await client.updateOrder(order_id, updateData);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2)
-          }
-        ]
-      };
-    } catch (error) {
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `Error updating order: ${error.message}`
-          }
-        ],
-        isError: true
-      };
-    }
-  }
-
-  async handleDeleteOrder(args) {
-    try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.deleteOrder(cleanArgs.order_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2)
-          }
-        ]
-      };
-    } catch (error) {
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `Error deleting order: ${error.message}`
-          }
-        ],
-        isError: true
-      };
-    }
-  }
-
-  async handleCloneOrder(args) {
-    try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.cloneOrder(cleanArgs.order_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2)
-          }
-        ]
-      };
-    } catch (error) {
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `Error cloning order: ${error.message}`
-          }
-        ],
-        isError: true
-      };
-    }
-  }
-
   // Customer portal handlers
   async handleGetCustomerPortalSession(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.getCustomerPortalSession(cleanArgs.customer_id);
+      this.validateRequired(args, ['customer_id']);
+      const { api_key: clientApiKey, customer_id } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.getCustomerPortalSession(customer_id);
+      
       return {
         content: [
           {
@@ -1952,10 +1938,11 @@ export class RechargeToolHandlers {
 
   async handleCreateCustomerPortalSession(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const { customer_id, ...sessionData } = args;
+      this.validateRequired(args, ['customer_id']);
+      const { api_key: clientApiKey, customer_id, ...sessionData } = args;
+      const client = this.getClient(clientApiKey);
       const result = await client.createCustomerPortalSession(customer_id, sessionData);
+      
       return {
         content: [
           {
@@ -1980,9 +1967,10 @@ export class RechargeToolHandlers {
   // Bundle selection handlers
   async handleGetBundleSelections(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.getBundleSelections(args);
+      const { api_key: clientApiKey, ...params } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.getBundleSelections(params);
+      
       return {
         content: [
           {
@@ -2006,9 +1994,11 @@ export class RechargeToolHandlers {
 
   async handleGetBundleSelection(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.getBundleSelection(cleanArgs.bundle_selection_id);
+      this.validateRequired(args, ['bundle_selection_id']);
+      const { api_key: clientApiKey, ...params } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.getBundleSelection(params.bundle_selection_id);
+      
       return {
         content: [
           {
@@ -2032,9 +2022,11 @@ export class RechargeToolHandlers {
 
   async handleCreateBundleSelection(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.createBundleSelection(args);
+      this.validateRequired(args, ['subscription_id', 'external_product_id', 'external_variant_id', 'quantity']);
+      const { api_key: clientApiKey, ...bundleSelectionData } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.createBundleSelection(bundleSelectionData);
+      
       return {
         content: [
           {
@@ -2058,10 +2050,11 @@ export class RechargeToolHandlers {
 
   async handleUpdateBundleSelection(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const { bundle_selection_id, ...updateData } = args;
-      const result = await client.updateBundleSelection(bundle_selection_id, updateData);
+      this.validateRequired(args, ['bundle_selection_id']);
+      const { api_key: clientApiKey, bundle_selection_id, ...bundleSelectionData } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.updateBundleSelection(bundle_selection_id, bundleSelectionData);
+      
       return {
         content: [
           {
@@ -2085,9 +2078,11 @@ export class RechargeToolHandlers {
 
   async handleDeleteBundleSelection(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.deleteBundleSelection(cleanArgs.bundle_selection_id);
+      this.validateRequired(args, ['bundle_selection_id']);
+      const { api_key: clientApiKey, bundle_selection_id } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.deleteBundleSelection(bundle_selection_id);
+      
       return {
         content: [
           {
@@ -2112,9 +2107,10 @@ export class RechargeToolHandlers {
   // Retention strategy handlers
   async handleGetRetentionStrategies(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.getRetentionStrategies(args);
+      const { api_key: clientApiKey, ...params } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.getRetentionStrategies(params);
+      
       return {
         content: [
           {
@@ -2138,9 +2134,11 @@ export class RechargeToolHandlers {
 
   async handleGetRetentionStrategy(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.getRetentionStrategy(cleanArgs.retention_strategy_id);
+      this.validateRequired(args, ['retention_strategy_id']);
+      const { api_key: clientApiKey, ...params } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.getRetentionStrategy(params.retention_strategy_id);
+      
       return {
         content: [
           {
@@ -2165,9 +2163,10 @@ export class RechargeToolHandlers {
   // Async batch handlers
   async handleGetAsyncBatches(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.getAsyncBatches(args);
+      const { api_key: clientApiKey, ...params } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.getAsyncBatches(params);
+      
       return {
         content: [
           {
@@ -2191,9 +2190,11 @@ export class RechargeToolHandlers {
 
   async handleGetAsyncBatch(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.getAsyncBatch(cleanArgs.async_batch_id);
+      this.validateRequired(args, ['async_batch_id']);
+      const { api_key: clientApiKey, ...params } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.getAsyncBatch(params.async_batch_id);
+      
       return {
         content: [
           {
@@ -2217,9 +2218,11 @@ export class RechargeToolHandlers {
 
   async handleCreateAsyncBatch(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.createAsyncBatch(args);
+      this.validateRequired(args, ['batch_type', 'requests']);
+      const { api_key: clientApiKey, ...asyncBatchData } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.createAsyncBatch(asyncBatchData);
+      
       return {
         content: [
           {
@@ -2244,9 +2247,10 @@ export class RechargeToolHandlers {
   // Notification handlers
   async handleGetNotifications(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.getNotifications(args);
+      const { api_key: clientApiKey, ...params } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.getNotifications(params);
+      
       return {
         content: [
           {
@@ -2270,9 +2274,11 @@ export class RechargeToolHandlers {
 
   async handleGetNotification(args) {
     try {
-      const { api_key, ...cleanArgs } = args || {};
-      const client = this.getClient(api_key);
-      const result = await client.getNotification(cleanArgs.notification_id);
+      this.validateRequired(args, ['notification_id']);
+      const { api_key: clientApiKey, ...params } = args;
+      const client = this.getClient(clientApiKey);
+      const result = await client.getNotification(params.notification_id);
+      
       return {
         content: [
           {

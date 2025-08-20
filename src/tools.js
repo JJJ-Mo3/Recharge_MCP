@@ -207,6 +207,10 @@ export const updateSubscriptionSchema = {
         type: 'string',
         description: 'The subscription ID'
       },
+      subscription_id: {
+        type: 'string',
+        description: 'The subscription ID'
+      },
       quantity: {
         type: 'number',
         description: 'Subscription quantity'
@@ -1478,7 +1482,7 @@ export const getCustomerAnalyticsSchema = {
       }
     }
   }
-}
+};
 
 // Order action tools
 export const updateOrderSchema = {
