@@ -467,7 +467,7 @@ export const handler = async (event, context) => {
 };
 
 // Start the server
-if (!process.env.NETLIFY && require.main === module) {
+if (!process.env.NETLIFY && import.meta.url === new URL(process.argv[1], import.meta.url).href) {
   const server = new RechargeServer();
   server.run().catch((error) => {
     console.error('Failed to start server:', error);
