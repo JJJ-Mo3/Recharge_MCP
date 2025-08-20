@@ -1,6 +1,16 @@
 # Recharge MCP Server
 
-A comprehensive Model Context Protocol (MCP) server that provides tools for interacting with the Recharge API v2021-11. This server enables AI assistants to manage subscriptions, customers, orders, charges, and other Recharge resources with full CRUD operations and advanced features.
+A comprehensive **local** Model Context Protocol (MCP) server that provides tools for interacting with the Recharge API v2021-11. This server runs as a local process and communicates with MCP clients via stdio (standard input/output). It enables AI assistants to manage subscriptions, customers, orders, charges, and other Recharge resources with full CRUD operations and advanced features.
+
+## Server Architecture
+
+This is a **local MCP server** that:
+- Runs as a local Node.js process on your machine
+- Communicates with MCP clients via stdio (standard input/output)
+- Follows the standard MCP local server pattern
+- Can be configured in MCP clients like Claude Desktop, Continue, or other MCP-compatible tools
+
+While the project includes deployment configurations for remote hosting (Docker, Kubernetes, Vercel, etc.), these are primarily for health monitoring and API documentation. The core MCP functionality operates locally via stdio communication.
 
 ## Features
 
@@ -154,23 +164,31 @@ Deploy without setting `RECHARGE_API_KEY` in the environment. All clients must p
 - This design allows multiple clients to use their own Recharge accounts through the same MCP server instance
 ## Usage
 
-### Running the server
+### Running the Local MCP Server
+
+This server is designed to be run by MCP clients automatically. When properly configured in your MCP client, it will be started automatically when needed.
+
+For testing or development, you can run it manually:
+
 ```bash
 npm start
 ```
 
-The server will start and listen for MCP protocol messages on stdin/stdout.
+The server will start and listen for MCP protocol messages on stdin/stdout. You can then send MCP protocol messages via stdin to interact with it.
 
-### Development
+### Development Mode
 ```bash
 npm run dev
 ```
 
-This runs the server with Node.js watch mode for development.
 
 ## MCP Configuration
 
-To use this server with an MCP client, add it to your client's configuration:
+To use this server with an MCP client, add it to your client's configuration. This is a **local MCP server** that runs as a process and communicates via stdio.
+
+### Claude Desktop Configuration
+
+Add to your Claude Desktop configuration file (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
 
 ```json
 {
@@ -185,6 +203,25 @@ To use this server with an MCP client, add it to your client's configuration:
   }
 }
 ```
+
+### Continue IDE Configuration
+
+Add to your Continue configuration:
+
+```json
+{
+  "mcpServers": {
+    "recharge": {
+      "command": "node",
+      "args": ["/path/to/recharge-mcp-server/index.js"]
+    }
+  }
+}
+```
+
+### Other MCP Clients
+
+For other MCP-compatible clients, configure them to run this server as a local process using the Node.js command with the path to `index.js`.
 
 ## Available Tools
 
@@ -385,7 +422,21 @@ MIT License - see LICENSE file for details.
 
 ## Deployment
 
-This MCP server can be deployed to various platforms:
+While this is primarily a **local MCP server**, it can also be deployed to various platforms for health monitoring, API documentation, or serverless function compatibility. Note that when deployed remotely, the core MCP functionality still requires local stdio communication.
+
+### Local Development and Production Use
+
+For normal MCP usage, simply configure the server in your MCP client as shown in the [MCP Configuration](#mcp-configuration) section. The client will handle starting and stopping the server process automatically.
+
+### Remote Deployment (Optional)
+
+Remote deployment is optional and primarily useful for:
+- Health monitoring and status checks
+- API documentation hosting  
+- Serverless function compatibility
+- Container orchestration in enterprise environments
+
+The MCP protocol communication still happens locally via stdio, but you can deploy the server for monitoring purposes:
 
 ### Docker
 
