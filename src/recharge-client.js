@@ -524,3 +524,4 @@ export class RechargeClient {
       body: JSON.stringify(refundData)
     });
   }
+}
