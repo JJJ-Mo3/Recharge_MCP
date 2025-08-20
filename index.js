@@ -30,7 +30,7 @@ class RechargeServer {
     this.server = new Server(
       {
         name: 'recharge-mcp-server',
-        version: '1.0.0',
+        version: '1.1.0',
       },
       {
         capabilities: {
@@ -39,16 +39,12 @@ class RechargeServer {
       }
     );
 
-    // Initialize with default handlers (using env var)
-    this.toolHandlers = new RechargeToolHandlers();
+    // Initialize handlers without requiring API key upfront
+    this.toolHandlers = new RechargeToolHandlers(null);
     this.setupToolHandlers();
     this.setupErrorHandling();
   }
 
-  // Method to create handlers with specific API key
-  createHandlersWithApiKey(apiKey) {
-    return new RechargeToolHandlers(apiKey);
-  }
 
   setupToolHandlers() {
     // List available tools
@@ -191,41 +187,31 @@ class RechargeServer {
     this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
       const { name, arguments: args } = request.params;
 
-      // Check if API key is provided in arguments
-      let handlers = this.toolHandlers;
-      if (args && args.api_key) {
-        // Create new handlers with the provided API key
-        const { api_key, ...cleanArgs } = args;
-        handlers = this.createHandlersWithApiKey(api_key);
-        // Update args to remove api_key before passing to handlers
-        request.params.arguments = cleanArgs;
-      }
-
       try {
         switch (name) {
           // Customer tools
           case 'recharge_get_customers':
-            return await handlers.handleGetCustomers(request.params.arguments);
+            return await this.toolHandlers.handleGetCustomers(request.params.arguments);
           case 'recharge_get_customer':
-            return await handlers.handleGetCustomer(request.params.arguments);
+            return await this.toolHandlers.handleGetCustomer(request.params.arguments);
           case 'recharge_update_customer':
-            return await handlers.handleUpdateCustomer(request.params.arguments);
+            return await this.toolHandlers.handleUpdateCustomer(request.params.arguments);
           case 'recharge_create_customer':
-            return await handlers.handleCreateCustomer(request.params.arguments);
+            return await this.toolHandlers.handleCreateCustomer(request.params.arguments);
 
           // Subscription tools
           case 'recharge_get_subscriptions':
-            return await handlers.handleGetSubscriptions(request.params.arguments);
+            return await this.toolHandlers.handleGetSubscriptions(request.params.arguments);
           case 'recharge_create_subscription':
-            return await handlers.handleCreateSubscription(request.params.arguments);
+            return await this.toolHandlers.handleCreateSubscription(request.params.arguments);
           case 'recharge_get_subscription':
-            return await handlers.handleGetSubscription(request.params.arguments);
+            return await this.toolHandlers.handleGetSubscription(request.params.arguments);
           case 'recharge_update_subscription':
-            return await handlers.handleUpdateSubscription(request.params.arguments);
+            return await this.toolHandlers.handleUpdateSubscription(request.params.arguments);
           case 'recharge_cancel_subscription':
-            return await handlers.handleCancelSubscription(request.params.arguments);
+            return await this.toolHandlers.handleCancelSubscription(request.params.arguments);
           case 'recharge_activate_subscription':
-            return await handlers.handleActivateSubscription(request.params.arguments);
+            return await this.toolHandlers.handleActivateSubscription(request.params.arguments);
 
           // Product tools
           case 'recharge_get_products':

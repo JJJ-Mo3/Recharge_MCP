@@ -8,11 +8,11 @@ config();
 export class RechargeClient {
   constructor(apiKey = null) {
     // Allow API key to be passed in constructor or fall back to environment
-    this.apiKey = apiKey || process.env.RECHARGE_API_KEY;
+    this.apiKey = apiKey || process.env.RECHARGE_API_KEY || null;
     this.baseUrl = process.env.RECHARGE_API_URL || 'https://api.rechargeapps.com';
     
     if (!this.apiKey) {
-      throw new Error('API key is required. Provide it via constructor parameter or RECHARGE_API_KEY environment variable');
+      throw new Error('API key is required. Provide it via constructor parameter, RECHARGE_API_KEY environment variable, or as api_key parameter in tool calls');
     }
   }
 

@@ -5,26 +5,55 @@ import { RechargeClient } from './recharge-client.js';
  */
 export class RechargeToolHandlers {
   constructor(apiKey = null) {
-    this.client = new RechargeClient(apiKey);
+    try {
+      this.client = new RechargeClient(apiKey);
+    } catch (error) {
+      // If no API key is provided, we'll create the client when needed
+      this.client = null;
+      this.apiKey = apiKey;
+    }
+  }
+
+  // Helper method to ensure we have a valid client
+  getClient(providedApiKey = null) {
+    const keyToUse = providedApiKey || this.apiKey || process.env.RECHARGE_API_KEY;
+    
+    if (!keyToUse) {
+      throw new Error('API key is required. Provide it via api_key parameter, constructor, or RECHARGE_API_KEY environment variable');
+    }
+
+    // If we have a client and the key matches, reuse it
+    if (this.client && this.client.apiKey === keyToUse) {
+      return this.client;
+    }
+
+    // Create new client with the provided key
+    return new RechargeClient(keyToUse);
   }
 
   // Customer handlers
   async handleGetCustomers(args) {
     try {
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      
       // Validate pagination parameters
-      if (args.limit && (args.limit < 1 || args.limit > 250)) {
+      if (cleanArgs.limit && (cleanArgs.limit < 1 || cleanArgs.limit > 250)) {
         throw new Error('Limit must be between 1 and 250');
       }
       
       // Validate date format if provided
-      if (args.created_at_min && !this.isValidISODate(args.created_at_min)) {
+      if (cleanArgs.created_at_min && !this.isValidISODate(cleanArgs.created_at_min)) {
         throw new Error('created_at_min must be in ISO 8601 format');
       }
-      if (args.created_at_max && !this.isValidISODate(args.created_at_max)) {
+      if (cleanArgs.created_at_max && !this.isValidISODate(cleanArgs.created_at_max)) {
         throw new Error('created_at_max must be in ISO 8601 format');
       }
       
-      const result = await this.client.getCustomers(args);
+      const result = await client.getCustomers(cleanArgs);
       return {
         content: [
           {
@@ -61,7 +90,13 @@ export class RechargeToolHandlers {
   }
   async handleGetCustomer(args) {
     try {
-      const result = await this.client.getCustomer(args.customer_id);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      
+      const result = await client.getCustomer(cleanArgs.customer_id);
       return {
         content: [
           {
@@ -85,15 +120,21 @@ export class RechargeToolHandlers {
 
   async handleCreateCustomer(args) {
     try {
-      this.validateRequiredFields(args, ['email']);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      
+      this.validateRequiredFields(cleanArgs, ['email']);
       
       // Validate email format
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(args.email)) {
+      if (!emailRegex.test(cleanArgs.email)) {
         throw new Error('Invalid email format');
       }
       
-      const result = await this.client.createCustomer(args);
+      const result = await client.createCustomer(cleanArgs);
       return {
         content: [
           {
@@ -117,8 +158,13 @@ export class RechargeToolHandlers {
 
   async handleUpdateCustomer(args) {
     try {
-      const { customer_id, ...updateData } = args;
-      const result = await this.client.updateCustomer(customer_id, updateData);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      
+      const { api_key, customer_id, ...updateData } = args || {};
+      const client = this.getClient(api_key);
+      
+      const result = await client.updateCustomer(customer_id, updateData);
       return {
         content: [
           {
@@ -143,7 +189,13 @@ export class RechargeToolHandlers {
   // Subscription handlers
   async handleGetSubscriptions(args) {
     try {
-      const result = await this.client.getSubscriptions(args);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      
+      const result = await client.getSubscriptions(cleanArgs);
       return {
         content: [
           {
@@ -167,7 +219,13 @@ export class RechargeToolHandlers {
 
   async handleCreateSubscription(args) {
     try {
-      this.validateRequiredFields(args, [
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      
+      this.validateRequiredFields(cleanArgs, [
         'address_id', 
         'next_charge_scheduled_at', 
         'order_interval_frequency', 
@@ -178,21 +236,21 @@ export class RechargeToolHandlers {
       
       // Validate interval unit
       const validUnits = ['day', 'week', 'month'];
-      if (!validUnits.includes(args.order_interval_unit)) {
+      if (!validUnits.includes(cleanArgs.order_interval_unit)) {
         throw new Error(`Invalid order_interval_unit. Must be one of: ${validUnits.join(', ')}`);
       }
       
       // Validate quantity
-      if (args.quantity < 1) {
+      if (cleanArgs.quantity < 1) {
         throw new Error('Quantity must be at least 1');
       }
       
       // Validate date format
-      if (!this.isValidISODate(args.next_charge_scheduled_at)) {
+      if (!this.isValidISODate(cleanArgs.next_charge_scheduled_at)) {
         throw new Error('next_charge_scheduled_at must be in ISO 8601 format');
       }
       
-      const result = await this.client.createSubscription(args);
+      const result = await client.createSubscription(cleanArgs);
       return {
         content: [
           {
@@ -216,7 +274,13 @@ export class RechargeToolHandlers {
 
   async handleGetSubscription(args) {
     try {
-      const result = await this.client.getSubscription(args.subscription_id);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      
+      const result = await client.getSubscription(cleanArgs.subscription_id);
       return {
         content: [
           {
@@ -240,8 +304,12 @@ export class RechargeToolHandlers {
 
   async handleUpdateSubscription(args) {
     try {
+      const { api_key, subscription_id, ...updateData } = args || {};
+      const client = this.getClient(api_key);
+      
+      const result = await client.updateSubscription(subscription_id, updateData);
       const { subscription_id, ...updateData } = args;
-      const result = await this.client.updateSubscription(subscription_id, updateData);
+      const result = await client.updateSubscription(subscription_id, updateData);
       return {
         content: [
           {
@@ -265,9 +333,14 @@ export class RechargeToolHandlers {
 
   async handleCancelSubscription(args) {
     try {
-      const result = await this.client.cancelSubscription(
-        args.subscription_id, 
-        args.cancellation_reason || ''
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      
+      const result = await client.cancelSubscription(
+        cleanArgs.subscription_id, 
+        cleanArgs.cancellation_reason || ''
+        cleanArgs.subscription_id, 
+        cleanArgs.cancellation_reason || ''
       );
       return {
         content: [
@@ -292,7 +365,12 @@ export class RechargeToolHandlers {
 
   async handleActivateSubscription(args) {
     try {
-      const result = await this.client.activateSubscription(args.subscription_id);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      
+      const result = await client.activateSubscription(cleanArgs.subscription_id);
+      const client = this.getClient(api_key);
+      const result = await client.activateSubscription(cleanArgs.subscription_id);
       return {
         content: [
           {
@@ -317,7 +395,9 @@ export class RechargeToolHandlers {
   // Product handlers
   async handleGetProducts(args) {
     try {
-      const result = await this.client.getProducts(args);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.getProducts(args);
       return {
         content: [
           {
@@ -341,7 +421,9 @@ export class RechargeToolHandlers {
 
   async handleGetProduct(args) {
     try {
-      const result = await this.client.getProduct(args.product_id);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.getProduct(cleanArgs.product_id);
       return {
         content: [
           {
@@ -366,7 +448,9 @@ export class RechargeToolHandlers {
   // Order handlers
   async handleGetOrders(args) {
     try {
-      const result = await this.client.getOrders(args);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.getOrders(args);
       return {
         content: [
           {
@@ -390,7 +474,9 @@ export class RechargeToolHandlers {
 
   async handleGetOrder(args) {
     try {
-      const result = await this.client.getOrder(args.order_id);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.getOrder(cleanArgs.order_id);
       return {
         content: [
           {
@@ -415,7 +501,9 @@ export class RechargeToolHandlers {
   // Charge handlers
   async handleGetCharges(args) {
     try {
-      const result = await this.client.getCharges(args);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.getCharges(args);
       return {
         content: [
           {
@@ -439,7 +527,9 @@ export class RechargeToolHandlers {
 
   async handleGetCharge(args) {
     try {
-      const result = await this.client.getCharge(args.charge_id);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.getCharge(cleanArgs.charge_id);
       return {
         content: [
           {
@@ -464,7 +554,9 @@ export class RechargeToolHandlers {
   // Address handlers
   async handleGetAddresses(args) {
     try {
-      const result = await this.client.getAddresses(args);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.getAddresses(args);
       return {
         content: [
           {
@@ -488,7 +580,9 @@ export class RechargeToolHandlers {
 
   async handleGetAddress(args) {
     try {
-      const result = await this.client.getAddress(args.address_id);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.getAddress(cleanArgs.address_id);
       return {
         content: [
           {
@@ -512,8 +606,10 @@ export class RechargeToolHandlers {
 
   async handleUpdateAddress(args) {
     try {
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
       const { address_id, ...updateData } = args;
-      const result = await this.client.updateAddress(address_id, updateData);
+      const result = await client.updateAddress(address_id, updateData);
       return {
         content: [
           {
@@ -537,7 +633,9 @@ export class RechargeToolHandlers {
 
   async handleCreateAddress(args) {
     try {
-      const result = await this.client.createAddress(args);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.createAddress(args);
       return {
         content: [
           {
@@ -562,7 +660,9 @@ export class RechargeToolHandlers {
   // Discount handlers
   async handleGetDiscounts(args) {
     try {
-      const result = await this.client.getDiscounts(args);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.getDiscounts(args);
       return {
         content: [
           {
@@ -586,7 +686,9 @@ export class RechargeToolHandlers {
 
   async handleGetDiscount(args) {
     try {
-      const result = await this.client.getDiscount(args.discount_id);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.getDiscount(cleanArgs.discount_id);
       return {
         content: [
           {
@@ -610,8 +712,10 @@ export class RechargeToolHandlers {
 
   async handleUpdateDiscount(args) {
     try {
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
       const { discount_id, ...updateData } = args;
-      const result = await this.client.updateDiscount(discount_id, updateData);
+      const result = await client.updateDiscount(discount_id, updateData);
       return {
         content: [
           {
@@ -635,7 +739,9 @@ export class RechargeToolHandlers {
 
   async handleDeleteDiscount(args) {
     try {
-      const result = await this.client.deleteDiscount(args.discount_id);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.deleteDiscount(cleanArgs.discount_id);
       return {
         content: [
           {
@@ -659,7 +765,9 @@ export class RechargeToolHandlers {
 
   async handleCreateDiscount(args) {
     try {
-      const result = await this.client.createDiscount(args);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.createDiscount(args);
       return {
         content: [
           {
@@ -684,7 +792,9 @@ export class RechargeToolHandlers {
   // Metafield handlers
   async handleGetMetafields(args) {
     try {
-      const result = await this.client.getMetafields(args);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.getMetafields(args);
       return {
         content: [
           {
@@ -708,7 +818,9 @@ export class RechargeToolHandlers {
 
   async handleGetMetafield(args) {
     try {
-      const result = await this.client.getMetafield(args.metafield_id);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.getMetafield(cleanArgs.metafield_id);
       return {
         content: [
           {
@@ -732,8 +844,10 @@ export class RechargeToolHandlers {
 
   async handleUpdateMetafield(args) {
     try {
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
       const { metafield_id, ...updateData } = args;
-      const result = await this.client.updateMetafield(metafield_id, updateData);
+      const result = await client.updateMetafield(metafield_id, updateData);
       return {
         content: [
           {
@@ -757,7 +871,9 @@ export class RechargeToolHandlers {
 
   async handleDeleteMetafield(args) {
     try {
-      const result = await this.client.deleteMetafield(args.metafield_id);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.deleteMetafield(cleanArgs.metafield_id);
       return {
         content: [
           {
@@ -781,7 +897,9 @@ export class RechargeToolHandlers {
 
   async handleCreateMetafield(args) {
     try {
-      const result = await this.client.createMetafield(args);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.createMetafield(args);
       return {
         content: [
           {
@@ -806,7 +924,9 @@ export class RechargeToolHandlers {
   // Webhook handlers
   async handleGetWebhooks(args) {
     try {
-      const result = await this.client.getWebhooks(args);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.getWebhooks(args);
       return {
         content: [
           {
@@ -830,7 +950,9 @@ export class RechargeToolHandlers {
 
   async handleGetWebhook(args) {
     try {
-      const result = await this.client.getWebhook(args.webhook_id);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.getWebhook(cleanArgs.webhook_id);
       return {
         content: [
           {
@@ -854,8 +976,10 @@ export class RechargeToolHandlers {
 
   async handleUpdateWebhook(args) {
     try {
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
       const { webhook_id, ...updateData } = args;
-      const result = await this.client.updateWebhook(webhook_id, updateData);
+      const result = await client.updateWebhook(webhook_id, updateData);
       return {
         content: [
           {
@@ -879,7 +1003,9 @@ export class RechargeToolHandlers {
 
   async handleDeleteWebhook(args) {
     try {
-      const result = await this.client.deleteWebhook(args.webhook_id);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.deleteWebhook(cleanArgs.webhook_id);
       return {
         content: [
           {
@@ -903,7 +1029,9 @@ export class RechargeToolHandlers {
 
   async handleCreateWebhook(args) {
     try {
-      const result = await this.client.createWebhook(args);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.createWebhook(args);
       return {
         content: [
           {
@@ -928,7 +1056,9 @@ export class RechargeToolHandlers {
   // Payment method handlers
   async handleGetPaymentMethods(args) {
     try {
-      const result = await this.client.getPaymentMethods(args);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.getPaymentMethods(args);
       return {
         content: [
           {
@@ -952,7 +1082,9 @@ export class RechargeToolHandlers {
 
   async handleGetPaymentMethod(args) {
     try {
-      const result = await this.client.getPaymentMethod(args.payment_method_id);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.getPaymentMethod(cleanArgs.payment_method_id);
       return {
         content: [
           {
@@ -976,8 +1108,10 @@ export class RechargeToolHandlers {
 
   async handleUpdatePaymentMethod(args) {
     try {
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
       const { payment_method_id, ...updateData } = args;
-      const result = await this.client.updatePaymentMethod(payment_method_id, updateData);
+      const result = await client.updatePaymentMethod(payment_method_id, updateData);
       return {
         content: [
           {
@@ -1002,7 +1136,9 @@ export class RechargeToolHandlers {
   // Checkout handlers
   async handleGetCheckouts(args) {
     try {
-      const result = await this.client.getCheckouts(args);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.getCheckouts(args);
       return {
         content: [
           {
@@ -1026,7 +1162,9 @@ export class RechargeToolHandlers {
 
   async handleGetCheckout(args) {
     try {
-      const result = await this.client.getCheckout(args.checkout_token);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.getCheckout(cleanArgs.checkout_token);
       return {
         content: [
           {
@@ -1050,8 +1188,10 @@ export class RechargeToolHandlers {
 
   async handleUpdateCheckout(args) {
     try {
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
       const { checkout_token, ...updateData } = args;
-      const result = await this.client.updateCheckout(checkout_token, updateData);
+      const result = await client.updateCheckout(checkout_token, updateData);
       return {
         content: [
           {
@@ -1075,7 +1215,9 @@ export class RechargeToolHandlers {
 
   async handleProcessCheckout(args) {
     try {
-      const result = await this.client.processCheckout(args.checkout_token);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.processCheckout(cleanArgs.checkout_token);
       return {
         content: [
           {
@@ -1099,7 +1241,9 @@ export class RechargeToolHandlers {
 
   async handleCreateCheckout(args) {
     try {
-      const result = await this.client.createCheckout(args);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.createCheckout(args);
       return {
         content: [
           {
@@ -1124,7 +1268,9 @@ export class RechargeToolHandlers {
   // Onetime handlers
   async handleGetOnetimes(args) {
     try {
-      const result = await this.client.getOnetimes(args);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.getOnetimes(args);
       return {
         content: [
           {
@@ -1148,7 +1294,9 @@ export class RechargeToolHandlers {
 
   async handleGetOnetime(args) {
     try {
-      const result = await this.client.getOnetime(args.onetime_id);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.getOnetime(cleanArgs.onetime_id);
       return {
         content: [
           {
@@ -1172,8 +1320,10 @@ export class RechargeToolHandlers {
 
   async handleUpdateOnetime(args) {
     try {
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
       const { onetime_id, ...updateData } = args;
-      const result = await this.client.updateOnetime(onetime_id, updateData);
+      const result = await client.updateOnetime(onetime_id, updateData);
       return {
         content: [
           {
@@ -1197,7 +1347,9 @@ export class RechargeToolHandlers {
 
   async handleDeleteOnetime(args) {
     try {
-      const result = await this.client.deleteOnetime(args.onetime_id);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.deleteOnetime(cleanArgs.onetime_id);
       return {
         content: [
           {
@@ -1221,7 +1373,9 @@ export class RechargeToolHandlers {
 
   async handleCreateOnetime(args) {
     try {
-      const result = await this.client.createOnetime(args);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.createOnetime(args);
       return {
         content: [
           {
@@ -1246,7 +1400,9 @@ export class RechargeToolHandlers {
   // Store credit handlers
   async handleGetStoreCredits(args) {
     try {
-      const result = await this.client.getStoreCredits(args);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.getStoreCredits(args);
       return {
         content: [
           {
@@ -1270,7 +1426,9 @@ export class RechargeToolHandlers {
 
   async handleGetStoreCredit(args) {
     try {
-      const result = await this.client.getStoreCredit(args.store_credit_id);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.getStoreCredit(cleanArgs.store_credit_id);
       return {
         content: [
           {
@@ -1294,7 +1452,9 @@ export class RechargeToolHandlers {
 
   async handleCreateStoreCredit(args) {
     try {
-      const result = await this.client.createStoreCredit(args);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.createStoreCredit(args);
       return {
         content: [
           {
@@ -1318,8 +1478,10 @@ export class RechargeToolHandlers {
 
   async handleUpdateStoreCredit(args) {
     try {
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
       const { store_credit_id, ...updateData } = args;
-      const result = await this.client.updateStoreCredit(store_credit_id, updateData);
+      const result = await client.updateStoreCredit(store_credit_id, updateData);
       return {
         content: [
           {
@@ -1344,7 +1506,9 @@ export class RechargeToolHandlers {
   // Charge action handlers
   async handleSkipCharge(args) {
     try {
-      const result = await this.client.skipCharge(args.charge_id);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.skipCharge(cleanArgs.charge_id);
       return {
         content: [
           {
@@ -1368,7 +1532,9 @@ export class RechargeToolHandlers {
 
   async handleProcessCharge(args) {
     try {
-      const result = await this.client.processCharge(args.charge_id);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.processCharge(cleanArgs.charge_id);
       return {
         content: [
           {
@@ -1392,8 +1558,10 @@ export class RechargeToolHandlers {
 
   async handleRefundCharge(args) {
     try {
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
       const { charge_id, ...refundData } = args;
-      const result = await this.client.refundCharge(charge_id, refundData);
+      const result = await client.refundCharge(charge_id, refundData);
       return {
         content: [
           {
@@ -1417,7 +1585,9 @@ export class RechargeToolHandlers {
 
   async handleUnskipCharge(args) {
     try {
-      const result = await this.client.unskipCharge(args.charge_id);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.unskipCharge(cleanArgs.charge_id);
       return {
         content: [
           {
@@ -1441,8 +1611,10 @@ export class RechargeToolHandlers {
 
   async handleDelayCharge(args) {
     try {
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
       const { charge_id, ...delayData } = args;
-      const result = await this.client.delayCharge(charge_id, delayData);
+      const result = await client.delayCharge(charge_id, delayData);
       return {
         content: [
           {
@@ -1467,7 +1639,9 @@ export class RechargeToolHandlers {
   // Subscription action handlers
   async handleSkipSubscriptionCharge(args) {
     try {
-      const result = await this.client.skipSubscriptionCharge(args.subscription_id, args.charge_date);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.skipSubscriptionCharge(cleanArgs.subscription_id, cleanArgs.charge_date);
       return {
         content: [
           {
@@ -1491,7 +1665,9 @@ export class RechargeToolHandlers {
 
   async handleUnskipSubscriptionCharge(args) {
     try {
-      const result = await this.client.unskipSubscriptionCharge(args.subscription_id, args.charge_date);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.unskipSubscriptionCharge(cleanArgs.subscription_id, cleanArgs.charge_date);
       return {
         content: [
           {
@@ -1516,7 +1692,9 @@ export class RechargeToolHandlers {
   // Shop handlers
   async handleGetShop(args) {
     try {
-      const result = await this.client.getShop();
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.getShop();
       return {
         content: [
           {
@@ -1541,7 +1719,9 @@ export class RechargeToolHandlers {
   // Collection handlers
   async handleGetCollections(args) {
     try {
-      const result = await this.client.getCollections(args);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.getCollections(args);
       return {
         content: [
           {
@@ -1565,7 +1745,9 @@ export class RechargeToolHandlers {
 
   async handleGetCollection(args) {
     try {
-      const result = await this.client.getCollection(args.collection_id);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.getCollection(cleanArgs.collection_id);
       return {
         content: [
           {
@@ -1590,7 +1772,9 @@ export class RechargeToolHandlers {
   // Analytics handlers
   async handleGetSubscriptionAnalytics(args) {
     try {
-      const result = await this.client.getSubscriptionAnalytics(args);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.getSubscriptionAnalytics(args);
       return {
         content: [
           {
@@ -1614,7 +1798,9 @@ export class RechargeToolHandlers {
 
   async handleGetCustomerAnalytics(args) {
     try {
-      const result = await this.client.getCustomerAnalytics(args);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.getCustomerAnalytics(args);
       return {
         content: [
           {
@@ -1639,8 +1825,10 @@ export class RechargeToolHandlers {
   // Order action handlers
   async handleUpdateOrder(args) {
     try {
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
       const { order_id, ...updateData } = args;
-      const result = await this.client.updateOrder(order_id, updateData);
+      const result = await client.updateOrder(order_id, updateData);
       return {
         content: [
           {
@@ -1664,7 +1852,9 @@ export class RechargeToolHandlers {
 
   async handleDeleteOrder(args) {
     try {
-      const result = await this.client.deleteOrder(args.order_id);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.deleteOrder(cleanArgs.order_id);
       return {
         content: [
           {
@@ -1688,7 +1878,9 @@ export class RechargeToolHandlers {
 
   async handleCloneOrder(args) {
     try {
-      const result = await this.client.cloneOrder(args.order_id);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.cloneOrder(cleanArgs.order_id);
       return {
         content: [
           {
@@ -1713,7 +1905,9 @@ export class RechargeToolHandlers {
   // Customer portal handlers
   async handleGetCustomerPortalSession(args) {
     try {
-      const result = await this.client.getCustomerPortalSession(args.customer_id);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.getCustomerPortalSession(cleanArgs.customer_id);
       return {
         content: [
           {
@@ -1737,8 +1931,10 @@ export class RechargeToolHandlers {
 
   async handleCreateCustomerPortalSession(args) {
     try {
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
       const { customer_id, ...sessionData } = args;
-      const result = await this.client.createCustomerPortalSession(customer_id, sessionData);
+      const result = await client.createCustomerPortalSession(customer_id, sessionData);
       return {
         content: [
           {
@@ -1763,7 +1959,9 @@ export class RechargeToolHandlers {
   // Bundle selection handlers
   async handleGetBundleSelections(args) {
     try {
-      const result = await this.client.getBundleSelections(args);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.getBundleSelections(args);
       return {
         content: [
           {
@@ -1787,7 +1985,9 @@ export class RechargeToolHandlers {
 
   async handleGetBundleSelection(args) {
     try {
-      const result = await this.client.getBundleSelection(args.bundle_selection_id);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.getBundleSelection(cleanArgs.bundle_selection_id);
       return {
         content: [
           {
@@ -1811,7 +2011,9 @@ export class RechargeToolHandlers {
 
   async handleCreateBundleSelection(args) {
     try {
-      const result = await this.client.createBundleSelection(args);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.createBundleSelection(args);
       return {
         content: [
           {
@@ -1835,8 +2037,10 @@ export class RechargeToolHandlers {
 
   async handleUpdateBundleSelection(args) {
     try {
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
       const { bundle_selection_id, ...updateData } = args;
-      const result = await this.client.updateBundleSelection(bundle_selection_id, updateData);
+      const result = await client.updateBundleSelection(bundle_selection_id, updateData);
       return {
         content: [
           {
@@ -1860,7 +2064,9 @@ export class RechargeToolHandlers {
 
   async handleDeleteBundleSelection(args) {
     try {
-      const result = await this.client.deleteBundleSelection(args.bundle_selection_id);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.deleteBundleSelection(cleanArgs.bundle_selection_id);
       return {
         content: [
           {
@@ -1885,7 +2091,9 @@ export class RechargeToolHandlers {
   // Retention strategy handlers
   async handleGetRetentionStrategies(args) {
     try {
-      const result = await this.client.getRetentionStrategies(args);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.getRetentionStrategies(args);
       return {
         content: [
           {
@@ -1909,7 +2117,9 @@ export class RechargeToolHandlers {
 
   async handleGetRetentionStrategy(args) {
     try {
-      const result = await this.client.getRetentionStrategy(args.retention_strategy_id);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.getRetentionStrategy(cleanArgs.retention_strategy_id);
       return {
         content: [
           {
@@ -1934,7 +2144,9 @@ export class RechargeToolHandlers {
   // Async batch handlers
   async handleGetAsyncBatches(args) {
     try {
-      const result = await this.client.getAsyncBatches(args);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.getAsyncBatches(args);
       return {
         content: [
           {
@@ -1958,7 +2170,9 @@ export class RechargeToolHandlers {
 
   async handleGetAsyncBatch(args) {
     try {
-      const result = await this.client.getAsyncBatch(args.async_batch_id);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.getAsyncBatch(cleanArgs.async_batch_id);
       return {
         content: [
           {
@@ -1982,7 +2196,9 @@ export class RechargeToolHandlers {
 
   async handleCreateAsyncBatch(args) {
     try {
-      const result = await this.client.createAsyncBatch(args);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.createAsyncBatch(args);
       return {
         content: [
           {
@@ -2007,7 +2223,9 @@ export class RechargeToolHandlers {
   // Notification handlers
   async handleGetNotifications(args) {
     try {
-      const result = await this.client.getNotifications(args);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.getNotifications(args);
       return {
         content: [
           {
@@ -2031,7 +2249,9 @@ export class RechargeToolHandlers {
 
   async handleGetNotification(args) {
     try {
-      const result = await this.client.getNotification(args.notification_id);
+      const { api_key, ...cleanArgs } = args || {};
+      const client = this.getClient(api_key);
+      const result = await client.getNotification(cleanArgs.notification_id);
       return {
         content: [
           {

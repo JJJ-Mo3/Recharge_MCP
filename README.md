@@ -129,7 +129,7 @@ A comprehensive Model Context Protocol (MCP) server that provides tools for inte
 The MCP server supports two methods for API key configuration:
 
 ### Method 1: Environment Variable (Server-wide)
-Set `RECHARGE_API_KEY` in your environment or `.env` file. This key will be used for all requests when no client-specific key is provided.
+Set `RECHARGE_API_KEY` in your environment or `.env` file. This key will be used as a fallback when no client-specific key is provided.
 
 ### Method 2: Client-provided API Key (Per-request)
 Clients can provide their own API key with each tool call by including an `api_key` parameter:
@@ -145,7 +145,13 @@ Clients can provide their own API key with each tool call by including an `api_k
 }
 ```
 
-**Note:** The client-provided API key takes precedence over the environment variable, allowing multiple clients to use their own Recharge accounts through the same MCP server instance.
+### Method 3: No Default API Key (Recommended for Multi-tenant)
+Deploy without setting `RECHARGE_API_KEY` in the environment. All clients must provide their own API key with each request.
+
+**Note:** 
+- Client-provided API keys always take precedence over environment variables
+- If no API key is available (neither environment nor client-provided), requests will fail with a clear error message
+- This design allows multiple clients to use their own Recharge accounts through the same MCP server instance
 ## Usage
 
 ### Running the server
@@ -343,9 +349,10 @@ Recharge API has rate limits. The server doesn't implement client-side rate limi
 ### Common Issues
 
 1. **Authentication Errors**
-   - Verify your `RECHARGE_API_KEY` is correct
+   - Verify your API key (environment variable or client-provided) is correct
    - Ensure the API key has proper permissions
    - Check that the API key hasn't expired
+   - If using client-provided keys, ensure the `api_key` parameter is included in requests
 
 2. **Rate Limiting**
    - Implement delays between requests if hitting rate limits

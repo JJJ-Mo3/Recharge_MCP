@@ -9,7 +9,7 @@
     "dev": "node --watch index.js",
     "build": "npm run validate && npm run build:functions && echo \"Build completed successfully. Ready for deployment.\"",
     "build:functions": "mkdir -p dist && echo 'Build artifacts ready'",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npm run validate && echo \"All validations passed\"",
     "validate": "node -c index.js && node -c src/recharge-client.js && node -c src/tool-handlers.js && node -c src/tools.js",
     "prestart": "npm run validate"
   },
