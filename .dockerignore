@@ -12,3 +12,15 @@ coverage
 *.log
 .vscode
 .idea
+dist
+.bolt
+netlify
+vercel.json
+railway.json
+fly.toml
+render.yaml
+*.md
+docs/
+examples/
+tests/
+.github/

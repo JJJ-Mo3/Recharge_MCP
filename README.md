@@ -359,9 +359,78 @@ MIT License - see LICENSE file for details.
 This MCP server can be deployed to various platforms:
 
 ### Docker
+
+#### Basic Docker Deployment
 ```bash
+# Build the Docker image
 docker build -t recharge-mcp-server .
-docker run -e RECHARGE_API_KEY=your_key recharge-mcp-server
+
+# Run the container
+docker run -d \
+  --name recharge-mcp-server \
+  -p 3000:3000 \
+  -e RECHARGE_API_KEY=your_api_key_here \
+  -e RECHARGE_API_URL=https://api.rechargeapps.com \
+  -e NODE_ENV=production \
+  --restart unless-stopped \
+  recharge-mcp-server
+```
+
+#### Docker Compose Deployment
+```bash
+# Create .env file with your configuration
+echo "RECHARGE_API_KEY=your_api_key_here" > .env
+echo "RECHARGE_API_URL=https://api.rechargeapps.com" >> .env
+
+# Start the services
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop the services
+docker-compose down
+```
+
+#### Docker Health Checks
+The Docker container includes built-in health checks:
+```bash
+# Check container health
+docker ps
+
+# View health check logs
+docker inspect --format='{{json .State.Health}}' recharge-mcp-server
+```
+
+#### Docker Production Considerations
+- **Security**: The container runs as a non-root user (`mcp:nodejs`)
+- **Signal Handling**: Uses `dumb-init` for proper signal forwarding
+- **Resource Limits**: Consider setting memory and CPU limits in production
+- **Logging**: Logs are written to `/app/logs` volume for persistence
+- **Networking**: Uses bridge networking for container isolation
+
+#### Docker Environment Variables
+Required:
+- `RECHARGE_API_KEY`: Your Recharge API access token
+
+Optional:
+- `RECHARGE_API_URL`: Recharge API URL (defaults to https://api.rechargeapps.com)
+- `NODE_ENV`: Environment (defaults to production in Docker)
+- `PORT`: Port to listen on (defaults to 3000)
+
+#### Docker Troubleshooting
+```bash
+# View container logs
+docker logs recharge-mcp-server
+
+# Execute commands in running container
+docker exec -it recharge-mcp-server sh
+
+# Check container resource usage
+docker stats recharge-mcp-server
+
+# Restart container
+docker restart recharge-mcp-server
 ```
 
 ### Vercel
