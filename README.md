@@ -219,6 +219,49 @@ Add to your Continue configuration:
 }
 ```
 
+### Cursor IDE Configuration
+
+Cursor supports MCP servers through its configuration. Add to your Cursor settings:
+
+1. **Open Cursor Settings**: Go to `Cursor > Settings` (macOS) or `File > Preferences` (Windows/Linux)
+
+2. **Navigate to MCP Settings**: Look for "MCP" or "Model Context Protocol" in the settings
+
+3. **Add Server Configuration**:
+```json
+{
+  "mcpServers": {
+    "recharge": {
+      "command": "node",
+      "args": ["/path/to/recharge-mcp-server/index.js"],
+      "env": {
+        "RECHARGE_API_KEY": "your_api_key_here"
+      }
+    }
+  }
+}
+```
+
+4. **Alternative: Workspace Configuration**
+
+You can also add the MCP server configuration to your workspace settings by creating a `.cursor/settings.json` file in your project root:
+
+```json
+{
+  "mcpServers": {
+    "recharge": {
+      "command": "node",
+      "args": ["/absolute/path/to/recharge-mcp-server/index.js"],
+      "env": {
+        "RECHARGE_API_KEY": "your_api_key_here"
+      }
+    }
+  }
+}
+```
+
+**Note**: Make sure to use the absolute path to the `index.js` file in your Cursor configuration.
+
 ### Other MCP Clients
 
 For other MCP-compatible clients, configure them to run this server as a local process using the Node.js command with the path to `index.js`.
