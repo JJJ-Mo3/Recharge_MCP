@@ -1,3 +1,3 @@
-import { handler } from '../../index.js';
+const { handler } = await import('../../index.js');
 
 export { handler };

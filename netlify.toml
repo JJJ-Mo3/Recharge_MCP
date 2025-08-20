@@ -1,16 +1,21 @@
 [build]
   command = "npm run build"
   functions = "netlify/functions"
-  publish = "dist"
+  publish = "."
 
 [build.environment]
   NODE_VERSION = "20"
+  NPM_FLAGS = "--production=false"
 
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/index/:splat"
   status = 200
 
+[[redirects]]
+  from = "/health"
+  to = "/.netlify/functions/index"
+  status = 200
+
 [functions]
   node_bundler = "esbuild"
-  node_bundler_config = "{ \"format\": \"esm\" }"

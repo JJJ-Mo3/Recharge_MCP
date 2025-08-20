@@ -447,7 +447,10 @@ class RechargeServer {
 
 // Export for serverless platforms
 export const handler = async (event, context) => {
-  if (event.path === '/health') {
+  // Handle different serverless platform event formats
+  const path = event.path || event.rawPath || event.url || '/';
+  
+  if (path === '/health' || path.includes('/health')) {
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
@@ -455,11 +458,28 @@ export const handler = async (event, context) => {
     };
   }
   
-  // For MCP, we typically use stdio, but this allows HTTP deployment
+  // Handle API routes
+  if (path.startsWith('/api/')) {
+    return {
+      statusCode: 200,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: 'Recharge MCP Server API',
+        version: '1.1.0',
+        endpoints: ['/health']
+      })
+    };
+  }
+  
+  // Default response for MCP server
   return {
     statusCode: 200,
-    headers: { 'Content-Type': 'text/plain' },
-    body: 'Recharge MCP Server - Use stdio transport for MCP communication'
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      message: 'Recharge MCP Server',
+      description: 'Use stdio transport for MCP communication',
+      version: '1.1.0'
+    })
   };
 };
 
