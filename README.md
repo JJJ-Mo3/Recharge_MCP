@@ -1,6 +1,6 @@
-# Recharge Payments MCP Server
+# Recharge MCP Server
 
-A comprehensive Model Context Protocol (MCP) server that provides tools for interacting with the Recharge Payments API v2021-11. This server enables AI assistants to manage subscriptions, customers, orders, charges, and other Recharge resources with full CRUD operations and advanced features.
+A comprehensive Model Context Protocol (MCP) server that provides tools for interacting with the Recharge API v2021-11. This server enables AI assistants to manage subscriptions, customers, orders, charges, and other Recharge resources with full CRUD operations and advanced features.
 
 ## Features
 
@@ -291,7 +291,7 @@ To use this server with an MCP client, add it to your client's configuration:
 
 ## API Documentation
 
-This server implements endpoints from the Recharge Payments API v2021-11. For detailed API documentation, visit: https://developer.rechargepayments.com/2021-11
+This server implements endpoints from the Recharge API v2021-11. For detailed API documentation, visit: https://developer.rechargepayments.com/2021-11
 
 ## Error Handling
 

@@ -11,9 +11,9 @@ import { RechargeToolHandlers } from './src/tool-handlers.js';
 import * as tools from './src/tools.js';
 
 /**
- * Recharge Payments MCP Server
+ * Recharge MCP Server
  * 
- * This server provides tools for interacting with the Recharge Payments API,
+ * This server provides tools for interacting with the Recharge API,
  * allowing management of subscriptions, customers, orders, charges, and more.
  */
 class RechargeServer {
