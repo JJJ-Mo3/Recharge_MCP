@@ -35,13 +35,26 @@ export class RechargeClient {
       });
 
       if (!response.ok) {
-        const errorData = await response.text();
-        throw new Error(`Recharge API error ${response.status}: ${errorData}`);
+        let errorData;
+        try {
+          errorData = await response.json();
+        } catch {
+          errorData = await response.text();
+        }
+        
+        const errorMessage = typeof errorData === 'object' && errorData.errors 
+          ? JSON.stringify(errorData.errors)
+          : errorData;
+        
+        throw new Error(`Recharge API error ${response.status}: ${errorMessage}`);
       }
 
       return await response.json();
     } catch (error) {
-      throw new Error(`Request failed: ${error.message}`);
+      if (error.message.includes('Recharge API error')) {
+        throw error;
+      }
+      throw new Error(`Network request failed: ${error.message}`);
     }
   }
 

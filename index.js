@@ -414,6 +414,16 @@ class RechargeServer {
       await this.server.close();
       process.exit(0);
     });
+
+    process.on('uncaughtException', (error) => {
+      console.error('[Uncaught Exception]', error);
+      process.exit(1);
+    });
+
+    process.on('unhandledRejection', (reason, promise) => {
+      console.error('[Unhandled Rejection]', reason, 'at', promise);
+      process.exit(1);
+    });
   }
 
   async run() {

@@ -11,6 +11,19 @@ export class RechargeToolHandlers {
   // Customer handlers
   async handleGetCustomers(args) {
     try {
+      // Validate pagination parameters
+      if (args.limit && (args.limit < 1 || args.limit > 250)) {
+        throw new Error('Limit must be between 1 and 250');
+      }
+      
+      // Validate date format if provided
+      if (args.created_at_min && !this.isValidISODate(args.created_at_min)) {
+        throw new Error('created_at_min must be in ISO 8601 format');
+      }
+      if (args.created_at_max && !this.isValidISODate(args.created_at_max)) {
+        throw new Error('created_at_max must be in ISO 8601 format');
+      }
+      
       const result = await this.client.getCustomers(args);
       return {
         content: [
@@ -33,6 +46,19 @@ export class RechargeToolHandlers {
     }
   }
 
+  // Helper method to validate ISO date format
+  isValidISODate(dateString) {
+    const date = new Date(dateString);
+    return date instanceof Date && !isNaN(date) && dateString.includes('T');
+  }
+
+  // Helper method to validate required fields
+  validateRequiredFields(args, requiredFields) {
+    const missing = requiredFields.filter(field => !args[field]);
+    if (missing.length > 0) {
+      throw new Error(`Missing required fields: ${missing.join(', ')}`);
+    }
+  }
   async handleGetCustomer(args) {
     try {
       const result = await this.client.getCustomer(args.customer_id);
@@ -59,6 +85,14 @@ export class RechargeToolHandlers {
 
   async handleCreateCustomer(args) {
     try {
+      this.validateRequiredFields(args, ['email']);
+      
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(args.email)) {
+        throw new Error('Invalid email format');
+      }
+      
       const result = await this.client.createCustomer(args);
       return {
         content: [
@@ -133,6 +167,31 @@ export class RechargeToolHandlers {
 
   async handleCreateSubscription(args) {
     try {
+      this.validateRequiredFields(args, [
+        'address_id', 
+        'next_charge_scheduled_at', 
+        'order_interval_frequency', 
+        'order_interval_unit', 
+        'quantity', 
+        'shopify_variant_id'
+      ]);
+      
+      // Validate interval unit
+      const validUnits = ['day', 'week', 'month'];
+      if (!validUnits.includes(args.order_interval_unit)) {
+        throw new Error(`Invalid order_interval_unit. Must be one of: ${validUnits.join(', ')}`);
+      }
+      
+      // Validate quantity
+      if (args.quantity < 1) {
+        throw new Error('Quantity must be at least 1');
+      }
+      
+      // Validate date format
+      if (!this.isValidISODate(args.next_charge_scheduled_at)) {
+        throw new Error('next_charge_scheduled_at must be in ISO 8601 format');
+      }
+      
       const result = await this.client.createSubscription(args);
       return {
         content: [

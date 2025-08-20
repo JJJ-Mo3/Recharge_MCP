@@ -7,7 +7,8 @@
   "scripts": {
     "start": "node index.js",
     "dev": "node --watch index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "validate": "node -c index.js && node -c src/recharge-client.js && node -c src/tool-handlers.js && node -c src/tools.js"
   },
   "keywords": ["mcp", "recharge", "payments", "subscriptions"],
   "author": "",

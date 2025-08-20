@@ -296,10 +296,12 @@ This server implements endpoints from the Recharge Payments API v2021-11. For de
 ## Error Handling
 
 The server includes comprehensive error handling:
-- API errors are caught and returned with descriptive messages
-- Network errors are handled gracefully
-- Invalid tool calls return appropriate error responses
-- All errors include context about what operation failed
+- **API errors** are caught and returned with descriptive messages including error codes
+- **Network errors** are handled gracefully with retry suggestions
+- **Validation errors** for required fields, formats, and constraints
+- **Invalid tool calls** return appropriate error responses
+- **All errors** include context about what operation failed
+- **Structured error responses** with consistent formatting
 
 ## Security
 
@@ -333,6 +335,21 @@ Recharge API has rate limits. The server doesn't implement client-side rate limi
    - Verify Recharge API status
    - Implement retry logic for transient failures
 
+4. **Validation Errors**
+   - Ensure all required fields are provided
+   - Use proper date formats (ISO 8601: YYYY-MM-DDTHH:mm:ssZ)
+   - Validate email addresses before creating customers
+   - Check that numeric values are within acceptable ranges
+
+5. **Data Format Issues**
+   - Use strings for IDs, not numbers
+   - Ensure currency amounts are formatted as strings
+   - Validate enum values against allowed options
+
+6. **Timeout Issues**
+   - Use pagination for large datasets
+   - Implement request timeouts
+   - Consider using async batches for bulk operations
 ## License
 
 MIT License - see LICENSE file for details.
@@ -1400,3 +1417,8 @@ Resources with status fields support filtering:
 13. **Log API calls** for debugging and monitoring
 14. **Use environment variables** for sensitive configuration
 15. **Test with sandbox data** before production deployment
+16. **Validate input parameters** before sending requests to avoid API errors
+17. **Use proper date formats** (ISO 8601) for all date fields
+18. **Check response status** and handle different error types appropriately
+19. **Implement circuit breakers** for high-volume applications
+20. **Use connection pooling** for better performance in production
