@@ -1,0 +1,20 @@
+{
+  "name": "recharge-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server for Recharge Payments API",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["mcp", "recharge", "payments", "subscriptions"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "latest",
+    "zod": "latest",
+    "dotenv": "latest"
+  }
+}
