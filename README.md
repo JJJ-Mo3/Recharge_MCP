@@ -32,6 +32,50 @@ A Model Context Protocol (MCP) server that provides tools for interacting with t
 - Get addresses (with filtering and pagination)
 - Create new addresses
 
+### Discount Management
+- Get discounts (with filtering and pagination)
+- Create new discounts
+
+### Metafield Management
+- Get metafields (with filtering by resource type)
+- Create new metafields for customers, subscriptions, or store
+
+### Webhook Management
+- Get webhooks
+- Create new webhooks for event notifications
+
+### Payment Method Management
+- Get payment methods (with customer filtering)
+
+### Checkout Management
+- Create new checkouts for one-time purchases
+
+### One-time Product Management
+- Get one-time products
+- Create new one-time products
+
+### Store Credit Management
+- Get store credits
+- Create new store credits
+
+### Charge Actions
+- Skip charges
+- Process charges
+- Refund charges
+
+### Subscription Actions
+- Skip subscription charges
+
+### Shop Information
+- Get shop details and configuration
+
+### Collection Management
+- Get product collections
+
+### Analytics
+- Get subscription analytics
+- Get customer analytics
+
 ## Setup
 
 1. **Install dependencies:**
@@ -119,6 +163,50 @@ To use this server with an MCP client, add it to your client's configuration:
 ### Address Tools
 - `recharge_get_addresses` - Retrieve addresses with filtering
 - `recharge_create_address` - Create a new address
+
+### Discount Tools
+- `recharge_get_discounts` - Retrieve discounts with filtering
+- `recharge_create_discount` - Create a new discount
+
+### Metafield Tools
+- `recharge_get_metafields` - Retrieve metafields with filtering
+- `recharge_create_metafield` - Create a new metafield
+
+### Webhook Tools
+- `recharge_get_webhooks` - Retrieve webhooks
+- `recharge_create_webhook` - Create a new webhook
+
+### Payment Method Tools
+- `recharge_get_payment_methods` - Retrieve payment methods
+
+### Checkout Tools
+- `recharge_create_checkout` - Create a new checkout
+
+### One-time Product Tools
+- `recharge_get_onetimes` - Retrieve one-time products
+- `recharge_create_onetime` - Create a new one-time product
+
+### Store Credit Tools
+- `recharge_get_store_credits` - Retrieve store credits
+- `recharge_create_store_credit` - Create a new store credit
+
+### Charge Action Tools
+- `recharge_skip_charge` - Skip a specific charge
+- `recharge_process_charge` - Process a specific charge
+- `recharge_refund_charge` - Refund a specific charge
+
+### Subscription Action Tools
+- `recharge_skip_subscription_charge` - Skip the next charge for a subscription
+
+### Shop Tools
+- `recharge_get_shop` - Get shop information
+
+### Collection Tools
+- `recharge_get_collections` - Retrieve product collections
+
+### Analytics Tools
+- `recharge_get_subscription_analytics` - Get subscription analytics data
+- `recharge_get_customer_analytics` - Get customer analytics data
 
 ## API Documentation
 

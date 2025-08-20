@@ -67,6 +67,50 @@ class RechargeServer {
           // Address tools
           tools.getAddressesSchema,
           tools.createAddressSchema,
+
+          // Discount tools
+          tools.getDiscountsSchema,
+          tools.createDiscountSchema,
+
+          // Metafield tools
+          tools.getMetafieldsSchema,
+          tools.createMetafieldSchema,
+
+          // Webhook tools
+          tools.getWebhooksSchema,
+          tools.createWebhookSchema,
+
+          // Payment method tools
+          tools.getPaymentMethodsSchema,
+
+          // Checkout tools
+          tools.createCheckoutSchema,
+
+          // Onetime tools
+          tools.getOnetimesSchema,
+          tools.createOnetimeSchema,
+
+          // Store credit tools
+          tools.getStoreCreditSchema,
+          tools.createStoreCreditSchema,
+
+          // Charge action tools
+          tools.skipChargeSchema,
+          tools.processChargeSchema,
+          tools.refundChargeSchema,
+
+          // Subscription action tools
+          tools.skipSubscriptionChargeSchema,
+
+          // Shop tools
+          tools.getShopSchema,
+
+          // Collection tools
+          tools.getCollectionsSchema,
+
+          // Analytics tools
+          tools.getSubscriptionAnalyticsSchema,
+          tools.getCustomerAnalyticsSchema,
         ],
       };
     });
@@ -120,6 +164,70 @@ class RechargeServer {
             return await this.toolHandlers.handleGetAddresses(args);
           case 'recharge_create_address':
             return await this.toolHandlers.handleCreateAddress(args);
+
+          // Discount tools
+          case 'recharge_get_discounts':
+            return await this.toolHandlers.handleGetDiscounts(args);
+          case 'recharge_create_discount':
+            return await this.toolHandlers.handleCreateDiscount(args);
+
+          // Metafield tools
+          case 'recharge_get_metafields':
+            return await this.toolHandlers.handleGetMetafields(args);
+          case 'recharge_create_metafield':
+            return await this.toolHandlers.handleCreateMetafield(args);
+
+          // Webhook tools
+          case 'recharge_get_webhooks':
+            return await this.toolHandlers.handleGetWebhooks(args);
+          case 'recharge_create_webhook':
+            return await this.toolHandlers.handleCreateWebhook(args);
+
+          // Payment method tools
+          case 'recharge_get_payment_methods':
+            return await this.toolHandlers.handleGetPaymentMethods(args);
+
+          // Checkout tools
+          case 'recharge_create_checkout':
+            return await this.toolHandlers.handleCreateCheckout(args);
+
+          // Onetime tools
+          case 'recharge_get_onetimes':
+            return await this.toolHandlers.handleGetOnetimes(args);
+          case 'recharge_create_onetime':
+            return await this.toolHandlers.handleCreateOnetime(args);
+
+          // Store credit tools
+          case 'recharge_get_store_credits':
+            return await this.toolHandlers.handleGetStoreCredits(args);
+          case 'recharge_create_store_credit':
+            return await this.toolHandlers.handleCreateStoreCredit(args);
+
+          // Charge action tools
+          case 'recharge_skip_charge':
+            return await this.toolHandlers.handleSkipCharge(args);
+          case 'recharge_process_charge':
+            return await this.toolHandlers.handleProcessCharge(args);
+          case 'recharge_refund_charge':
+            return await this.toolHandlers.handleRefundCharge(args);
+
+          // Subscription action tools
+          case 'recharge_skip_subscription_charge':
+            return await this.toolHandlers.handleSkipSubscriptionCharge(args);
+
+          // Shop tools
+          case 'recharge_get_shop':
+            return await this.toolHandlers.handleGetShop(args);
+
+          // Collection tools
+          case 'recharge_get_collections':
+            return await this.toolHandlers.handleGetCollections(args);
+
+          // Analytics tools
+          case 'recharge_get_subscription_analytics':
+            return await this.toolHandlers.handleGetSubscriptionAnalytics(args);
+          case 'recharge_get_customer_analytics':
+            return await this.toolHandlers.handleGetCustomerAnalytics(args);
 
           default:
             throw new Error(`Unknown tool: ${name}`);
