@@ -203,6 +203,10 @@ export const updateSubscriptionSchema = {
   inputSchema: {
     type: 'object',
     properties: {
+      subscription_id: {
+        type: 'string',
+        description: 'The subscription ID'
+      },
       quantity: {
         type: 'number',
         description: 'Subscription quantity'
