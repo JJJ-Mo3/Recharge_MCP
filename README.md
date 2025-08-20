@@ -354,6 +354,48 @@ Recharge API has rate limits. The server doesn't implement client-side rate limi
 
 MIT License - see LICENSE file for details.
 
+## Deployment
+
+This MCP server can be deployed to various platforms:
+
+### Docker
+```bash
+docker build -t recharge-mcp-server .
+docker run -e RECHARGE_API_KEY=your_key recharge-mcp-server
+```
+
+### Vercel
+```bash
+npm install -g vercel
+vercel --prod
+```
+
+### Netlify
+```bash
+npm install -g netlify-cli
+netlify deploy --prod
+```
+
+### Railway
+```bash
+npm install -g @railway/cli
+railway deploy
+```
+
+### Render
+Connect your GitHub repository to Render and it will auto-deploy.
+
+### Fly.io
+```bash
+flyctl deploy
+```
+
+### Environment Variables
+All deployment platforms require:
+- `RECHARGE_API_KEY`: Your Recharge API key
+- `RECHARGE_API_URL`: Recharge API URL (defaults to https://api.rechargeapps.com)
+- `NODE_ENV`: Set to "production" for production deployments
+
 ## Sample Usage
 
 Below are examples of how to use each tool with sample parameters and expected responses.

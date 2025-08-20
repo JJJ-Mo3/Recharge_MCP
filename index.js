@@ -10,6 +10,15 @@ import {
 import { RechargeToolHandlers } from './src/tool-handlers.js';
 import * as tools from './src/tools.js';
 
+// Health check endpoint for deployment platforms
+const healthCheck = () => {
+  return {
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    version: '1.1.0'
+  };
+};
+
 /**
  * Recharge MCP Server
  * 
@@ -422,7 +431,10 @@ class RechargeServer {
 
     process.on('unhandledRejection', (reason, promise) => {
       console.error('[Unhandled Rejection]', reason, 'at', promise);
-      process.exit(1);
+      // Don't exit in production for unhandled rejections
+      if (process.env.NODE_ENV !== 'production') {
+        process.exit(1);
+      }
     });
   }
 
@@ -433,9 +445,29 @@ class RechargeServer {
   }
 }
 
+// Export for serverless platforms
+export const handler = async (event, context) => {
+  if (event.path === '/health') {
+    return {
+      statusCode: 200,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(healthCheck())
+    };
+  }
+  
+  // For MCP, we typically use stdio, but this allows HTTP deployment
+  return {
+    statusCode: 200,
+    headers: { 'Content-Type': 'text/plain' },
+    body: 'Recharge MCP Server - Use stdio transport for MCP communication'
+  };
+};
+
 // Start the server
-const server = new RechargeServer();
-server.run().catch((error) => {
-  console.error('Failed to start server:', error);
-  process.exit(1);
-});
+if (import.meta.url === `file://${process.argv[1]}`) {
+  const server = new RechargeServer();
+  server.run().catch((error) => {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  });
+}

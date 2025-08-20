@@ -7,16 +7,20 @@
   "scripts": {
     "start": "node index.js",
     "dev": "node --watch index.js",
-    "build": "echo \"No build step required for this project. Use 'npm start' to run the server.\"",
+    "build": "npm run validate && echo \"Build completed successfully. Ready for deployment.\"",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "validate": "node -c index.js && node -c src/recharge-client.js && node -c src/tool-handlers.js && node -c src/tools.js"
+    "validate": "node -c index.js && node -c src/recharge-client.js && node -c src/tool-handlers.js && node -c src/tools.js",
+    "prestart": "npm run validate"
   },
   "keywords": ["mcp", "recharge", "payments", "subscriptions"],
   "author": "",
   "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "latest",
-    "zod": "latest",
     "dotenv": "latest"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
   }
 }
