@@ -13,3 +13,4 @@
 
 [functions]
   node_bundler = "esbuild"
+  node_bundler_config = "{ \"format\": \"esm\" }"
