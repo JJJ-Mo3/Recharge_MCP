@@ -129,10 +129,6 @@ While the project includes deployment configurations for remote hosting (Docker,
    ```
 
 3. **Get your Recharge API key:**
-   - Log in to your Recharge dashboard
-   - Navigate to Apps & integrations > Private apps
-   - Create a new private app or use an existing one
-   - Copy the API access token
 
 ## API Key Configuration
 
