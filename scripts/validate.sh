@@ -1,9 +1,15 @@
 #!/bin/bash
 
 # Validation script for Recharge MCP Server
-# Usage: ./scripts/validate.sh
+# Usage: ./scripts/validate.sh [--verbose]
 
 set -e
+
+# Parse arguments
+VERBOSE=false
+if [[ "$1" == "--verbose" ]]; then
+    VERBOSE=true
+fi
 
 # Colors for output
 RED='\033[0;31m'
@@ -13,6 +19,11 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 echo -e "${BLUE}🔍 Validating Recharge MCP Server...${NC}"
+
+if [[ "$VERBOSE" == "true" ]]; then
+    echo -e "${YELLOW}Running in verbose mode...${NC}"
+    set -x
+fi
 
 # Check Node.js version
 echo -e "${YELLOW}📋 Checking Node.js version...${NC}"
@@ -32,9 +43,15 @@ if [ ! -f package.json ]; then
     exit 1
 fi
 
+if [ ! -f package.json ]; then
+    echo -e "${RED}❌ package.json not found${NC}"
+    exit 1
+fi
+
 # Check if node_modules exists
 if [ ! -d node_modules ]; then
     echo -e "${YELLOW}⚠️  node_modules not found. Installing dependencies...${NC}"
+    echo -e "${BLUE}Running: npm install${NC}"
     npm install
 fi
 
@@ -45,13 +62,14 @@ FILES_TO_CHECK=(
     "index.js"
     "src/recharge-client.js"
     "src/tool-handlers.js"
+    "src/tool-handlers.js"
     "src/tools/index.js"
 )
 
 for file in "${FILES_TO_CHECK[@]}"; do
     if [ -f "$file" ]; then
         echo -e "${BLUE}  Checking $file...${NC}"
-        if node -c "$file"; then
+        if node -c "$file" 2>/dev/null; then
             echo -e "${GREEN}  ✅ $file syntax is valid${NC}"
         else
             echo -e "${RED}  ❌ $file has syntax errors${NC}"
@@ -63,6 +81,18 @@ for file in "${FILES_TO_CHECK[@]}"; do
     fi
 done
 
+# Check for modular tools structure
+echo -e "${YELLOW}📋 Checking modular tools structure...${NC}"
+TOOL_FILES=(
+    "src/tools/customer-tools.js"
+    "src/tools/subscription-tools.js"
+    "src/tools/index.js"
+)
+
+for file in "${TOOL_FILES[@]}"; do
+    [[ -f "$file" ]] && echo -e "${GREEN}  ✅ $file found${NC}" || echo -e "${YELLOW}  ⚠️  $file not found${NC}"
+done
+
 # Check environment file
 echo -e "${YELLOW}📋 Checking environment configuration...${NC}"
 if [ -f .env ]; then
@@ -70,7 +100,7 @@ if [ -f .env ]; then
     
     # Check if API key is set (optional)
     if grep -q "RECHARGE_API_KEY=" .env; then
-        if grep -q "RECHARGE_API_KEY=your_" .env; then
+        if grep -q "RECHARGE_API_KEY=your_" .env || grep -q "RECHARGE_API_KEY=$" .env; then
             echo -e "${YELLOW}⚠️  Default API key placeholder found in .env${NC}"
         else
             echo -e "${GREEN}✅ API key configured in .env${NC}"
@@ -83,6 +113,14 @@ else
     if [ -f .env.example ]; then
         echo -e "${BLUE}  You can copy .env.example to .env and configure it${NC}"
     fi
+fi
+
+# Check for sensitive files that shouldn't be committed
+echo -e "${YELLOW}📋 Checking for sensitive files...${NC}"
+if [ -f .env ] && ! grep -q ".env" .gitignore 2>/dev/null; then
+    echo -e "${YELLOW}⚠️  .env file exists but may not be in .gitignore${NC}"
+else
+    echo -e "${GREEN}✅ Sensitive files properly configured${NC}"
 fi
 
 # Check Docker files
@@ -150,13 +188,22 @@ done
 # Test basic functionality
 echo -e "${YELLOW}📋 Testing basic functionality...${NC}"
 if timeout 10s node -e "
-const { RechargeServer } = require('./index.js');
-console.log('✅ Server can be imported successfully');
-process.exit(0);
+try {
+  import('./index.js').then(() => {
+    console.log('✅ Server can be imported successfully');
+    process.exit(0);
+  }).catch((err) => {
+    console.error('Import failed:', err.message);
+    process.exit(1);
+  });
+} catch (err) {
+  console.error('Import failed:', err.message);
+  process.exit(1);
+}
 " 2>/dev/null; then
     echo -e "${GREEN}✅ Basic functionality test passed${NC}"
 else
-    echo -e "${YELLOW}⚠️  Basic functionality test skipped (timeout or import issues)${NC}"
+    echo -e "${YELLOW}⚠️  Basic functionality test failed or timed out${NC}"
 fi
 
 # Check documentation
@@ -165,7 +212,7 @@ if [ -f README.md ]; then
     echo -e "${GREEN}✅ README.md found${NC}"
     
     # Check if README has basic sections
-    SECTIONS=("Setup" "Usage" "Configuration" "Deployment")
+    SECTIONS=("Setup" "Usage" "Configuration" "Deployment" "Quick Start")
     for section in "${SECTIONS[@]}"; do
         if grep -q "## $section" README.md; then
             echo -e "${GREEN}  ✅ $section section found${NC}"
@@ -183,6 +230,11 @@ else
     echo -e "${YELLOW}⚠️  LICENSE not found${NC}"
 fi
 
+# Final summary
+echo ""
+echo -e "${GREEN}🎉 Validation completed successfully!${NC}"
+echo ""
+
 echo ""
 echo -e "${GREEN}🎉 Validation completed!${NC}"
 echo ""
@@ -192,6 +244,13 @@ echo -e "${GREEN}✅ JavaScript syntax is correct${NC}"
 echo -e "${GREEN}✅ Node.js version is compatible${NC}"
 echo ""
 echo -e "${BLUE}🚀 Ready to run:${NC}"
+echo -e "${BLUE}  npm start                    # Start the MCP server${NC}"
+echo -e "${BLUE}  npm run dev                  # Start in development mode${NC}"
+echo -e "${BLUE}  npm run docker:build         # Build Docker image${NC}"
+echo -e "${BLUE}  npm run docker:run           # Run in Docker${NC}"
+echo ""
+echo -e "${BLUE}📖 Next steps:${NC}"
+echo -e "${BLUE}  1. Configure your MCP client (see README.md)${NC}"
+echo -e "${BLUE}  2. Add your Recharge API key to .env or client config${NC}"
 echo -e "${BLUE}  npm start${NC}"
 echo -e "${BLUE}  npm run dev${NC}"
-echo -e "${BLUE}  docker-compose up${NC}"

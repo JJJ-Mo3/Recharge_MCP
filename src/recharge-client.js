@@ -4,6 +4,8 @@ config();
 
 /**
  * Recharge API client for handling HTTP requests
+ * Supports the Recharge API v2021-11 with comprehensive error handling,
+ * retry logic, and timeout management.
  */
 export class RechargeClient {
   constructor(apiKey = null) {
@@ -12,7 +14,7 @@ export class RechargeClient {
     this.baseUrl = process.env.RECHARGE_API_URL || 'https://api.rechargeapps.com';
     this.timeout = parseInt(process.env.RECHARGE_API_TIMEOUT) || 30000; // 30 seconds default
     this.retryAttempts = parseInt(process.env.RECHARGE_API_RETRY_ATTEMPTS) || 3;
-    this.retryDelay = parseInt(process.env.RECHARGE_API_RETRY_DELAY) || 1000; // 1 second
+    this.retryDelay = parseInt(process.env.RECHARGE_API_RETRY_DELAY) || 1000; // 1 second base delay
   }
 
   /**
@@ -33,6 +35,10 @@ export class RechargeClient {
 
   /**
    * Make authenticated request to Recharge API
+   * @param {string} endpoint - API endpoint path
+   * @param {Object} options - Request options (method, body, headers, etc.)
+   * @returns {Promise<Object>} - API response data
+   * @throws {Error} - On API errors, network errors, or timeouts
    */
   async request(endpoint, options = {}) {
     this.validateApiKey();
@@ -72,7 +78,7 @@ export class RechargeClient {
           
           const errorMessage = typeof errorData === 'object' && errorData.errors 
             ? JSON.stringify(errorData.errors)
-            : errorData;
+            : errorData || `HTTP ${response.status}`;
           
           // Don't retry on client errors (4xx)
           if (response.status >= 400 && response.status < 500) {
@@ -80,9 +86,9 @@ export class RechargeClient {
           }
           
           // Retry on server errors (5xx) and rate limits (429)
-          if (attempt < this.retryAttempts && (response.status >= 500 || response.status === 429)) {
+          if (attempt < this.retryAttempts && (response.status >= 500 || response.status === 429 || response.status === 503)) {
             console.error(`Attempt ${attempt} failed with status ${response.status}, retrying...`);
-            await this.sleep(this.retryDelay * attempt);
+            await this.sleep(this.retryDelay * Math.pow(2, attempt - 1)); // Exponential backoff
             continue;
           }
           
@@ -110,7 +116,7 @@ export class RechargeClient {
         // Retry on network errors
         if (attempt < this.retryAttempts) {
           console.error(`Network error on attempt ${attempt}: ${error.message}, retrying...`);
-          await this.sleep(this.retryDelay * attempt);
+          await this.sleep(this.retryDelay * Math.pow(2, attempt - 1)); // Exponential backoff
           continue;
         }
       }
@@ -119,9 +125,17 @@ export class RechargeClient {
     throw new Error(`Network request failed after ${this.retryAttempts} attempts: ${lastError.message}`);
   }
 
+  // Utility method for building query parameters
+  buildQueryParams(params) {
+    const filteredParams = Object.fromEntries(
+      Object.entries(params).filter(([_, value]) => value !== undefined && value !== null && value !== '')
+    );
+    return new URLSearchParams(filteredParams);
+  }
+
   // Customer methods
   async getCustomers(params = {}) {
-    const searchParams = new URLSearchParams(params);
+    const searchParams = this.buildQueryParams(params);
     return this.request(`/customers?${searchParams}`);
   }
 
@@ -145,7 +159,7 @@ export class RechargeClient {
 
   // Subscription methods
   async getSubscriptions(params = {}) {
-    const searchParams = new URLSearchParams(params);
+    const searchParams = this.buildQueryParams(params);
     return this.request(`/subscriptions?${searchParams}`);
   }
 
@@ -182,7 +196,7 @@ export class RechargeClient {
 
   // Product methods
   async getProducts(params = {}) {
-    const searchParams = new URLSearchParams(params);
+    const searchParams = this.buildQueryParams(params);
     return this.request(`/products?${searchParams}`);
   }
 
@@ -192,7 +206,7 @@ export class RechargeClient {
 
   // Order methods
   async getOrders(params = {}) {
-    const searchParams = new URLSearchParams(params);
+    const searchParams = this.buildQueryParams(params);
     return this.request(`/orders?${searchParams}`);
   }
 
@@ -202,7 +216,7 @@ export class RechargeClient {
 
   // Charge methods
   async getCharges(params = {}) {
-    const searchParams = new URLSearchParams(params);
+    const searchParams = this.buildQueryParams(params);
     return this.request(`/charges?${searchParams}`);
   }
 
@@ -212,7 +226,7 @@ export class RechargeClient {
 
   // Address methods
   async getAddresses(params = {}) {
-    const searchParams = new URLSearchParams(params);
+    const searchParams = this.buildQueryParams(params);
     return this.request(`/addresses?${searchParams}`);
   }
 
@@ -236,7 +250,7 @@ export class RechargeClient {
 
   // Discount methods
   async getDiscounts(params = {}) {
-    const searchParams = new URLSearchParams(params);
+    const searchParams = this.buildQueryParams(params);
     return this.request(`/discounts?${searchParams}`);
   }
 
@@ -266,7 +280,7 @@ export class RechargeClient {
 
   // Metafield methods
   async getMetafields(params = {}) {
-    const searchParams = new URLSearchParams(params);
+    const searchParams = this.buildQueryParams(params);
     return this.request(`/metafields?${searchParams}`);
   }
 
@@ -296,7 +310,7 @@ export class RechargeClient {
 
   // Payment method methods
   async getPaymentMethods(params = {}) {
-    const searchParams = new URLSearchParams(params);
+    const searchParams = this.buildQueryParams(params);
     return this.request(`/payment_methods?${searchParams}`);
   }
 
@@ -313,7 +327,7 @@ export class RechargeClient {
 
   // Webhook methods
   async getWebhooks(params = {}) {
-    const searchParams = new URLSearchParams(params);
+    const searchParams = this.buildQueryParams(params);
     return this.request(`/webhooks?${searchParams}`);
   }
 
@@ -348,7 +362,7 @@ export class RechargeClient {
 
   // Collection methods
   async getCollections(params = {}) {
-    const searchParams = new URLSearchParams(params);
+    const searchParams = this.buildQueryParams(params);
     return this.request(`/collections?${searchParams}`);
   }
 
@@ -358,7 +372,7 @@ export class RechargeClient {
 
   // Bundle selection methods
   async getBundleSelections(params = {}) {
-    const searchParams = new URLSearchParams(params);
+    const searchParams = this.buildQueryParams(params);
     return this.request(`/bundle_selections?${searchParams}`);
   }
 
@@ -388,7 +402,7 @@ export class RechargeClient {
 
   // Retention strategy methods
   async getRetentionStrategies(params = {}) {
-    const searchParams = new URLSearchParams(params);
+    const searchParams = this.buildQueryParams(params);
     return this.request(`/retention_strategies?${searchParams}`);
   }
 
@@ -398,7 +412,7 @@ export class RechargeClient {
 
   // Async batch methods
   async getAsyncBatches(params = {}) {
-    const searchParams = new URLSearchParams(params);
+    const searchParams = this.buildQueryParams(params);
     return this.request(`/async_batches?${searchParams}`);
   }
 
@@ -415,7 +429,7 @@ export class RechargeClient {
 
   // Checkout methods
   async getCheckouts(params = {}) {
-    const searchParams = new URLSearchParams(params);
+    const searchParams = this.buildQueryParams(params);
     return this.request(`/checkouts?${searchParams}`);
   }
 
@@ -445,7 +459,7 @@ export class RechargeClient {
 
   // Notification methods
   async getNotifications(params = {}) {
-    const searchParams = new URLSearchParams(params);
+    const searchParams = this.buildQueryParams(params);
     return this.request(`/notifications?${searchParams}`);
   }
 
@@ -486,7 +500,7 @@ export class RechargeClient {
   }
   // Onetimes methods
   async getOnetimes(params = {}) {
-    const searchParams = new URLSearchParams(params);
+    const searchParams = this.buildQueryParams(params);
     return this.request(`/onetimes?${searchParams}`);
   }
 
@@ -516,19 +530,19 @@ export class RechargeClient {
 
   // Subscription analytics methods
   async getSubscriptionAnalytics(params = {}) {
-    const searchParams = new URLSearchParams(params);
+    const searchParams = this.buildQueryParams(params);
     return this.request(`/analytics/subscriptions?${searchParams}`);
   }
 
   // Customer analytics methods
   async getCustomerAnalytics(params = {}) {
-    const searchParams = new URLSearchParams(params);
+    const searchParams = this.buildQueryParams(params);
     return this.request(`/analytics/customers?${searchParams}`);
   }
 
   // Store credit methods
   async getStoreCredits(params = {}) {
-    const searchParams = new URLSearchParams(params);
+    const searchParams = this.buildQueryParams(params);
     return this.request(`/store_credits?${searchParams}`);
   }
 

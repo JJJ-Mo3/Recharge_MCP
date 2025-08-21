@@ -1,10 +1,11 @@
 # Recharge MCP Server
 
-A comprehensive **local** Model Context Protocol (MCP) server that provides tools for interacting with the Recharge API v2021-11. This server runs as a local process and communicates with MCP clients via stdio (standard input/output). It enables AI assistants to manage subscriptions, customers, orders, charges, and other Recharge resources with full CRUD operations and advanced features.
+A comprehensive **local** Model Context Protocol (MCP) server that provides 70+ tools for interacting with the Recharge API v2021-11. This server runs as a local process and communicates with MCP clients via stdio (standard input/output). It enables AI assistants to manage subscriptions, customers, orders, charges, and other Recharge resources with full CRUD operations and advanced features.
 
 ## Table of Contents
 
 - [Overview](#overview)
+- [Quick Start](#quick-start)
 - [Server Architecture](#server-architecture)
 - [Setup](#setup)
 - [API Key Configuration](#api-key-configuration)
@@ -33,6 +34,37 @@ This MCP server provides comprehensive access to the Recharge API v2021-11, enab
 - **Analytics**: Access subscription and customer analytics data
 - **Webhooks**: Set up and manage webhook notifications
 - **And much more**: 70+ tools covering all major Recharge API endpoints
+
+## Quick Start
+
+1. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+2. **Configure your API key (optional):**
+   ```bash
+   cp .env.example .env
+   # Edit .env and add your RECHARGE_API_KEY
+   ```
+
+3. **Add to your MCP client configuration:**
+   ```json
+   {
+     "mcpServers": {
+       "recharge": {
+         "command": "node",
+         "args": ["/path/to/recharge-mcp-server/index.js"],
+         "env": {
+           "RECHARGE_API_KEY": "your_api_key_here"
+         }
+       }
+     }
+   }
+   ```
+
+4. **Start using the tools in your AI assistant!**
+
 ## Server Architecture
 
 This is a **local MCP server** that:
@@ -70,8 +102,12 @@ While the project includes deployment configurations for remote hosting (Docker,
    - Navigate to Apps > Custom integrations
    - Create a new integration or use an existing one
    - Copy the API access token
-   - Ensure the integration has the necessary permissions for your use case
+   - Ensure the integration has the necessary permissions (see [API Key Permissions](#api-key-permissions))
 
+4. **Validate your setup:**
+   ```bash
+   npm run validate
+   ```
 ## API Key Configuration
 
 The MCP server supports two methods for API key configuration:
@@ -96,14 +132,14 @@ Clients can provide their own API key with each tool call by including an `api_k
 ### Method 3: No Default API Key (Recommended for Multi-tenant)
 Deploy without setting `RECHARGE_API_KEY` in the environment. All clients must provide their own API key with each request.
 
+### API Key Permissions
+
 **Note:** 
 - Client-provided API keys always take precedence over environment variables
 - If no API key is available (neither environment nor client-provided), requests will fail with a clear error message
 - This design allows multiple clients to use their own Recharge accounts through the same MCP server instance
 
 ### API Key Permissions
-
-Ensure your Recharge API key has the following permissions based on your needs:
 
 - **Read permissions**: For retrieving data (customers, subscriptions, orders, etc.)
 - **Write permissions**: For creating and updating resources
@@ -112,6 +148,7 @@ Ensure your Recharge API key has the following permissions based on your needs:
 
 **Security Best Practices:**
 - Use environment variables or secure configuration management
+- Never commit API keys to version control
 - Rotate API keys regularly
 - Use the principle of least privilege - only grant necessary permissions
 - Monitor API key usage and set up alerts for unusual activity
@@ -133,6 +170,16 @@ The server will start and listen for MCP protocol messages on stdin/stdout. You 
 ### Development Mode
 ```bash
 npm run dev
+```
+
+### Testing the Server
+```bash
+# Validate the entire project
+npm run validate
+
+# Test with Docker
+npm run docker:build
+npm run docker:run
 ```
 
 
@@ -1567,26 +1614,34 @@ Resources with status fields support filtering:
 
 ## Best Practices
 
-1. **Use pagination** for large datasets to avoid timeouts
-2. **Filter by customer_id** when possible to reduce response size
-3. **Use date ranges** for analytics and reporting queries
-4. **Handle errors gracefully** - check the `isError` field in responses
-5. **Validate required fields** before making tool calls
-6. **Use specific IDs** when retrieving individual resources for better performance
-7. **Monitor rate limits** - Recharge has API rate limits that vary by plan
-8. **Use async batches** for bulk operations to improve performance
-9. **Implement proper error handling** for network timeouts and API errors
-10. **Cache frequently accessed data** like product information to reduce API calls
-11. **Use webhooks** for real-time updates instead of polling
-12. **Implement retry logic** for transient failures
-13. **Log API calls** for debugging and monitoring
-14. **Use environment variables** for sensitive configuration
-15. **Test with sandbox data** before production deployment
-16. **Validate input parameters** before sending requests to avoid API errors
-17. **Use proper date formats** (ISO 8601) for all date fields
-18. **Check response status** and handle different error types appropriately
-19. **Implement circuit breakers** for high-volume applications
-20. **Use connection pooling** for better performance in production
+### API Usage
+- **Use pagination** for large datasets to avoid timeouts
+- **Filter by customer_id** when possible to reduce response size
+- **Use date ranges** for analytics and reporting queries
+- **Use specific IDs** when retrieving individual resources for better performance
+- **Monitor rate limits** - Recharge has API rate limits that vary by plan
+- **Use async batches** for bulk operations to improve performance
+
+### Error Handling
+- **Handle errors gracefully** - check the `isError` field in responses
+- **Validate required fields** before making tool calls
+- **Implement proper error handling** for network timeouts and API errors
+- **Check response status** and handle different error types appropriately
+- **Use proper date formats** (ISO 8601) for all date fields
+
+### Performance & Reliability
+- **Cache frequently accessed data** like product information to reduce API calls
+- **Use webhooks** for real-time updates instead of polling
+- **Implement retry logic** for transient failures (built-in to this server)
+- **Implement circuit breakers** for high-volume applications
+- **Use connection pooling** for better performance in production
+
+### Security & Configuration
+- **Use environment variables** for sensitive configuration
+- **Never commit API keys** to version control
+- **Validate input parameters** before sending requests to avoid API errors
+- **Test with sandbox data** before production deployment
+- **Log API calls** for debugging and monitoring (but not sensitive data)
 
 ## API Documentation
 
@@ -1595,12 +1650,33 @@ This server implements endpoints from the Recharge API v2021-11. For detailed AP
 ## Error Handling
 
 The server includes comprehensive error handling:
-- **API errors** are caught and returned with descriptive messages including error codes
-- **Network errors** are handled gracefully with retry suggestions
-- **Validation errors** for required fields, formats, and constraints
-- **Invalid tool calls** return appropriate error responses
-- **All errors** include context about what operation failed
-- **Structured error responses** with consistent formatting
+
+### Built-in Features
+- **Automatic retry logic** with exponential backoff for transient failures
+- **Request timeout handling** (configurable, default 30 seconds)
+- **Rate limit handling** with automatic retries for 429 responses
+- **Network error recovery** with multiple retry attempts
+
+### Error Types
+- **API errors**: Descriptive messages with error codes from Recharge API
+- **Network errors**: Handled gracefully with retry logic
+- **Validation errors**: Clear messages for required fields and format issues
+- **Authentication errors**: Clear guidance on API key issues
+- **Timeout errors**: Configurable timeouts with clear error messages
+
+### Error Response Format
+All errors follow a consistent format:
+```json
+{
+  "content": [
+    {
+      "type": "text", 
+      "text": "Error [operation]: [detailed error message]"
+    }
+  ],
+  "isError": true
+}
+```
 
 ## Security
 
@@ -1611,9 +1687,22 @@ The server includes comprehensive error handling:
 ## Rate Limiting
 
 Recharge API has rate limits. The server doesn't implement client-side rate limiting, so ensure your usage stays within Recharge's limits:
-- Standard: 500 requests per minute
-- Plus: 1000 requests per minute
-- Pro: 1500 requests per minute
+
+### Recharge API Limits
+- **Standard Plan**: 500 requests per minute
+- **Plus Plan**: 1000 requests per minute  
+- **Pro Plan**: 1500 requests per minute
+
+### Built-in Rate Limit Handling
+- Automatic retry on 429 (rate limit) responses
+- Exponential backoff for retry attempts
+- Configurable retry attempts and delays
+
+### Rate Limit Best Practices
+- Use pagination to reduce large requests
+- Implement request queuing for high-volume applications
+- Monitor your usage and implement client-side throttling if needed
+- Use webhooks instead of polling for real-time updates
 
 ## Troubleshooting
 
@@ -1657,12 +1746,15 @@ You can configure these environment variables to help with debugging:
 
 ```bash
 # API Configuration
+RECHARGE_API_KEY=your_api_key_here     # Your Recharge API key
+RECHARGE_API_URL=https://api.rechargeapps.com  # API base URL
 RECHARGE_API_TIMEOUT=30000          # Request timeout in milliseconds
 RECHARGE_API_RETRY_ATTEMPTS=3       # Number of retry attempts
 RECHARGE_API_RETRY_DELAY=1000       # Delay between retries in milliseconds
 
 # Logging
 NODE_ENV=development                # Enable detailed error logging
+PORT=3000                          # Port for health checks
 ```
 
 ### Debug Mode
@@ -1672,6 +1764,15 @@ Run the server in development mode for more detailed logging:
 ```bash
 NODE_ENV=development npm run dev
 ```
+
+### Common Error Messages
+
+- **"API key is required"**: Set `RECHARGE_API_KEY` or provide `api_key` parameter
+- **"Recharge API error 401"**: Invalid or expired API key
+- **"Recharge API error 429"**: Rate limit exceeded (will auto-retry)
+- **"Request timeout"**: Increase `RECHARGE_API_TIMEOUT` or check network
+- **"Missing required fields"**: Check tool documentation for required parameters
+- **"Network request failed"**: Check internet connection and Recharge API status
 
 ### Health Check
 

@@ -2,7 +2,8 @@ import { RechargeClient } from './recharge-client.js';
 
 /**
  * Tool handlers for Recharge MCP server
- * Handles all tool execution and response formatting
+ * Handles all tool execution, validation, and response formatting
+ * Provides consistent error handling and API key management
  */
 export class RechargeToolHandlers {
   constructor(defaultApiKey = null) {
@@ -29,6 +30,8 @@ export class RechargeToolHandlers {
 
   /**
    * Format successful response
+   * @param {Object} data - Response data from API
+   * @returns {Object} - Formatted MCP response
    */
   formatResponse(data) {
     return {
@@ -43,6 +46,9 @@ export class RechargeToolHandlers {
 
   /**
    * Format error response
+   * @param {string} operation - Description of the operation that failed
+   * @param {Error} error - The error object
+   * @returns {Object} - Formatted MCP error response
    */
   formatError(operation, error) {
     return {
@@ -58,6 +64,9 @@ export class RechargeToolHandlers {
 
   /**
    * Validate required fields
+   * @param {Object} args - Arguments to validate
+   * @param {string[]} requiredFields - Array of required field names
+   * @throws {Error} - If any required fields are missing
    */
   validateRequired(args, requiredFields) {
     const missing = requiredFields.filter(field => !args[field]);
@@ -66,11 +75,26 @@ export class RechargeToolHandlers {
     }
   }
 
+  /**
+   * Sanitize and validate input parameters
+   * @param {Object} args - Input arguments
+   * @returns {Object} - Sanitized arguments
+   */
+  sanitizeArgs(args) {
+    const sanitized = {};
+    for (const [key, value] of Object.entries(args)) {
+      if (value !== undefined && value !== null && value !== '') {
+        sanitized[key] = value;
+      }
+    }
+    return sanitized;
+  }
+
   // Customer handlers
   async handleGetCustomers(args) {
     try {
       const client = this.createClient(args);
-      const { api_key, ...params } = args;
+      const { api_key, ...params } = this.sanitizeArgs(args);
       const data = await client.getCustomers(params);
       return this.formatResponse(data);
     } catch (error) {
@@ -93,7 +117,7 @@ export class RechargeToolHandlers {
     try {
       this.validateRequired(args, ['email']);
       const client = this.createClient(args);
-      const { api_key, ...customerData } = args;
+      const { api_key, ...customerData } = this.sanitizeArgs(args);
       const data = await client.createCustomer(customerData);
       return this.formatResponse(data);
     } catch (error) {
@@ -105,7 +129,7 @@ export class RechargeToolHandlers {
     try {
       this.validateRequired(args, ['customer_id']);
       const client = this.createClient(args);
-      const { api_key, customer_id, ...customerData } = args;
+      const { api_key, customer_id, ...customerData } = this.sanitizeArgs(args);
       const data = await client.updateCustomer(customer_id, customerData);
       return this.formatResponse(data);
     } catch (error) {
@@ -117,7 +141,7 @@ export class RechargeToolHandlers {
   async handleGetSubscriptions(args) {
     try {
       const client = this.createClient(args);
-      const { api_key, ...params } = args;
+      const { api_key, ...params } = this.sanitizeArgs(args);
       const data = await client.getSubscriptions(params);
       return this.formatResponse(data);
     } catch (error) {
@@ -129,7 +153,7 @@ export class RechargeToolHandlers {
     try {
       this.validateRequired(args, ['address_id', 'next_charge_scheduled_at', 'order_interval_frequency', 'order_interval_unit', 'quantity', 'shopify_variant_id']);
       const client = this.createClient(args);
-      const { api_key, ...subscriptionData } = args;
+      const { api_key, ...subscriptionData } = this.sanitizeArgs(args);
       const data = await client.createSubscription(subscriptionData);
       return this.formatResponse(data);
     } catch (error) {

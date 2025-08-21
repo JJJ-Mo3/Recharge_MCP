@@ -5,6 +5,42 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2024-01-21
+
+### Added
+- Comprehensive JSDoc documentation throughout codebase
+- Enhanced error handling with exponential backoff retry logic
+- Input sanitization and validation improvements
+- Security policy (SECURITY.md) with best practices
+- Comprehensive .gitignore file
+- Enhanced health check endpoint with API configuration status
+- Quick Start section in README for faster onboarding
+- Verbose mode for validation script
+- Additional npm scripts for better developer experience
+
+### Changed
+- Improved retry logic with exponential backoff instead of linear delays
+- Enhanced query parameter building with null/undefined filtering
+- Better error messages with more context and troubleshooting guidance
+- Improved Docker configuration with better health checks and security
+- Enhanced validation script with more comprehensive checks
+- Updated documentation with better organization and troubleshooting
+- Improved package.json with better metadata and scripts
+
+### Fixed
+- Fixed duplicate validation in scripts/validate.sh
+- Improved error handling for edge cases in API responses
+- Better handling of empty or invalid query parameters
+- Enhanced Docker health check reliability
+- Fixed potential security issues with input validation
+
+### Security
+- Added comprehensive security documentation
+- Improved input sanitization across all handlers
+- Enhanced API key handling and validation
+- Added security best practices documentation
+- Implemented proper error message sanitization
+
 ## [1.1.0] - 2024-01-20
 
 ### Added

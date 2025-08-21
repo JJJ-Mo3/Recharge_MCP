@@ -1,5 +1,16 @@
 #!/usr/bin/env node
 
+/**
+ * Recharge MCP Server
+ * 
+ * A comprehensive Model Context Protocol (MCP) server for the Recharge API v2021-11.
+ * Provides 70+ tools for managing subscriptions, customers, orders, charges, and more.
+ * 
+ * @version 1.1.0
+ * @author Recharge MCP Server Team
+ * @license MIT
+ */
+
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { 
@@ -27,15 +38,17 @@ const healthCheck = () => {
     node_version: process.version,
     uptime: process.uptime(),
     memory_usage: process.memoryUsage(),
-    environment: process.env.NODE_ENV || 'development'
+    environment: process.env.NODE_ENV || 'development',
+    api_configured: !!process.env.RECHARGE_API_KEY,
+    api_url: process.env.RECHARGE_API_URL || 'https://api.rechargeapps.com'
   };
 };
 
 /**
  * Recharge MCP Server
  * 
- * This server provides tools for interacting with the Recharge API,
- * allowing management of subscriptions, customers, orders, charges, and more.
+ * Provides comprehensive access to the Recharge API v2021-11 through MCP tools.
+ * Supports flexible API key configuration and robust error handling.
  */
 class RechargeServer {
   constructor() {
@@ -57,6 +70,9 @@ class RechargeServer {
     this.setupErrorHandling();
   }
 
+  /**
+   * Set up all tool handlers and request handlers
+   */
 
   setupToolHandlers() {
     // List available tools
@@ -428,6 +444,9 @@ class RechargeServer {
     });
   }
 
+  /**
+   * Set up comprehensive error handling and graceful shutdown
+   */
   setupErrorHandling() {
     this.server.onerror = (error) => {
       console.error('[MCP Error]', error);
@@ -459,10 +478,13 @@ class RechargeServer {
     });
   }
 
+  /**
+   * Start the MCP server with stdio transport
+   */
   async run() {
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
-    console.error('Recharge MCP server running on stdio');
+    console.error(`Recharge MCP Server v1.1.0 running on stdio (Node.js ${process.version})`);
   }
 }
 
