@@ -12,103 +12,6 @@ This is a **local MCP server** that:
 
 While the project includes deployment configurations for remote hosting (Docker, Kubernetes, Vercel, etc.), these are primarily for health monitoring and API documentation. The core MCP functionality operates locally via stdio communication.
 
-## Features
-
-### Customer Management
-- Get customers (with filtering and pagination)
-- Get specific customer by ID
-- Create new customers
-
-### Subscription Management
-- Get subscriptions (with filtering and pagination)
-- Get specific subscription by ID
-- Update subscription details
-- Cancel subscriptions
-- Activate cancelled subscriptions
-
-### Product Management
-- Get products (with filtering and pagination)
-- Get specific product by ID
-
-### Order Management
-- Get orders (with filtering and pagination)
-- Get specific order by ID
-
-### Charge Management
-- Get charges (with filtering and pagination)
-- Get specific charge by ID
-
-### Address Management
-- Get addresses (with filtering and pagination)
-- Create new addresses
-
-### Discount Management
-- Get discounts (with filtering and pagination)
-- Create new discounts
-
-### Metafield Management
-- Get metafields (with filtering by resource type)
-- Create new metafields for customers, subscriptions, or store
-
-### Webhook Management
-- Get webhooks
-- Create new webhooks for event notifications
-
-### Payment Method Management
-- Get payment methods (with customer filtering)
-
-### Checkout Management
-- Create new checkouts for one-time purchases
-
-### One-time Product Management
-- Get one-time products
-- Create new one-time products
-
-### Store Credit Management
-- Get store credits
-- Create new store credits
-
-### Charge Actions
-- Skip charges
-- Process charges
-- Refund charges
-
-### Subscription Actions
-- Skip subscription charges
-
-### Shop Information
-- Get shop details and configuration
-
-### Collection Management
-- Get product collections
-
-### Analytics
-- Get subscription analytics
-- Get customer analytics
-
-### Order Actions
-- Update order details
-- Delete orders
-- Clone existing orders
-
-### Customer Portal
-- Get customer portal session information
-- Create customer portal sessions
-
-### Bundle Selections
-- Get bundle selections for subscriptions
-- Create and manage bundle selections
-
-### Retention Strategies
-- Get retention strategies and configurations
-
-### Async Batches
-- Create and manage batch operations
-- Monitor batch processing status
-
-### Notifications
-- Get customer notifications
-- Retrieve notification details
 
 ## Setup
 
@@ -128,7 +31,7 @@ While the project includes deployment configurations for remote hosting (Docker,
    RECHARGE_API_URL=https://api.rechargeapps.com
    ```
 
-3. **Get your Recharge API key:**
+3. **Get your Recharge API key**
 
 ## API Key Configuration
 
@@ -318,6 +221,104 @@ You can also add the configuration to your workspace settings by creating or edi
 ### Other MCP Clients
 
 For other MCP-compatible clients, configure them to run this server as a local process using the Node.js command with the path to `index.js`.
+
+## Features
+
+### Customer Management
+- Get customers (with filtering and pagination)
+- Get specific customer by ID
+- Create new customers
+
+### Subscription Management
+- Get subscriptions (with filtering and pagination)
+- Get specific subscription by ID
+- Update subscription details
+- Cancel subscriptions
+- Activate cancelled subscriptions
+
+### Product Management
+- Get products (with filtering and pagination)
+- Get specific product by ID
+
+### Order Management
+- Get orders (with filtering and pagination)
+- Get specific order by ID
+
+### Charge Management
+- Get charges (with filtering and pagination)
+- Get specific charge by ID
+
+### Address Management
+- Get addresses (with filtering and pagination)
+- Create new addresses
+
+### Discount Management
+- Get discounts (with filtering and pagination)
+- Create new discounts
+
+### Metafield Management
+- Get metafields (with filtering by resource type)
+- Create new metafields for customers, subscriptions, or store
+
+### Webhook Management
+- Get webhooks
+- Create new webhooks for event notifications
+
+### Payment Method Management
+- Get payment methods (with customer filtering)
+
+### Checkout Management
+- Create new checkouts for one-time purchases
+
+### One-time Product Management
+- Get one-time products
+- Create new one-time products
+
+### Store Credit Management
+- Get store credits
+- Create new store credits
+
+### Charge Actions
+- Skip charges
+- Process charges
+- Refund charges
+
+### Subscription Actions
+- Skip subscription charges
+
+### Shop Information
+- Get shop details and configuration
+
+### Collection Management
+- Get product collections
+
+### Analytics
+- Get subscription analytics
+- Get customer analytics
+
+### Order Actions
+- Update order details
+- Delete orders
+- Clone existing orders
+
+### Customer Portal
+- Get customer portal session information
+- Create customer portal sessions
+
+### Bundle Selections
+- Get bundle selections for subscriptions
+- Create and manage bundle selections
+
+### Retention Strategies
+- Get retention strategies and configurations
+
+### Async Batches
+- Create and manage batch operations
+- Monitor batch processing status
+
+### Notifications
+- Get customer notifications
+- Retrieve notification details
 
 ## Available Tools
 
