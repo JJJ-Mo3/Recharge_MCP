@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "name": "recharge-mcp-server",
+  "name": "recharge-storefront-api-mcp",
   "builds": [
     {
       "src": "index.js",

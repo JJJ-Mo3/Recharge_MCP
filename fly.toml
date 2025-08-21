@@ -1,4 +1,4 @@
-app = "recharge-mcp-server"
+app = "recharge-storefront-api-mcp"
 primary_region = "dfw"
 
 [build]

@@ -1,9 +1,9 @@
 version: '3.8'
 
 services:
-  recharge-mcp-server:
+  recharge-storefront-api-mcp:
     build: .
-    container_name: recharge-mcp-server
+    container_name: recharge-storefront-api-mcp
     restart: unless-stopped
     environment:
       - NODE_ENV=production

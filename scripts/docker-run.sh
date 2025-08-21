@@ -23,10 +23,10 @@ if [ -z "$RECHARGE_API_KEY" ]; then
     exit 1
 fi
 
-IMAGE_NAME="recharge-mcp-server"
-CONTAINER_NAME="recharge-mcp-server"
+IMAGE_NAME="recharge-storefront-api-mcp"
+CONTAINER_NAME="recharge-storefront-api-mcp"
 
-echo "🐳 Starting Recharge MCP Server container..."
+echo "🐳 Starting Recharge Storefront API MCP Server container..."
 
 # Stop and remove existing container if it exists
 if docker ps -a --format 'table {{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
