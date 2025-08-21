@@ -451,324 +451,6 @@ For other MCP-compatible clients, configure them to run this server as a local p
 - `recharge_get_notifications` - Retrieve notifications with filtering
 - `recharge_get_notification` - Get a specific notification by ID
 
-## API Documentation
-
-This server implements endpoints from the Recharge API v2021-11. For detailed API documentation, visit: https://developer.rechargepayments.com/2021-11
-
-## Error Handling
-
-The server includes comprehensive error handling:
-- **API errors** are caught and returned with descriptive messages including error codes
-- **Network errors** are handled gracefully with retry suggestions
-- **Validation errors** for required fields, formats, and constraints
-- **Invalid tool calls** return appropriate error responses
-- **All errors** include context about what operation failed
-- **Structured error responses** with consistent formatting
-
-## Security
-
-- API keys are loaded from environment variables
-- All API requests use proper authentication headers
-- No sensitive data is logged to stdout (only to stderr for debugging)
-
-## Rate Limiting
-
-Recharge API has rate limits. The server doesn't implement client-side rate limiting, so ensure your usage stays within Recharge's limits:
-- Standard: 500 requests per minute
-- Plus: 1000 requests per minute
-- Pro: 1500 requests per minute
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Authentication Errors**
-   - Verify your API key (environment variable or client-provided) is correct
-   - Ensure the API key has proper permissions
-   - Check that the API key hasn't expired
-   - If using client-provided keys, ensure the `api_key` parameter is included in requests
-
-2. **Rate Limiting**
-   - Implement delays between requests if hitting rate limits
-   - Use pagination to reduce large data requests
-   - Consider caching frequently accessed data
-
-3. **Network Errors**
-   - Check internet connectivity
-   - Verify Recharge API status
-   - Implement retry logic for transient failures
-
-4. **Validation Errors**
-   - Ensure all required fields are provided
-   - Use proper date formats (ISO 8601: YYYY-MM-DDTHH:mm:ssZ)
-   - Validate email addresses before creating customers
-   - Check that numeric values are within acceptable ranges
-
-5. **Data Format Issues**
-   - Use strings for IDs, not numbers
-   - Ensure currency amounts are formatted as strings
-   - Validate enum values against allowed options
-
-6. **Timeout Issues**
-   - Use pagination for large datasets
-   - Implement request timeouts
-   - Consider using async batches for bulk operations
-## License
-
-MIT License - see LICENSE file for details.
-
-## Deployment
-
-While this is primarily a **local MCP server**, it can also be deployed to various platforms for health monitoring, API documentation, or serverless function compatibility. Note that when deployed remotely, the core MCP functionality still requires local stdio communication.
-
-### Local Development and Production Use
-
-For normal MCP usage, simply configure the server in your MCP client as shown in the [MCP Configuration](#mcp-configuration) section. The client will handle starting and stopping the server process automatically.
-
-### Remote Deployment (Optional)
-
-Remote deployment is optional and primarily useful for:
-- Health monitoring and status checks
-- API documentation hosting  
-- Serverless function compatibility
-- Container orchestration in enterprise environments
-
-The MCP protocol communication still happens locally via stdio, but you can deploy the server for monitoring purposes:
-
-### Docker
-
-#### Basic Docker Deployment
-```bash
-# Build the Docker image
-docker build -t recharge-mcp-server .
-
-# Run the container
-docker run -d \
-  --name recharge-mcp-server \
-  -p 3000:3000 \
-  -e RECHARGE_API_KEY=your_api_key_here \
-  -e RECHARGE_API_URL=https://api.rechargeapps.com \
-  -e NODE_ENV=production \
-  --restart unless-stopped \
-  recharge-mcp-server
-```
-
-#### Docker Compose Deployment
-```bash
-# Create .env file with your configuration
-echo "RECHARGE_API_KEY=your_api_key_here" > .env
-echo "RECHARGE_API_URL=https://api.rechargeapps.com" >> .env
-
-# Start the services
-docker-compose up -d
-
-# View logs
-docker-compose logs -f
-
-# Stop the services
-docker-compose down
-```
-
-#### Docker Health Checks
-The Docker container includes built-in health checks:
-```bash
-# Check container health
-docker ps
-
-# View health check logs
-docker inspect --format='{{json .State.Health}}' recharge-mcp-server
-```
-
-#### Docker Production Considerations
-- **Security**: The container runs as a non-root user (`mcp:nodejs`)
-- **Signal Handling**: Uses `dumb-init` for proper signal forwarding
-- **Resource Limits**: Consider setting memory and CPU limits in production
-- **Logging**: Logs are written to `/app/logs` volume for persistence
-- **Networking**: Uses bridge networking for container isolation
-
-#### Docker Environment Variables
-Required:
-- `RECHARGE_API_KEY`: Your Recharge API access token
-
-Optional:
-- `RECHARGE_API_URL`: Recharge API URL (defaults to https://api.rechargeapps.com)
-- `NODE_ENV`: Environment (defaults to production in Docker)
-- `PORT`: Port to listen on (defaults to 3000)
-
-#### Docker Troubleshooting
-```bash
-# View container logs
-docker logs recharge-mcp-server
-
-# Execute commands in running container
-docker exec -it recharge-mcp-server sh
-
-# Check container resource usage
-docker stats recharge-mcp-server
-
-# Restart container
-docker restart recharge-mcp-server
-```
-
-### Vercel
-```bash
-npm install -g vercel
-vercel --prod
-```
-
-### Netlify
-```bash
-npm install -g netlify-cli
-netlify deploy --prod
-```
-
-### Railway
-```bash
-npm install -g @railway/cli
-railway deploy
-```
-
-### Render
-Connect your GitHub repository to Render and it will auto-deploy.
-
-### Fly.io
-```bash
-flyctl deploy
-```
-
-### Kubernetes
-
-#### Prerequisites
-- Kubernetes cluster (local or cloud)
-- kubectl configured and connected to your cluster
-- Docker image built and available to your cluster
-
-#### Quick Deployment
-```bash
-# Build and tag the Docker image
-docker build -t recharge-mcp-server:v1.1.0 .
-
-# If using a remote registry, push the image
-# docker tag recharge-mcp-server:v1.1.0 your-registry/recharge-mcp-server:v1.1.0
-# docker push your-registry/recharge-mcp-server:v1.1.0
-
-# Set your API key
-export RECHARGE_API_KEY=your_api_key_here
-
-# Deploy to Kubernetes
-./scripts/k8s-deploy.sh
-
-# Deploy with ingress (for external access)
-./scripts/k8s-deploy.sh production with-ingress
-```
-
-#### Manual Deployment
-```bash
-# Apply all manifests
-kubectl apply -f k8s/
-
-# Update secret with your API key
-kubectl create secret generic recharge-mcp-secret \
-  --from-literal=RECHARGE_API_KEY=your_api_key_here \
-  -n recharge-mcp
-```
-
-#### Using Kustomize
-```bash
-# Deploy with kustomize
-kubectl apply -k k8s/
-
-# Deploy to different environment
-kubectl apply -k k8s/ --namespace=recharge-mcp-staging
-```
-
-#### Kubernetes Configuration Files
-
-The `k8s/` directory contains:
-- `namespace.yaml` - Dedicated namespace for the application
-- `configmap.yaml` - Non-sensitive configuration
-- `secret.yaml` - Sensitive configuration (API keys)
-- `deployment.yaml` - Main application deployment
-- `service.yaml` - Internal service configuration
-- `ingress.yaml` - External access configuration
-- `hpa.yaml` - Horizontal Pod Autoscaler
-- `networkpolicy.yaml` - Network security policies
-- `kustomization.yaml` - Kustomize configuration
-
-#### Kubernetes Features
-- **High Availability**: 2+ replicas with rolling updates
-- **Auto-scaling**: HPA based on CPU/memory usage (2-10 pods)
-- **Health Checks**: Liveness and readiness probes
-- **Security**: Non-root containers, network policies, resource limits
-- **Monitoring**: Prometheus annotations for metrics collection
-- **SSL/TLS**: Automatic certificate management with cert-manager
-- **Resource Management**: CPU/memory requests and limits
-- **Graceful Shutdown**: Proper termination handling
-
-#### Kubernetes Management Commands
-```bash
-# View deployment status
-kubectl get deployments -n recharge-mcp
-
-# View pods
-kubectl get pods -n recharge-mcp
-
-# View logs
-kubectl logs -f deployment/recharge-mcp-server -n recharge-mcp
-
-# Scale deployment
-kubectl scale deployment recharge-mcp-server --replicas=5 -n recharge-mcp
-
-# Port forward for local access
-kubectl port-forward service/recharge-mcp-service 8080:80 -n recharge-mcp
-
-# Update deployment image
-kubectl set image deployment/recharge-mcp-server \
-  recharge-mcp-server=recharge-mcp-server:v1.2.0 -n recharge-mcp
-
-# Rollback deployment
-kubectl rollout undo deployment/recharge-mcp-server -n recharge-mcp
-
-# Clean up everything
-./scripts/k8s-cleanup.sh
-```
-
-#### Kubernetes Troubleshooting
-```bash
-# Check pod status and events
-kubectl describe pods -n recharge-mcp
-
-# Check deployment events
-kubectl describe deployment recharge-mcp-server -n recharge-mcp
-
-# Check service endpoints
-kubectl get endpoints -n recharge-mcp
-
-# Test connectivity from within cluster
-kubectl run test-pod --image=curlimages/curl -it --rm -- \
-  curl http://recharge-mcp-service.recharge-mcp.svc.cluster.local/health
-
-# Check resource usage
-kubectl top pods -n recharge-mcp
-kubectl top nodes
-```
-
-#### Production Considerations for Kubernetes
-- **Image Registry**: Use a private registry for production images
-- **Secrets Management**: Consider using external secret management (Vault, AWS Secrets Manager)
-- **Monitoring**: Deploy Prometheus and Grafana for comprehensive monitoring
-- **Logging**: Use centralized logging (ELK stack, Fluentd)
-- **Backup**: Regular backups of configurations and persistent data
-- **Security**: Regular security scans and updates
-- **Resource Limits**: Set appropriate CPU/memory limits based on load testing
-- **Network Policies**: Implement strict network segmentation
-- **RBAC**: Use Role-Based Access Control for cluster security
-
-### Environment Variables
-All deployment platforms require:
-- `RECHARGE_API_KEY`: Your Recharge API key
-- `RECHARGE_API_URL`: Recharge API URL (defaults to https://api.rechargeapps.com)
-- `NODE_ENV`: Set to "production" for production deployments
 
 ## Sample Usage
 
@@ -1850,3 +1532,323 @@ Resources with status fields support filtering:
 18. **Check response status** and handle different error types appropriately
 19. **Implement circuit breakers** for high-volume applications
 20. **Use connection pooling** for better performance in production
+
+## API Documentation
+
+This server implements endpoints from the Recharge API v2021-11. For detailed API documentation, visit: https://developer.rechargepayments.com/2021-11
+
+## Error Handling
+
+The server includes comprehensive error handling:
+- **API errors** are caught and returned with descriptive messages including error codes
+- **Network errors** are handled gracefully with retry suggestions
+- **Validation errors** for required fields, formats, and constraints
+- **Invalid tool calls** return appropriate error responses
+- **All errors** include context about what operation failed
+- **Structured error responses** with consistent formatting
+
+## Security
+
+- API keys are loaded from environment variables
+- All API requests use proper authentication headers
+- No sensitive data is logged to stdout (only to stderr for debugging)
+
+## Rate Limiting
+
+Recharge API has rate limits. The server doesn't implement client-side rate limiting, so ensure your usage stays within Recharge's limits:
+- Standard: 500 requests per minute
+- Plus: 1000 requests per minute
+- Pro: 1500 requests per minute
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Authentication Errors**
+   - Verify your API key (environment variable or client-provided) is correct
+   - Ensure the API key has proper permissions
+   - Check that the API key hasn't expired
+   - If using client-provided keys, ensure the `api_key` parameter is included in requests
+
+2. **Rate Limiting**
+   - Implement delays between requests if hitting rate limits
+   - Use pagination to reduce large data requests
+   - Consider caching frequently accessed data
+
+3. **Network Errors**
+   - Check internet connectivity
+   - Verify Recharge API status
+   - Implement retry logic for transient failures
+
+4. **Validation Errors**
+   - Ensure all required fields are provided
+   - Use proper date formats (ISO 8601: YYYY-MM-DDTHH:mm:ssZ)
+   - Validate email addresses before creating customers
+   - Check that numeric values are within acceptable ranges
+
+5. **Data Format Issues**
+   - Use strings for IDs, not numbers
+   - Ensure currency amounts are formatted as strings
+   - Validate enum values against allowed options
+
+6. **Timeout Issues**
+   - Use pagination for large datasets
+   - Implement request timeouts
+   - Consider using async batches for bulk operations
+
+## Deployment
+
+While this is primarily a **local MCP server**, it can also be deployed to various platforms for health monitoring, API documentation, or serverless function compatibility. Note that when deployed remotely, the core MCP functionality still requires local stdio communication.
+
+### Local Development and Production Use
+
+For normal MCP usage, simply configure the server in your MCP client as shown in the [MCP Configuration](#mcp-configuration) section. The client will handle starting and stopping the server process automatically.
+
+### Remote Deployment (Optional)
+
+Remote deployment is optional and primarily useful for:
+- Health monitoring and status checks
+- API documentation hosting  
+- Serverless function compatibility
+- Container orchestration in enterprise environments
+
+The MCP protocol communication still happens locally via stdio, but you can deploy the server for monitoring purposes:
+
+### Docker
+
+#### Basic Docker Deployment
+```bash
+# Build the Docker image
+docker build -t recharge-mcp-server .
+
+# Run the container
+docker run -d \
+  --name recharge-mcp-server \
+  -p 3000:3000 \
+  -e RECHARGE_API_KEY=your_api_key_here \
+  -e RECHARGE_API_URL=https://api.rechargeapps.com \
+  -e NODE_ENV=production \
+  --restart unless-stopped \
+  recharge-mcp-server
+```
+
+#### Docker Compose Deployment
+```bash
+# Create .env file with your configuration
+echo "RECHARGE_API_KEY=your_api_key_here" > .env
+echo "RECHARGE_API_URL=https://api.rechargeapps.com" >> .env
+
+# Start the services
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop the services
+docker-compose down
+```
+
+#### Docker Health Checks
+The Docker container includes built-in health checks:
+```bash
+# Check container health
+docker ps
+
+# View health check logs
+docker inspect --format='{{json .State.Health}}' recharge-mcp-server
+```
+
+#### Docker Production Considerations
+- **Security**: The container runs as a non-root user (`mcp:nodejs`)
+- **Signal Handling**: Uses `dumb-init` for proper signal forwarding
+- **Resource Limits**: Consider setting memory and CPU limits in production
+- **Logging**: Logs are written to `/app/logs` volume for persistence
+- **Networking**: Uses bridge networking for container isolation
+
+#### Docker Environment Variables
+Required:
+- `RECHARGE_API_KEY`: Your Recharge API access token
+
+Optional:
+- `RECHARGE_API_URL`: Recharge API URL (defaults to https://api.rechargeapps.com)
+- `NODE_ENV`: Environment (defaults to production in Docker)
+- `PORT`: Port to listen on (defaults to 3000)
+
+#### Docker Troubleshooting
+```bash
+# View container logs
+docker logs recharge-mcp-server
+
+# Execute commands in running container
+docker exec -it recharge-mcp-server sh
+
+# Check container resource usage
+docker stats recharge-mcp-server
+
+# Restart container
+docker restart recharge-mcp-server
+```
+
+### Vercel
+```bash
+npm install -g vercel
+vercel --prod
+```
+
+### Netlify
+```bash
+npm install -g netlify-cli
+netlify deploy --prod
+```
+
+### Railway
+```bash
+npm install -g @railway/cli
+railway deploy
+```
+
+### Render
+Connect your GitHub repository to Render and it will auto-deploy.
+
+### Fly.io
+```bash
+flyctl deploy
+```
+
+### Kubernetes
+
+#### Prerequisites
+- Kubernetes cluster (local or cloud)
+- kubectl configured and connected to your cluster
+- Docker image built and available to your cluster
+
+#### Quick Deployment
+```bash
+# Build and tag the Docker image
+docker build -t recharge-mcp-server:v1.1.0 .
+
+# If using a remote registry, push the image
+# docker tag recharge-mcp-server:v1.1.0 your-registry/recharge-mcp-server:v1.1.0
+# docker push your-registry/recharge-mcp-server:v1.1.0
+
+# Set your API key
+export RECHARGE_API_KEY=your_api_key_here
+
+# Deploy to Kubernetes
+./scripts/k8s-deploy.sh
+
+# Deploy with ingress (for external access)
+./scripts/k8s-deploy.sh production with-ingress
+```
+
+#### Manual Deployment
+```bash
+# Apply all manifests
+kubectl apply -f k8s/
+
+# Update secret with your API key
+kubectl create secret generic recharge-mcp-secret \
+  --from-literal=RECHARGE_API_KEY=your_api_key_here \
+  -n recharge-mcp
+```
+
+#### Using Kustomize
+```bash
+# Deploy with kustomize
+kubectl apply -k k8s/
+
+# Deploy to different environment
+kubectl apply -k k8s/ --namespace=recharge-mcp-staging
+```
+
+#### Kubernetes Configuration Files
+
+The `k8s/` directory contains:
+- `namespace.yaml` - Dedicated namespace for the application
+- `configmap.yaml` - Non-sensitive configuration
+- `secret.yaml` - Sensitive configuration (API keys)
+- `deployment.yaml` - Main application deployment
+- `service.yaml` - Internal service configuration
+- `ingress.yaml` - External access configuration
+- `hpa.yaml` - Horizontal Pod Autoscaler
+- `networkpolicy.yaml` - Network security policies
+- `kustomization.yaml` - Kustomize configuration
+
+#### Kubernetes Features
+- **High Availability**: 2+ replicas with rolling updates
+- **Auto-scaling**: HPA based on CPU/memory usage (2-10 pods)
+- **Health Checks**: Liveness and readiness probes
+- **Security**: Non-root containers, network policies, resource limits
+- **Monitoring**: Prometheus annotations for metrics collection
+- **SSL/TLS**: Automatic certificate management with cert-manager
+- **Resource Management**: CPU/memory requests and limits
+- **Graceful Shutdown**: Proper termination handling
+
+#### Kubernetes Management Commands
+```bash
+# View deployment status
+kubectl get deployments -n recharge-mcp
+
+# View pods
+kubectl get pods -n recharge-mcp
+
+# View logs
+kubectl logs -f deployment/recharge-mcp-server -n recharge-mcp
+
+# Scale deployment
+kubectl scale deployment recharge-mcp-server --replicas=5 -n recharge-mcp
+
+# Port forward for local access
+kubectl port-forward service/recharge-mcp-service 8080:80 -n recharge-mcp
+
+# Update deployment image
+kubectl set image deployment/recharge-mcp-server \
+  recharge-mcp-server=recharge-mcp-server:v1.2.0 -n recharge-mcp
+
+# Rollback deployment
+kubectl rollout undo deployment/recharge-mcp-server -n recharge-mcp
+
+# Clean up everything
+./scripts/k8s-cleanup.sh
+```
+
+#### Kubernetes Troubleshooting
+```bash
+# Check pod status and events
+kubectl describe pods -n recharge-mcp
+
+# Check deployment events
+kubectl describe deployment recharge-mcp-server -n recharge-mcp
+
+# Check service endpoints
+kubectl get endpoints -n recharge-mcp
+
+# Test connectivity from within cluster
+kubectl run test-pod --image=curlimages/curl -it --rm -- \
+  curl http://recharge-mcp-service.recharge-mcp.svc.cluster.local/health
+
+# Check resource usage
+kubectl top pods -n recharge-mcp
+kubectl top nodes
+```
+
+#### Production Considerations for Kubernetes
+- **Image Registry**: Use a private registry for production images
+- **Secrets Management**: Consider using external secret management (Vault, AWS Secrets Manager)
+- **Monitoring**: Deploy Prometheus and Grafana for comprehensive monitoring
+- **Logging**: Use centralized logging (ELK stack, Fluentd)
+- **Backup**: Regular backups of configurations and persistent data
+- **Security**: Regular security scans and updates
+- **Resource Limits**: Set appropriate CPU/memory limits based on load testing
+- **Network Policies**: Implement strict network segmentation
+- **RBAC**: Use Role-Based Access Control for cluster security
+
+### Environment Variables
+All deployment platforms require:
+- `RECHARGE_API_KEY`: Your Recharge API key
+- `RECHARGE_API_URL`: Recharge API URL (defaults to https://api.rechargeapps.com)
+- `NODE_ENV`: Set to "production" for production deployments
+
+  ## License
+
+MIT License - see LICENSE file for details.
