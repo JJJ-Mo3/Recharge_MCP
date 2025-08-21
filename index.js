@@ -10,12 +10,24 @@ import {
 import { RechargeToolHandlers } from './src/tool-handlers.js';
 import * as tools from './src/tools.js';
 
+// Validate Node.js version
+const nodeVersion = process.version;
+const majorVersion = parseInt(nodeVersion.slice(1).split('.')[0]);
+if (majorVersion < 18) {
+  console.error(`❌ Node.js version ${nodeVersion} is not supported. Please use Node.js 18 or higher.`);
+  process.exit(1);
+}
+
 // Health check endpoint for deployment platforms
 const healthCheck = () => {
   return {
     status: 'healthy',
     timestamp: new Date().toISOString(),
-    version: '1.1.0'
+    version: '1.1.0',
+    node_version: process.version,
+    uptime: process.uptime(),
+    memory_usage: process.memoryUsage(),
+    environment: process.env.NODE_ENV || 'development'
   };
 };
 
@@ -422,6 +434,13 @@ class RechargeServer {
     };
 
     process.on('SIGINT', async () => {
+      console.log('Received SIGINT, shutting down gracefully...');
+      await this.server.close();
+      process.exit(0);
+    });
+    
+    process.on('SIGTERM', async () => {
+      console.log('Received SIGTERM, shutting down gracefully...');
       await this.server.close();
       process.exit(0);
     });

@@ -10,53 +10,113 @@ export class RechargeClient {
     // Allow API key to be passed in constructor or fall back to environment
     this.apiKey = apiKey || process.env.RECHARGE_API_KEY || null;
     this.baseUrl = process.env.RECHARGE_API_URL || 'https://api.rechargeapps.com';
-    
+    this.timeout = parseInt(process.env.RECHARGE_API_TIMEOUT) || 30000; // 30 seconds default
+    this.retryAttempts = parseInt(process.env.RECHARGE_API_RETRY_ATTEMPTS) || 3;
+    this.retryDelay = parseInt(process.env.RECHARGE_API_RETRY_DELAY) || 1000; // 1 second
+  }
+
+  /**
+   * Validate that API key is available
+   */
+  validateApiKey() {
     if (!this.apiKey) {
       throw new Error('API key is required. Provide it via constructor parameter, RECHARGE_API_KEY environment variable, or as api_key parameter in tool calls');
     }
   }
 
   /**
+   * Sleep for specified milliseconds
+   */
+  async sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  /**
    * Make authenticated request to Recharge API
    */
   async request(endpoint, options = {}) {
+    this.validateApiKey();
+    
     const url = `${this.baseUrl}${endpoint}`;
     const headers = {
       'X-Recharge-Access-Token': this.apiKey,
       'Content-Type': 'application/json',
       'Accept': 'application/json',
       'X-Recharge-Version': '2021-11',
+      'User-Agent': 'recharge-mcp-server/1.1.0',
       ...options.headers
     };
 
-    try {
-      const response = await fetch(url, {
-        ...options,
-        headers
-      });
+    let lastError;
+    
+    for (let attempt = 1; attempt <= this.retryAttempts; attempt++) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+        
+        const response = await fetch(url, {
+          ...options,
+          headers,
+          signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
 
-      if (!response.ok) {
-        let errorData;
-        try {
-          errorData = await response.json();
-        } catch {
-          errorData = await response.text();
+        if (!response.ok) {
+          let errorData;
+          try {
+            errorData = await response.json();
+          } catch {
+            errorData = await response.text();
+          }
+          
+          const errorMessage = typeof errorData === 'object' && errorData.errors 
+            ? JSON.stringify(errorData.errors)
+            : errorData;
+          
+          // Don't retry on client errors (4xx)
+          if (response.status >= 400 && response.status < 500) {
+            throw new Error(`Recharge API error ${response.status}: ${errorMessage}`);
+          }
+          
+          // Retry on server errors (5xx) and rate limits (429)
+          if (attempt < this.retryAttempts && (response.status >= 500 || response.status === 429)) {
+            console.error(`Attempt ${attempt} failed with status ${response.status}, retrying...`);
+            await this.sleep(this.retryDelay * attempt);
+            continue;
+          }
+          
+          throw new Error(`Recharge API error ${response.status}: ${errorMessage}`);
+        }
+
+        return await response.json();
+        
+      } catch (error) {
+        lastError = error;
+        
+        if (error.message.includes('Recharge API error')) {
+          throw error;
         }
         
-        const errorMessage = typeof errorData === 'object' && errorData.errors 
-          ? JSON.stringify(errorData.errors)
-          : errorData;
+        if (error.name === 'AbortError') {
+          if (attempt < this.retryAttempts) {
+            console.error(`Request timeout on attempt ${attempt}, retrying...`);
+            await this.sleep(this.retryDelay * attempt);
+            continue;
+          }
+          throw new Error(`Request timeout after ${this.timeout}ms`);
+        }
         
-        throw new Error(`Recharge API error ${response.status}: ${errorMessage}`);
+        // Retry on network errors
+        if (attempt < this.retryAttempts) {
+          console.error(`Network error on attempt ${attempt}: ${error.message}, retrying...`);
+          await this.sleep(this.retryDelay * attempt);
+          continue;
+        }
       }
-
-      return await response.json();
-    } catch (error) {
-      if (error.message.includes('Recharge API error')) {
-        throw error;
-      }
-      throw new Error(`Network request failed: ${error.message}`);
     }
+    
+    throw new Error(`Network request failed after ${this.retryAttempts} attempts: ${lastError.message}`);
   }
 
   // Customer methods

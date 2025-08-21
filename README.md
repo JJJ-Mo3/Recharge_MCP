@@ -2,6 +2,37 @@
 
 A comprehensive **local** Model Context Protocol (MCP) server that provides tools for interacting with the Recharge API v2021-11. This server runs as a local process and communicates with MCP clients via stdio (standard input/output). It enables AI assistants to manage subscriptions, customers, orders, charges, and other Recharge resources with full CRUD operations and advanced features.
 
+## Table of Contents
+
+- [Overview](#overview)
+- [Server Architecture](#server-architecture)
+- [Setup](#setup)
+- [API Key Configuration](#api-key-configuration)
+- [Usage](#usage)
+- [MCP Configuration](#mcp-configuration)
+- [Features](#features)
+- [Available Tools](#available-tools)
+- [Sample Usage](#sample-usage)
+- [Response Format](#response-format)
+- [Common Parameters](#common-parameters)
+- [Best Practices](#best-practices)
+- [Troubleshooting](#troubleshooting)
+- [Deployment](#deployment)
+- [License](#license)
+
+## Overview
+
+This MCP server provides comprehensive access to the Recharge API v2021-11, enabling AI assistants to:
+
+- **Manage Customers**: Create, update, and retrieve customer information
+- **Handle Subscriptions**: Full lifecycle management including creation, updates, cancellation, and reactivation
+- **Process Orders**: View and manage order history and details
+- **Manage Charges**: Handle billing, refunds, and charge scheduling
+- **Address Management**: Create and update customer addresses
+- **Discount Management**: Create and manage discount codes and promotions
+- **Analytics**: Access subscription and customer analytics data
+- **Webhooks**: Set up and manage webhook notifications
+- **And much more**: 70+ tools covering all major Recharge API endpoints
 ## Server Architecture
 
 This is a **local MCP server** that:
@@ -29,9 +60,17 @@ While the project includes deployment configurations for remote hosting (Docker,
    ```
    RECHARGE_API_KEY=your_default_recharge_api_key_here
    RECHARGE_API_URL=https://api.rechargeapps.com
+    RECHARGE_API_TIMEOUT=30000
+    RECHARGE_API_RETRY_ATTEMPTS=3
+    RECHARGE_API_RETRY_DELAY=1000
    ```
 
-3. **Get your Recharge API key**
+3. **Get your Recharge API key:**
+   - Log in to your Recharge merchant portal
+   - Navigate to Apps > Custom integrations
+   - Create a new integration or use an existing one
+   - Copy the API access token
+   - Ensure the integration has the necessary permissions for your use case
 
 ## API Key Configuration
 
@@ -61,6 +100,22 @@ Deploy without setting `RECHARGE_API_KEY` in the environment. All clients must p
 - Client-provided API keys always take precedence over environment variables
 - If no API key is available (neither environment nor client-provided), requests will fail with a clear error message
 - This design allows multiple clients to use their own Recharge accounts through the same MCP server instance
+
+### API Key Permissions
+
+Ensure your Recharge API key has the following permissions based on your needs:
+
+- **Read permissions**: For retrieving data (customers, subscriptions, orders, etc.)
+- **Write permissions**: For creating and updating resources
+- **Webhook permissions**: For managing webhook endpoints
+- **Analytics permissions**: For accessing analytics data
+
+**Security Best Practices:**
+- Use environment variables or secure configuration management
+- Rotate API keys regularly
+- Use the principle of least privilege - only grant necessary permissions
+- Monitor API key usage and set up alerts for unusual activity
+
 ## Usage
 
 ### Running the Local MCP Server
@@ -1595,6 +1650,49 @@ Recharge API has rate limits. The server doesn't implement client-side rate limi
    - Use pagination for large datasets
    - Implement request timeouts
    - Consider using async batches for bulk operations
+
+### Environment Variables for Troubleshooting
+
+You can configure these environment variables to help with debugging:
+
+```bash
+# API Configuration
+RECHARGE_API_TIMEOUT=30000          # Request timeout in milliseconds
+RECHARGE_API_RETRY_ATTEMPTS=3       # Number of retry attempts
+RECHARGE_API_RETRY_DELAY=1000       # Delay between retries in milliseconds
+
+# Logging
+NODE_ENV=development                # Enable detailed error logging
+```
+
+### Debug Mode
+
+Run the server in development mode for more detailed logging:
+
+```bash
+NODE_ENV=development npm run dev
+```
+
+### Health Check
+
+Test server health with:
+
+```bash
+curl http://localhost:3000/health
+```
+
+Expected response:
+```json
+{
+  "status": "healthy",
+  "timestamp": "2024-01-01T00:00:00.000Z",
+  "version": "1.1.0",
+  "node_version": "v18.0.0",
+  "uptime": 123.456,
+  "memory_usage": {...},
+  "environment": "development"
+}
+```
 
 ## Deployment
 

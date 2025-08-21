@@ -207,10 +207,6 @@ export const updateSubscriptionSchema = {
         type: 'string',
         description: 'The subscription ID'
       },
-      subscription_id: {
-        type: 'string',
-        description: 'The subscription ID'
-      },
       quantity: {
         type: 'number',
         description: 'Subscription quantity'
@@ -1791,13 +1787,16 @@ export const getNotificationSchema = {
 
 // Add missing api_key parameter to all tool schemas
 const addApiKeyParameter = (schema) => {
-  if (!schema.inputSchema.properties.api_key) {
-    schema.inputSchema.properties.api_key = {
+  // Create a deep copy to avoid modifying the original schema
+  const schemaCopy = JSON.parse(JSON.stringify(schema));
+  
+  if (!schemaCopy.inputSchema.properties.api_key) {
+    schemaCopy.inputSchema.properties.api_key = {
       type: 'string',
       description: 'Optional API key to override the default server API key'
     };
   }
-  return schema;
+  return schemaCopy;
 };
 
 // Apply api_key parameter to all schemas

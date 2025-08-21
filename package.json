@@ -1,7 +1,7 @@
 {
   "name": "recharge-mcp-server",
   "version": "1.1.0",
-  "description": "MCP server for Recharge API",
+  "description": "Model Context Protocol (MCP) server for Recharge API v2021-11 - enables AI assistants to manage subscriptions, customers, orders, and charges",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -11,17 +11,59 @@
     "build:functions": "mkdir -p dist && echo 'Build artifacts ready'",
     "test": "npm run validate && echo \"All validations passed\"",
     "validate": "node -c index.js && node -c src/recharge-client.js && node -c src/tool-handlers.js && node -c src/tools.js",
-    "prestart": "npm run validate"
+    "prestart": "npm run validate",
+    "lint": "echo 'Linting completed - no linter configured'",
+    "format": "echo 'Formatting completed - no formatter configured'",
+    "validate:full": "./scripts/validate.sh",
+    "docker:build": "./scripts/docker-build.sh",
+    "docker:run": "./scripts/docker-run.sh"
   },
-  "keywords": ["mcp", "recharge", "storefront", "api", "payments", "subscriptions"],
+  "keywords": [
+    "mcp", 
+    "model-context-protocol", 
+    "recharge", 
+    "recharge-api", 
+    "subscriptions", 
+    "payments", 
+    "ecommerce", 
+    "recurring-billing", 
+    "ai-assistant", 
+    "claude", 
+    "copilot"
+  ],
   "author": "",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/recharge-mcp-server.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/recharge-mcp-server/issues"
+  },
+  "homepage": "https://github.com/your-username/recharge-mcp-server#readme",
   "dependencies": {
     "@modelcontextprotocol/sdk": "latest",
     "dotenv": "latest"
   },
+  "devDependencies": {},
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=8.0.0"
+  },
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "files": [
+    "index.js",
+    "src/",
+    "README.md",
+    "LICENSE",
+    ".env.example"
+  ],
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/your-username"
   }
 }

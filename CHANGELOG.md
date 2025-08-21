@@ -1,0 +1,76 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [1.1.0] - 2024-01-20
+
+### Added
+- Comprehensive MCP server for Recharge API v2021-11
+- Support for 70+ Recharge API endpoints
+- Flexible API key configuration (environment variable + per-request override)
+- Full CRUD operations for customers, subscriptions, orders, charges
+- Advanced features: analytics, webhooks, bundle selections, retention strategies
+- Docker and Kubernetes deployment configurations
+- Comprehensive documentation with setup guides for multiple MCP clients
+- Health check endpoints for deployment platforms
+- Retry logic and timeout handling for API requests
+- Input validation and error handling
+- Support for Claude Desktop, Continue, Cursor, and VSCode with Copilot
+
+### Features
+- **Customer Management**: Create, read, update customer information
+- **Subscription Management**: Full lifecycle management including cancellation and reactivation
+- **Order Management**: View and manage order history
+- **Charge Management**: Handle billing, refunds, and charge scheduling
+- **Address Management**: Create and update customer addresses
+- **Discount Management**: Create and manage discount codes
+- **Metafield Management**: Custom data storage for resources
+- **Webhook Management**: Event notification setup
+- **Payment Method Management**: Payment information handling
+- **Checkout Management**: One-time purchase processing
+- **Store Credit Management**: Store credit creation and management
+- **Analytics**: Subscription and customer analytics data
+- **Bundle Selections**: Subscription bundle management
+- **Retention Strategies**: Customer retention configuration
+- **Async Batches**: Bulk operation processing
+- **Notifications**: Customer notification management
+
+### Technical
+- Node.js 18+ support
+- ES modules architecture
+- Comprehensive error handling
+- Request retry logic with exponential backoff
+- Timeout handling for API requests
+- Input validation for all endpoints
+- Structured logging
+- Health check endpoints
+- Docker multi-stage builds
+- Kubernetes deployment with HPA and network policies
+- Environment-based configuration
+
+### Documentation
+- Complete README with setup instructions
+- API usage examples for all 70+ tools
+- MCP client configuration guides
+- Docker and Kubernetes deployment guides
+- Troubleshooting section
+- Best practices guide
+- Sample usage for all endpoints
+
+### Deployment
+- Docker support with health checks
+- Docker Compose configuration
+- Kubernetes manifests with production-ready configuration
+- Support for Vercel, Netlify, Railway, Render, and Fly.io
+- Automated deployment scripts
+
+## [1.0.0] - 2024-01-01
+
+### Added
+- Initial release
+- Basic MCP server structure
+- Core Recharge API integration
+- Essential customer and subscription management
