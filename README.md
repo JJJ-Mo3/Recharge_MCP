@@ -1,4 +1,4 @@
-# Recharge MCP Server
+# Recharge API MCP Server
 
 A comprehensive **local** Model Context Protocol (MCP) server that provides tools for interacting with the Recharge API v2021-11. This server runs as a local process and communicates with MCP clients via stdio (standard input/output). It enables AI assistants to manage subscriptions, customers, orders, charges, and other Recharge resources with full CRUD operations and advanced features.
 
