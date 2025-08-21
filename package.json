@@ -11,6 +11,7 @@
     "build:functions": "mkdir -p dist && echo 'Build artifacts ready'",
     "test": "npm run validate && echo \"All validations passed\"",
     "validate": "node -c index.js && node -c src/recharge-client.js && node -c src/tool-handlers.js && node -c src/tools.js",
+    "validate": "node -c index.js && node -c src/recharge-client.js && node -c src/tool-handlers.js && node -c src/tools/index.js",
     "prestart": "npm run validate",
     "lint": "echo 'Linting completed - no linter configured'",
     "format": "echo 'Formatting completed - no formatter configured'",

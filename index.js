@@ -8,7 +8,7 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 
 import { RechargeToolHandlers } from './src/tool-handlers.js';
-import * as tools from './src/tools.js';
+import * as tools from './src/tools/index.js';
 
 // Validate Node.js version
 const nodeVersion = process.version;

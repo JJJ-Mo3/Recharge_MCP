@@ -45,7 +45,7 @@ FILES_TO_CHECK=(
     "index.js"
     "src/recharge-client.js"
     "src/tool-handlers.js"
-    "src/tools.js"
+    "src/tools/index.js"
 )
 
 for file in "${FILES_TO_CHECK[@]}"; do
