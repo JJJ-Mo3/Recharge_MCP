@@ -7,7 +7,7 @@ set -e
 
 # Default tag
 TAG=${1:-latest}
-IMAGE_NAME="recharge-storefront-api-mcp"
+IMAGE_NAME="recharge-mcp-server"
 
 echo "🐳 Building Docker image: ${IMAGE_NAME}:${TAG}"
 

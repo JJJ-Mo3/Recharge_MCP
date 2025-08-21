@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: recharge-storefront-api-mcp
+    name: recharge-mcp-server
     env: node
     plan: free
     buildCommand: npm run build

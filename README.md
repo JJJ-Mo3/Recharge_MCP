@@ -1,6 +1,6 @@
-# Recharge Storefront API MCP Server
+# Recharge MCP Server
 
-A comprehensive **local** Model Context Protocol (MCP) server that provides tools for interacting with the Recharge Storefront API v2021-11. This server runs as a local process and communicates with MCP clients via stdio (standard input/output). It enables AI assistants to manage subscriptions, customers, orders, charges, and other Recharge resources with full CRUD operations and advanced features.
+A comprehensive **local** Model Context Protocol (MCP) server that provides tools for interacting with the Recharge API v2021-11. This server runs as a local process and communicates with MCP clients via stdio (standard input/output). It enables AI assistants to manage subscriptions, customers, orders, charges, and other Recharge resources with full CRUD operations and advanced features.
 
 ## Server Architecture
 
@@ -93,7 +93,7 @@ Add to your Claude Desktop configuration file (`~/Library/Application Support/Cl
 {
   "mcpServers": {
     "recharge": {
-      "command": "node",
+      "command": "node", 
       "args": ["/path/to/recharge-mcp-server/index.js"],
       "env": {
         "RECHARGE_API_KEY": "your_api_key_here"
@@ -110,9 +110,9 @@ Add to your Continue configuration:
 ```json
 {
   "mcpServers": {
-    "recharge-storefront-api": {
+    "recharge": {
       "command": "node",
-      "args": ["/path/to/Recharge-Storefront-API-MCP/index.js"]
+      "args": ["/path/to/recharge-mcp-server/index.js"]
     }
   }
 }
@@ -148,9 +148,9 @@ You can also add the MCP server configuration to your workspace settings by crea
 ```json
 {
   "mcpServers": {
-    "recharge-storefront-api": {
+    "recharge": {
       "command": "node",
-      "args": ["/absolute/path/to/Recharge-Storefront-API-MCP/index.js"],
+      "args": ["/absolute/path/to/recharge-mcp-server/index.js"],
       "env": {
         "RECHARGE_API_KEY": "your_api_key_here"
       }
@@ -1619,17 +1619,17 @@ The MCP protocol communication still happens locally via stdio, but you can depl
 #### Basic Docker Deployment
 ```bash
 # Build the Docker image
-docker build -t recharge-storefront-api-mcp .
+docker build -t recharge-mcp-server .
 
 # Run the container
 docker run -d \
-  --name recharge-storefront-api-mcp \
+  --name recharge-mcp-server \
   -p 3000:3000 \
   -e RECHARGE_API_KEY=your_api_key_here \
   -e RECHARGE_API_URL=https://api.rechargeapps.com \
   -e NODE_ENV=production \
   --restart unless-stopped \
-  recharge-storefront-api-mcp
+  recharge-mcp-server
 ```
 
 #### Docker Compose Deployment
@@ -1655,7 +1655,7 @@ The Docker container includes built-in health checks:
 docker ps
 
 # View health check logs
-docker inspect --format='{{json .State.Health}}' recharge-storefront-api-mcp
+docker inspect --format='{{json .State.Health}}' recharge-mcp-server
 ```
 
 #### Docker Production Considerations
@@ -1677,16 +1677,16 @@ Optional:
 #### Docker Troubleshooting
 ```bash
 # View container logs
-docker logs recharge-storefront-api-mcp
+docker logs recharge-mcp-server
 
 # Execute commands in running container
-docker exec -it recharge-storefront-api-mcp sh
+docker exec -it recharge-mcp-server sh
 
 # Check container resource usage
-docker stats recharge-storefront-api-mcp
+docker stats recharge-mcp-server
 
 # Restart container
-docker restart recharge-storefront-api-mcp
+docker restart recharge-mcp-server
 ```
 
 ### Vercel
@@ -1725,11 +1725,11 @@ flyctl deploy
 #### Quick Deployment
 ```bash
 # Build and tag the Docker image
-docker build -t recharge-storefront-api-mcp:v1.1.0 .
+docker build -t recharge-mcp-server:v1.1.0 .
 
 # If using a remote registry, push the image
-# docker tag recharge-storefront-api-mcp:v1.1.0 your-registry/recharge-storefront-api-mcp:v1.1.0
-# docker push your-registry/recharge-storefront-api-mcp:v1.1.0
+# docker tag recharge-mcp-server:v1.1.0 your-registry/recharge-mcp-server:v1.1.0
+# docker push your-registry/recharge-mcp-server:v1.1.0
 
 # Set your API key
 export RECHARGE_API_KEY=your_api_key_here
@@ -1802,11 +1802,11 @@ kubectl scale deployment recharge-mcp-server --replicas=5 -n recharge-mcp
 kubectl port-forward service/recharge-mcp-service 8080:80 -n recharge-mcp
 
 # Update deployment image
-kubectl set image deployment/recharge-storefront-api-mcp \
-  recharge-storefront-api-mcp=recharge-storefront-api-mcp:v1.2.0 -n recharge-mcp
+kubectl set image deployment/recharge-mcp-server \
+  recharge-mcp-server=recharge-mcp-server:v1.2.0 -n recharge-mcp
 
 # Rollback deployment
-kubectl rollout undo deployment/recharge-storefront-api-mcp -n recharge-mcp
+kubectl rollout undo deployment/recharge-mcp-server -n recharge-mcp
 
 # Clean up everything
 ./scripts/k8s-cleanup.sh
@@ -1818,14 +1818,14 @@ kubectl rollout undo deployment/recharge-storefront-api-mcp -n recharge-mcp
 kubectl describe pods -n recharge-mcp
 
 # Check deployment events
-kubectl describe deployment recharge-storefront-api-mcp -n recharge-mcp
+kubectl describe deployment recharge-mcp-server -n recharge-mcp
 
 # Check service endpoints
 kubectl get endpoints -n recharge-mcp
 
 # Test connectivity from within cluster
 kubectl run test-pod --image=curlimages/curl -it --rm -- \
-  curl http://recharge-storefront-api-service.recharge-mcp.svc.cluster.local/health
+  curl http://recharge-mcp-service.recharge-mcp.svc.cluster.local/health
 
 # Check resource usage
 kubectl top pods -n recharge-mcp
