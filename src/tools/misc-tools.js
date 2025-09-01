@@ -173,6 +173,19 @@ export const bulkUpdateSubscriptionsSchema = {
             quantity: {
               type: 'number',
               description: 'Updated quantity'
+            },
+            next_charge_scheduled_at: {
+              type: 'string',
+              description: 'Next charge date (ISO 8601)'
+            },
+            order_interval_frequency: {
+              type: 'string',
+              description: 'Order interval frequency'
+            },
+            order_interval_unit: {
+              type: 'string',
+              enum: ['day', 'week', 'month'],
+              description: 'Order interval unit'
             }
           },
           required: ['id']
