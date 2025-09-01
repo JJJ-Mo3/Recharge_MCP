@@ -788,6 +788,66 @@ export class RechargeClient {
     });
   }
 
+  // Plan methods
+  async getPlans(params = {}) {
+    const searchParams = this.buildQueryParams(params);
+    return this.request(`/plans?${searchParams}`);
+  }
+
+  async getPlan(planId) {
+    return this.request(`/plans/${planId}`);
+  }
+
+  async createPlan(planData) {
+    return this.request('/plans', {
+      method: 'POST',
+      body: JSON.stringify(planData)
+    });
+  }
+
+  async updatePlan(planId, planData) {
+    return this.request(`/plans/${planId}`, {
+      method: 'PUT',
+      body: JSON.stringify(planData)
+    });
+  }
+
+  async deletePlan(planId) {
+    return this.request(`/plans/${planId}`, {
+      method: 'DELETE'
+    });
+  }
+
+  // Subscription plan methods
+  async getSubscriptionPlans(params = {}) {
+    const searchParams = this.buildQueryParams(params);
+    return this.request(`/subscription_plans?${searchParams}`);
+  }
+
+  async getSubscriptionPlan(subscriptionPlanId) {
+    return this.request(`/subscription_plans/${subscriptionPlanId}`);
+  }
+
+  async createSubscriptionPlan(subscriptionPlanData) {
+    return this.request('/subscription_plans', {
+      method: 'POST',
+      body: JSON.stringify(subscriptionPlanData)
+    });
+  }
+
+  async updateSubscriptionPlan(subscriptionPlanId, subscriptionPlanData) {
+    return this.request(`/subscription_plans/${subscriptionPlanId}`, {
+      method: 'PUT',
+      body: JSON.stringify(subscriptionPlanData)
+    });
+  }
+
+  async deleteSubscriptionPlan(subscriptionPlanId) {
+    return this.request(`/subscription_plans/${subscriptionPlanId}`, {
+      method: 'DELETE'
+    });
+  }
+
   // Nested resource methods - Customer relationships
   async getCustomerAddresses(customerId, params = {}) {
     const searchParams = this.buildQueryParams(params);

@@ -937,88 +937,6 @@ export class RechargeToolHandlers {
     }
   }
 
-  // Analytics handlers
-  async handleGetSubscriptionAnalytics(args) {
-    try {
-      const client = this.createClient(args);
-      const { api_key, ...params } = this.sanitizeArgs(args);
-      const data = await client.getSubscriptionAnalytics(params);
-      return this.formatResponse(data);
-    } catch (error) {
-      return this.formatError('retrieving subscription analytics', error);
-    }
-  }
-
-  async handleGetCustomerAnalytics(args) {
-    try {
-      const client = this.createClient(args);
-      const { api_key, ...params } = this.sanitizeArgs(args);
-      const data = await client.getCustomerAnalytics(params);
-      return this.formatResponse(data);
-    } catch (error) {
-      return this.formatError('retrieving customer analytics', error);
-    }
-  }
-
-  // Order action handlers
-  async handleUpdateOrder(args) {
-    try {
-      this.validateRequired(args, ['order_id']);
-      const client = this.createClient(args);
-      const { api_key, order_id, ...orderData } = this.sanitizeArgs(args);
-      const data = await client.updateOrder(order_id, orderData);
-      return this.formatResponse(data);
-    } catch (error) {
-      return this.formatError('updating order', error);
-    }
-  }
-
-  async handleDeleteOrder(args) {
-    try {
-      this.validateRequired(args, ['order_id']);
-      const client = this.createClient(args);
-      const data = await client.deleteOrder(args.order_id);
-      return this.formatResponse(data);
-    } catch (error) {
-      return this.formatError('deleting order', error);
-    }
-  }
-
-  async handleCloneOrder(args) {
-    try {
-      this.validateRequired(args, ['order_id']);
-      const client = this.createClient(args);
-      const data = await client.cloneOrder(args.order_id);
-      return this.formatResponse(data);
-    } catch (error) {
-      return this.formatError('cloning order', error);
-    }
-  }
-
-  // Customer portal handlers
-  async handleGetCustomerPortalSession(args) {
-    try {
-      this.validateRequired(args, ['customer_id']);
-      const client = this.createClient(args);
-      const data = await client.getCustomerPortalSession(args.customer_id);
-      return this.formatResponse(data);
-    } catch (error) {
-      return this.formatError('retrieving customer portal session', error);
-    }
-  }
-
-  async handleCreateCustomerPortalSession(args) {
-    try {
-      this.validateRequired(args, ['customer_id']);
-      const client = this.createClient(args);
-      const { api_key, customer_id, ...sessionData } = this.sanitizeArgs(args);
-      const data = await client.createCustomerPortalSession(customer_id, sessionData);
-      return this.formatResponse(data);
-    } catch (error) {
-      return this.formatError('creating customer portal session', error);
-    }
-  }
-
   // Bundle selection handlers
   async handleGetBundleSelections(args) {
     try {
@@ -1772,6 +1690,88 @@ export class RechargeToolHandlers {
       return this.formatResponse(data);
     } catch (error) {
       return this.formatError('retrieving charge attempts', error);
+    }
+  }
+
+  // Analytics handlers
+  async handleGetSubscriptionAnalytics(args) {
+    try {
+      const client = this.createClient(args);
+      const { api_key, ...params } = this.sanitizeArgs(args);
+      const data = await client.getSubscriptionAnalytics(params);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('retrieving subscription analytics', error);
+    }
+  }
+
+  async handleGetCustomerAnalytics(args) {
+    try {
+      const client = this.createClient(args);
+      const { api_key, ...params } = this.sanitizeArgs(args);
+      const data = await client.getCustomerAnalytics(params);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('retrieving customer analytics', error);
+    }
+  }
+
+  // Order action handlers
+  async handleUpdateOrder(args) {
+    try {
+      this.validateRequired(args, ['order_id']);
+      const client = this.createClient(args);
+      const { api_key, order_id, ...orderData } = this.sanitizeArgs(args);
+      const data = await client.updateOrder(order_id, orderData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('updating order', error);
+    }
+  }
+
+  async handleDeleteOrder(args) {
+    try {
+      this.validateRequired(args, ['order_id']);
+      const client = this.createClient(args);
+      const data = await client.deleteOrder(args.order_id);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('deleting order', error);
+    }
+  }
+
+  async handleCloneOrder(args) {
+    try {
+      this.validateRequired(args, ['order_id']);
+      const client = this.createClient(args);
+      const data = await client.cloneOrder(args.order_id);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('cloning order', error);
+    }
+  }
+
+  // Customer portal handlers
+  async handleGetCustomerPortalSession(args) {
+    try {
+      this.validateRequired(args, ['customer_id']);
+      const client = this.createClient(args);
+      const data = await client.getCustomerPortalSession(args.customer_id);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('retrieving customer portal session', error);
+    }
+  }
+
+  async handleCreateCustomerPortalSession(args) {
+    try {
+      this.validateRequired(args, ['customer_id']);
+      const client = this.createClient(args);
+      const { api_key, customer_id, ...sessionData } = this.sanitizeArgs(args);
+      const data = await client.createCustomerPortalSession(customer_id, sessionData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('creating customer portal session', error);
     }
   }
 
