@@ -650,6 +650,15 @@ class RechargeServer {
             return await this.toolHandlers.handleGetChargeAttempts(request.params.arguments);
 
           // Collection management tools
+          // Bulk operation tools
+          case 'recharge_bulk_update_subscriptions':
+            return await this.toolHandlers.handleBulkUpdateSubscriptions(request.params.arguments);
+          case 'recharge_bulk_skip_charges':
+            return await this.toolHandlers.handleBulkSkipCharges(request.params.arguments);
+          case 'recharge_bulk_unskip_charges':
+            return await this.toolHandlers.handleBulkUnskipCharges(request.params.arguments);
+
+          // Collection management tools (moved to correct location)
           case 'recharge_create_collection':
             return await this.toolHandlers.handleCreateCollection(request.params.arguments);
           case 'recharge_update_collection':
@@ -658,14 +667,6 @@ class RechargeServer {
             return await this.toolHandlers.handleDeleteCollection(request.params.arguments);
           case 'recharge_update_shop':
             return await this.toolHandlers.handleUpdateShop(request.params.arguments);
-
-          // Bulk operation tools
-          case 'recharge_bulk_update_subscriptions':
-            return await this.toolHandlers.handleBulkUpdateSubscriptions(request.params.arguments);
-          case 'recharge_bulk_skip_charges':
-            return await this.toolHandlers.handleBulkSkipCharges(request.params.arguments);
-          case 'recharge_bulk_unskip_charges':
-            return await this.toolHandlers.handleBulkUnskipCharges(request.params.arguments);
 
           default:
             throw new Error(`Unknown tool: ${name}`);

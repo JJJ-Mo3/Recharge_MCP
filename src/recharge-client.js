@@ -282,6 +282,12 @@ export class RechargeClient {
     });
   }
 
+  async deleteAddress(addressId) {
+    return this.request(`/addresses/${addressId}`, {
+      method: 'DELETE'
+    });
+  }
+
   async validateAddress(addressData) {
     return this.request('/addresses/validate', {
       method: 'POST',
