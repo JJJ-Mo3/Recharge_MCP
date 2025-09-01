@@ -1077,6 +1077,7 @@ NODE_ENV=development npm run dev
 
 - **"API key is required"**: Set `RECHARGE_API_KEY` environment variable or provide `api_key` parameter
 - **"Recharge API error 401"**: Invalid, expired, or wrong type of API key (ensure you're using a Private App API key)
+ **"Recharge API error 401"**: Invalid, expired, or wrong type of API key (ensure you're using an Admin API key from Private App integration)
 - **"Recharge API error 429"**: Rate limit exceeded (will auto-retry)
 - **"Request timeout"**: Increase `RECHARGE_API_TIMEOUT` or check network
 - **"Missing required fields"**: Check tool documentation for required parameters
