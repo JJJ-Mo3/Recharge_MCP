@@ -92,11 +92,17 @@ This MCP server provides **complete access to 100% of the Recharge API v2021-11*
    ```
 
 3. **Get your Recharge API key:**
-   - Log in to your Recharge merchant portal
-   - Navigate to Apps > Custom integrations
-   - Create a new integration or use an existing one
-   - Copy the API access token
+   - **Required**: Recharge **Private App API Key** (not public/storefront key)
+   - Log in to your **Recharge Merchant Portal** at https://rechargepayments.com/
+   - Navigate to **Apps > Custom integrations**
+   - Create a new **Private App** integration (or use existing)
+   - Copy the **API Access Token** (starts with `sk_` for live or `sk_test_` for sandbox)
    - Ensure the integration has the necessary permissions (see [API Key Permissions](#api-key-permissions))
+
+   **⚠️ Important**: This server requires a **Private App API Key**, not:
+   - Storefront API keys (for customer-facing operations)
+   - Webhook signing secrets
+   - OAuth tokens from public apps
 
 4. **Validate your setup:**
    ```bash
@@ -111,13 +117,13 @@ The MCP server supports two methods for API key configuration:
 Set `RECHARGE_API_KEY` in your environment or `.env` file. This key will be used as a fallback when no client-specific key is provided.
 
 ### Method 2: Client-provided API Key (Per-request)
-Clients can provide their own API key with each tool call by including an `api_key` parameter:
+Clients can provide their own **Private App API key** with each tool call by including an `api_key` parameter:
 
 ```json
 {
   "tool": "recharge_get_customers",
   "arguments": {
-    "api_key": "your_client_specific_api_key",
+    "api_key": "sk_live_your_private_app_api_key_here",
     "limit": 10,
     "email": "customer@example.com"
   }
@@ -125,21 +131,37 @@ Clients can provide their own API key with each tool call by including an `api_k
 ```
 
 ### Method 3: No Default API Key (Recommended for Multi-tenant)
-Run without setting `RECHARGE_API_KEY` in the environment. All clients must provide their own API key with each request.
+Run without setting `RECHARGE_API_KEY` in the environment. All clients must provide their own **Private App API key** with each request.
 
 **Note:** 
-- Client-provided API keys always take precedence over environment variables
+- Client-provided **Private App API keys** always take precedence over environment variables
 - If no API key is available (neither environment nor client-provided), requests will fail with a clear error message
 - This design allows multiple clients to use their own Recharge accounts through the same MCP server instance
 
 ### API Key Permissions
 
-Your Recharge API key needs the following permissions:
+Your **Recharge Private App API Key** needs the following permissions:
 
-- **Read permissions**: For retrieving data (customers, subscriptions, orders, etc.)
-- **Write permissions**: For creating and updating resources
-- **Webhook permissions**: For managing webhook endpoints
-- **Analytics permissions**: For accessing analytics data
+#### **Required Permissions:**
+- ✅ **Read permissions**: For retrieving data (customers, subscriptions, orders, etc.)
+- ✅ **Write permissions**: For creating and updating resources  
+- ✅ **Webhook permissions**: For managing webhook endpoints
+- ✅ **Analytics permissions**: For accessing analytics data
+
+#### **Permission Setup:**
+1. In your Recharge merchant portal, go to **Apps > Custom integrations**
+2. Select your Private App integration
+3. Under **API Permissions**, enable:
+   - **Customers**: Read, Write
+   - **Subscriptions**: Read, Write  
+   - **Orders**: Read, Write
+   - **Charges**: Read, Write
+   - **Products**: Read
+   - **Addresses**: Read, Write
+   - **Discounts**: Read, Write
+   - **Webhooks**: Read, Write
+   - **Analytics**: Read
+   - **All other resources**: Read, Write (for complete functionality)
 
 **Security Best Practices:**
 - Use environment variables or secure configuration management
@@ -163,7 +185,7 @@ Add to your Claude Desktop configuration file (`~/Library/Application Support/Cl
       "command": "node", 
       "args": ["/path/to/recharge-mcp-server/index.js"],
       "env": {
-        "RECHARGE_API_KEY": "your_api_key_here"
+        "RECHARGE_API_KEY": "sk_live_your_private_app_api_key_here"
       }
     }
   }
