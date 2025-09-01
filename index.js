@@ -229,6 +229,53 @@ class RechargeServer {
           tools.getChargeDiscountsSchema,
           tools.applyChargeDiscountSchema,
           tools.removeChargeDiscountSchema,
+
+          // Nested resource tools - Customer relationships
+          tools.getCustomerAddressesSchema,
+          tools.getCustomerSubscriptionsSchema,
+          tools.getCustomerOrdersSchema,
+          tools.getCustomerChargesSchema,
+          tools.getCustomerPaymentSourcesSchema,
+          tools.createCustomerPaymentSourceSchema,
+          tools.updateCustomerPaymentSourceSchema,
+          tools.deleteCustomerPaymentSourceSchema,
+
+          // Nested resource tools - Subscription relationships
+          tools.getSubscriptionChargesSchema,
+          tools.createSubscriptionChargeSchema,
+          tools.getSubscriptionLineItemsSchema,
+          tools.createSubscriptionLineItemSchema,
+          tools.updateSubscriptionLineItemSchema,
+          tools.deleteSubscriptionLineItemSchema,
+          tools.getSubscriptionNotesSchema,
+          tools.createSubscriptionNoteSchema,
+          tools.updateSubscriptionNoteSchema,
+          tools.deleteSubscriptionNoteSchema,
+          tools.getSubscriptionDeliveryScheduleSchema,
+          tools.updateSubscriptionDeliveryScheduleSchema,
+          tools.pauseSubscriptionSchema,
+          tools.resumeSubscriptionSchema,
+
+          // Nested resource tools - Address relationships
+          tools.getAddressSubscriptionsSchema,
+          tools.getAddressChargesSchema,
+
+          // Line item tools
+          tools.getOrderLineItemsSchema,
+          tools.getChargeLineItemsSchema,
+          tools.updateChargeLineItemSchema,
+          tools.getChargeAttemptsSchema,
+
+          // Collection management tools
+          tools.createCollectionSchema,
+          tools.updateCollectionSchema,
+          tools.deleteCollectionSchema,
+          tools.updateShopSchema,
+
+          // Bulk operation tools
+          tools.bulkUpdateSubscriptionsSchema,
+          tools.bulkSkipChargesSchema,
+          tools.bulkUnskipChargesSchema,
         ],
       };
     });
@@ -527,6 +574,88 @@ class RechargeServer {
             return await this.toolHandlers.handleApplyChargeDiscount(request.params.arguments);
           case 'recharge_remove_charge_discount':
             return await this.toolHandlers.handleRemoveChargeDiscount(request.params.arguments);
+
+          // Nested resource tools - Customer relationships
+          case 'recharge_get_customer_addresses':
+            return await this.toolHandlers.handleGetCustomerAddresses(request.params.arguments);
+          case 'recharge_get_customer_subscriptions':
+            return await this.toolHandlers.handleGetCustomerSubscriptions(request.params.arguments);
+          case 'recharge_get_customer_orders':
+            return await this.toolHandlers.handleGetCustomerOrders(request.params.arguments);
+          case 'recharge_get_customer_charges':
+            return await this.toolHandlers.handleGetCustomerCharges(request.params.arguments);
+          case 'recharge_get_customer_payment_sources':
+            return await this.toolHandlers.handleGetCustomerPaymentSources(request.params.arguments);
+          case 'recharge_create_customer_payment_source':
+            return await this.toolHandlers.handleCreateCustomerPaymentSource(request.params.arguments);
+          case 'recharge_update_customer_payment_source':
+            return await this.toolHandlers.handleUpdateCustomerPaymentSource(request.params.arguments);
+          case 'recharge_delete_customer_payment_source':
+            return await this.toolHandlers.handleDeleteCustomerPaymentSource(request.params.arguments);
+
+          // Nested resource tools - Subscription relationships
+          case 'recharge_get_subscription_charges':
+            return await this.toolHandlers.handleGetSubscriptionCharges(request.params.arguments);
+          case 'recharge_create_subscription_charge':
+            return await this.toolHandlers.handleCreateSubscriptionCharge(request.params.arguments);
+          case 'recharge_get_subscription_line_items':
+            return await this.toolHandlers.handleGetSubscriptionLineItems(request.params.arguments);
+          case 'recharge_create_subscription_line_item':
+            return await this.toolHandlers.handleCreateSubscriptionLineItem(request.params.arguments);
+          case 'recharge_update_subscription_line_item':
+            return await this.toolHandlers.handleUpdateSubscriptionLineItem(request.params.arguments);
+          case 'recharge_delete_subscription_line_item':
+            return await this.toolHandlers.handleDeleteSubscriptionLineItem(request.params.arguments);
+          case 'recharge_get_subscription_notes':
+            return await this.toolHandlers.handleGetSubscriptionNotes(request.params.arguments);
+          case 'recharge_create_subscription_note':
+            return await this.toolHandlers.handleCreateSubscriptionNote(request.params.arguments);
+          case 'recharge_update_subscription_note':
+            return await this.toolHandlers.handleUpdateSubscriptionNote(request.params.arguments);
+          case 'recharge_delete_subscription_note':
+            return await this.toolHandlers.handleDeleteSubscriptionNote(request.params.arguments);
+          case 'recharge_get_subscription_delivery_schedule':
+            return await this.toolHandlers.handleGetSubscriptionDeliverySchedule(request.params.arguments);
+          case 'recharge_update_subscription_delivery_schedule':
+            return await this.toolHandlers.handleUpdateSubscriptionDeliverySchedule(request.params.arguments);
+          case 'recharge_pause_subscription':
+            return await this.toolHandlers.handlePauseSubscription(request.params.arguments);
+          case 'recharge_resume_subscription':
+            return await this.toolHandlers.handleResumeSubscription(request.params.arguments);
+
+          // Nested resource tools - Address relationships
+          case 'recharge_get_address_subscriptions':
+            return await this.toolHandlers.handleGetAddressSubscriptions(request.params.arguments);
+          case 'recharge_get_address_charges':
+            return await this.toolHandlers.handleGetAddressCharges(request.params.arguments);
+
+          // Line item tools
+          case 'recharge_get_order_line_items':
+            return await this.toolHandlers.handleGetOrderLineItems(request.params.arguments);
+          case 'recharge_get_charge_line_items':
+            return await this.toolHandlers.handleGetChargeLineItems(request.params.arguments);
+          case 'recharge_update_charge_line_item':
+            return await this.toolHandlers.handleUpdateChargeLineItem(request.params.arguments);
+          case 'recharge_get_charge_attempts':
+            return await this.toolHandlers.handleGetChargeAttempts(request.params.arguments);
+
+          // Collection management tools
+          case 'recharge_create_collection':
+            return await this.toolHandlers.handleCreateCollection(request.params.arguments);
+          case 'recharge_update_collection':
+            return await this.toolHandlers.handleUpdateCollection(request.params.arguments);
+          case 'recharge_delete_collection':
+            return await this.toolHandlers.handleDeleteCollection(request.params.arguments);
+          case 'recharge_update_shop':
+            return await this.toolHandlers.handleUpdateShop(request.params.arguments);
+
+          // Bulk operation tools
+          case 'recharge_bulk_update_subscriptions':
+            return await this.toolHandlers.handleBulkUpdateSubscriptions(request.params.arguments);
+          case 'recharge_bulk_skip_charges':
+            return await this.toolHandlers.handleBulkSkipCharges(request.params.arguments);
+          case 'recharge_bulk_unskip_charges':
+            return await this.toolHandlers.handleBulkUnskipCharges(request.params.arguments);
 
           default:
             throw new Error(`Unknown tool: ${name}`);

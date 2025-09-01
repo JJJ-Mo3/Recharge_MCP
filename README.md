@@ -511,6 +511,53 @@ For other MCP-compatible clients, configure them to run this server as a local p
 - `recharge_apply_charge_discount` - Apply a discount to a charge
 - `recharge_remove_charge_discount` - Remove a discount from a charge
 
+### Nested Resource Tools - Customer Relationships
+- `recharge_get_customer_addresses` - Retrieve addresses for a specific customer
+- `recharge_get_customer_subscriptions` - Retrieve subscriptions for a specific customer
+- `recharge_get_customer_orders` - Retrieve orders for a specific customer
+- `recharge_get_customer_charges` - Retrieve charges for a specific customer
+- `recharge_get_customer_payment_sources` - Retrieve payment sources for a specific customer
+- `recharge_create_customer_payment_source` - Create a new payment source for a customer
+- `recharge_update_customer_payment_source` - Update a customer payment source
+- `recharge_delete_customer_payment_source` - Delete a customer payment source
+
+### Nested Resource Tools - Subscription Relationships
+- `recharge_get_subscription_charges` - Retrieve charges for a specific subscription
+- `recharge_create_subscription_charge` - Create a new charge for a subscription
+- `recharge_get_subscription_line_items` - Retrieve line items for a specific subscription
+- `recharge_create_subscription_line_item` - Add a line item to a subscription
+- `recharge_update_subscription_line_item` - Update a subscription line item
+- `recharge_delete_subscription_line_item` - Remove a line item from a subscription
+- `recharge_get_subscription_notes` - Retrieve notes for a specific subscription
+- `recharge_create_subscription_note` - Add a note to a subscription
+- `recharge_update_subscription_note` - Update a subscription note
+- `recharge_delete_subscription_note` - Delete a subscription note
+- `recharge_get_subscription_delivery_schedule` - Get delivery schedule for a subscription
+- `recharge_update_subscription_delivery_schedule` - Update delivery schedule for a subscription
+- `recharge_pause_subscription` - Pause a subscription
+- `recharge_resume_subscription` - Resume a paused subscription
+
+### Nested Resource Tools - Address Relationships
+- `recharge_get_address_subscriptions` - Retrieve subscriptions for a specific address
+- `recharge_get_address_charges` - Retrieve charges for a specific address
+
+### Line Item Management Tools
+- `recharge_get_order_line_items` - Retrieve line items for a specific order
+- `recharge_get_charge_line_items` - Retrieve line items for a specific charge
+- `recharge_update_charge_line_item` - Update a charge line item
+- `recharge_get_charge_attempts` - Retrieve charge attempts for a specific charge
+
+### Collection Management Tools
+- `recharge_create_collection` - Create a new collection
+- `recharge_update_collection` - Update an existing collection
+- `recharge_delete_collection` - Delete a collection
+- `recharge_update_shop` - Update shop configuration
+
+### Bulk Operation Tools
+- `recharge_bulk_update_subscriptions` - Bulk update multiple subscriptions
+- `recharge_bulk_skip_charges` - Bulk skip multiple charges
+- `recharge_bulk_unskip_charges` - Bulk unskip multiple charges
+
 ## Sample Usage
 
 Below are examples of how to use each tool with sample parameters and expected responses.
@@ -765,6 +812,99 @@ Below are examples of how to use each tool with sample parameters and expected r
   "arguments": {
     "charge_id": "333444",
     "discount_id": "discount_123"
+  }
+}
+```
+
+### Nested Resource Management
+
+#### Get Customer's Subscriptions
+```json
+{
+  "tool": "recharge_get_customer_subscriptions",
+  "arguments": {
+    "customer_id": "123456",
+    "status": "active",
+    "limit": 25
+  }
+}
+```
+
+#### Add Line Item to Subscription
+```json
+{
+  "tool": "recharge_create_subscription_line_item",
+  "arguments": {
+    "subscription_id": "456789",
+    "shopify_variant_id": "987654",
+    "quantity": 2
+  }
+}
+```
+
+#### Add Note to Subscription
+```json
+{
+  "tool": "recharge_create_subscription_note",
+  "arguments": {
+    "subscription_id": "456789",
+    "body": "Customer requested delivery on weekends only"
+  }
+}
+```
+
+#### Pause Subscription
+```json
+{
+  "tool": "recharge_pause_subscription",
+  "arguments": {
+    "subscription_id": "456789",
+    "pause_reason": "Customer vacation",
+    "resume_date": "2024-03-01T00:00:00Z"
+  }
+}
+```
+
+### Collection Management
+
+#### Create Collection
+```json
+{
+  "tool": "recharge_create_collection",
+  "arguments": {
+    "name": "Premium Coffee Collection",
+    "description": "Our finest coffee selections"
+  }
+}
+```
+
+### Bulk Operations
+
+#### Bulk Update Subscriptions
+```json
+{
+  "tool": "recharge_bulk_update_subscriptions",
+  "arguments": {
+    "subscriptions": [
+      {
+        "id": "123",
+        "quantity": 2
+      },
+      {
+        "id": "456",
+        "quantity": 3
+      }
+    ]
+  }
+}
+```
+
+#### Bulk Skip Charges
+```json
+{
+  "tool": "recharge_bulk_skip_charges",
+  "arguments": {
+    "charge_ids": ["charge_123", "charge_456", "charge_789"]
   }
 }
 ```

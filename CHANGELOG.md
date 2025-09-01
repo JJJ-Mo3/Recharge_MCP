@@ -8,6 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.1.1] - 2024-01-21
 
 ### Added
+- **Complete nested resource relationships**: Customer addresses, subscriptions, orders, charges
+- **Subscription line item management**: Add, update, remove items from subscriptions
+- **Subscription notes system**: Customer service note management
+- **Customer payment source management**: Full CRUD for payment methods
+- **Advanced subscription features**: Delivery schedules, pause/resume functionality
+- **Charge attempt tracking**: View payment attempt history
+- **Collection management**: Create, update, delete product collections
+- **Shop configuration updates**: Modify shop settings
+- **Bulk operations**: Mass subscription updates and charge management
+- **Line item management**: Detailed order and charge item handling
 - **Missing API endpoints**: Added subscription swap, set next charge date, charge CRUD operations
 - **Address validation**: Added address validation and deletion endpoints
 - **Plan management**: Added complete plan and subscription plan management tools
