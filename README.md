@@ -92,14 +92,14 @@ This MCP server provides **complete access to 100% of the Recharge API v2021-11*
    ```
 
 3. **Get your Recharge API key:**
-   - **Required**: Recharge **Admin API Key** (also called Private App API Key - not public/storefront key)
+   - **Required**: Recharge **Admin API Key** (from Private App integration - not public/storefront key)
    - Log in to your **Recharge Merchant Portal** at https://rechargepayments.com/
    - Navigate to **Apps > Custom integrations**
-   - Create a new **Private App** integration (or use existing) to generate an **Admin API Key**
+   - Create a new **Private App** integration (or use existing) to generate an Admin API Key
    - Copy the **API Access Token** (starts with `sk_` for live or `sk_test_` for sandbox)
    - Ensure the integration has the necessary permissions (see [API Key Permissions](#api-key-permissions))
 
-   **⚠️ Important**: This server requires an **Admin API Key** (from Private App integration), not:
+   **⚠️ Important**: This server requires an Admin API Key (from Private App integration), not:
    - Storefront API keys (for customer-facing operations)
    - Webhook signing secrets
    - OAuth tokens from public apps
@@ -117,7 +117,7 @@ The MCP server supports two methods for API key configuration:
 Set `RECHARGE_API_KEY` in your environment or `.env` file. This key will be used as a fallback when no client-specific key is provided.
 
 ### Method 2: Client-provided API Key (Per-request)
-Clients can provide their own **Admin API key** with each tool call by including an `api_key` parameter:
+Clients can provide their own Admin API key with each tool call by including an `api_key` parameter:
 
 ```json
 {
@@ -131,16 +131,16 @@ Clients can provide their own **Admin API key** with each tool call by including
 ```
 
 ### Method 3: No Default API Key (Recommended for Multi-tenant)
-Run without setting `RECHARGE_API_KEY` in the environment. All clients must provide their own **Admin API key** with each request.
+Run without setting `RECHARGE_API_KEY` in the environment. All clients must provide their own Admin API key with each request.
 
 **Note:** 
-- Client-provided **Admin API keys** always take precedence over environment variables
+- Client-provided Admin API keys always take precedence over environment variables
 - If no API key is available (neither environment nor client-provided), requests will fail with a clear error message
 - This design allows multiple clients to use their own Recharge accounts through the same MCP server instance
 
 ### API Key Permissions
 
-Your **Recharge Admin API Key** needs the following permissions:
+Your Recharge Admin API Key needs the following permissions:
 
 #### **Required Permissions:**
 - ✅ **Read permissions**: For retrieving data (customers, subscriptions, orders, etc.)
