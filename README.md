@@ -218,7 +218,7 @@ Add to your Cursor settings or create a `.cursor/settings.json` file in your pro
       "command": "node",
       "args": ["/absolute/path/to/recharge-mcp-server/index.js"],
       "env": {
-        "RECHARGE_API_KEY": "sk_live_your_admin_api_key_here"
+        "RECHARGE_API_KEY": "your_api_key_here"
       }
     }
   }
