@@ -444,8 +444,6 @@ export class RechargeClient {
     });
   }
 
-  // Shop methods
-
   // Bundle selection methods
   async getBundleSelections(params = {}) {
     const searchParams = this.buildQueryParams(params);
