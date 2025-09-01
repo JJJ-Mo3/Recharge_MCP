@@ -4,7 +4,7 @@
  * Recharge MCP Server
  * 
  * A comprehensive Model Context Protocol (MCP) server for the Recharge API v2021-11.
- * Provides 70+ tools for managing subscriptions, customers, orders, charges, and more.
+ * Provides 130+ tools for managing subscriptions, customers, orders, charges, and more.
  * 
  * @version 1.1.0
  * @author Recharge MCP Server Team
@@ -50,7 +50,6 @@ class RechargeServer {
   /**
    * Set up all tool handlers and request handlers
    */
-
   setupToolHandlers() {
     // List available tools
     this.server.setRequestHandler(ListToolsRequestSchema, async () => {
@@ -61,6 +60,14 @@ class RechargeServer {
           tools.getCustomerSchema,
           tools.updateCustomerSchema,
           tools.createCustomerSchema,
+          tools.getCustomerAddressesSchema,
+          tools.getCustomerSubscriptionsSchema,
+          tools.getCustomerOrdersSchema,
+          tools.getCustomerChargesSchema,
+          tools.getCustomerPaymentSourcesSchema,
+          tools.createCustomerPaymentSourceSchema,
+          tools.updateCustomerPaymentSourceSchema,
+          tools.deleteCustomerPaymentSourceSchema,
 
           // Subscription tools
           tools.getSubscriptionsSchema,
@@ -69,8 +76,27 @@ class RechargeServer {
           tools.updateSubscriptionSchema,
           tools.cancelSubscriptionSchema,
           tools.activateSubscriptionSchema,
+          tools.skipSubscriptionChargeSchema,
+          tools.unskipSubscriptionChargeSchema,
           tools.swapSubscriptionSchema,
           tools.setNextChargeDateSchema,
+          tools.getSubscriptionChargesSchema,
+          tools.createSubscriptionChargeSchema,
+          tools.getSubscriptionLineItemsSchema,
+          tools.createSubscriptionLineItemSchema,
+          tools.updateSubscriptionLineItemSchema,
+          tools.deleteSubscriptionLineItemSchema,
+          tools.getSubscriptionNotesSchema,
+          tools.createSubscriptionNoteSchema,
+          tools.updateSubscriptionNoteSchema,
+          tools.deleteSubscriptionNoteSchema,
+          tools.getSubscriptionDeliveryScheduleSchema,
+          tools.updateSubscriptionDeliveryScheduleSchema,
+          tools.pauseSubscriptionSchema,
+          tools.resumeSubscriptionSchema,
+          tools.getSubscriptionDiscountsSchema,
+          tools.applySubscriptionDiscountSchema,
+          tools.removeSubscriptionDiscountSchema,
 
           // Product tools
           tools.getProductsSchema,
@@ -79,6 +105,11 @@ class RechargeServer {
           // Order tools
           tools.getOrdersSchema,
           tools.getOrderSchema,
+          tools.updateOrderSchema,
+          tools.deleteOrderSchema,
+          tools.cloneOrderSchema,
+          tools.getOrderLineItemsSchema,
+          tools.getOrderDiscountsSchema,
 
           // Charge tools
           tools.getChargesSchema,
@@ -86,6 +117,17 @@ class RechargeServer {
           tools.createChargeSchema,
           tools.updateChargeSchema,
           tools.deleteChargeSchema,
+          tools.skipChargeSchema,
+          tools.processChargeSchema,
+          tools.unskipChargeSchema,
+          tools.delayChargeSchema,
+          tools.refundChargeSchema,
+          tools.getChargeLineItemsSchema,
+          tools.updateChargeLineItemSchema,
+          tools.getChargeAttemptsSchema,
+          tools.getChargeDiscountsSchema,
+          tools.applyChargeDiscountSchema,
+          tools.removeChargeDiscountSchema,
 
           // Address tools
           tools.getAddressesSchema,
@@ -94,6 +136,8 @@ class RechargeServer {
           tools.createAddressSchema,
           tools.deleteAddressSchema,
           tools.validateAddressSchema,
+          tools.getAddressSubscriptionsSchema,
+          tools.getAddressChargesSchema,
 
           // Discount tools
           tools.getDiscountsSchema,
@@ -128,7 +172,7 @@ class RechargeServer {
           tools.processCheckoutSchema,
           tools.createCheckoutSchema,
 
-          // Onetime tools
+          // One-time product tools
           tools.getOnetimesSchema,
           tools.getOnetimeSchema,
           tools.updateOnetimeSchema,
@@ -141,32 +185,20 @@ class RechargeServer {
           tools.updateStoreCreditSchema,
           tools.createStoreCreditSchema,
 
-          // Charge action tools
-          tools.skipChargeSchema,
-          tools.processChargeSchema,
-          tools.unskipChargeSchema,
-          tools.delayChargeSchema,
-          tools.refundChargeSchema,
-
-          // Subscription action tools
-          tools.skipSubscriptionChargeSchema,
-          tools.unskipSubscriptionChargeSchema,
-
           // Shop tools
           tools.getShopSchema,
+          tools.updateShopSchema,
 
           // Collection tools
           tools.getCollectionsSchema,
           tools.getCollectionSchema,
+          tools.createCollectionSchema,
+          tools.updateCollectionSchema,
+          tools.deleteCollectionSchema,
 
           // Analytics tools
           tools.getSubscriptionAnalyticsSchema,
           tools.getCustomerAnalyticsSchema,
-
-          // Order action tools
-          tools.updateOrderSchema,
-          tools.deleteOrderSchema,
-          tools.cloneOrderSchema,
 
           // Customer portal tools
           tools.getCustomerPortalSessionSchema,
@@ -217,61 +249,6 @@ class RechargeServer {
           tools.getTaxLinesSchema,
           tools.getTaxLineSchema,
 
-          // Subscription discount tools
-          tools.getSubscriptionDiscountsSchema,
-          tools.applySubscriptionDiscountSchema,
-          tools.removeSubscriptionDiscountSchema,
-
-          // Order discount tools
-          tools.getOrderDiscountsSchema,
-
-          // Charge discount tools
-          tools.getChargeDiscountsSchema,
-          tools.applyChargeDiscountSchema,
-          tools.removeChargeDiscountSchema,
-
-          // Nested resource tools - Customer relationships
-          tools.getCustomerAddressesSchema,
-          tools.getCustomerSubscriptionsSchema,
-          tools.getCustomerOrdersSchema,
-          tools.getCustomerChargesSchema,
-          tools.getCustomerPaymentSourcesSchema,
-          tools.createCustomerPaymentSourceSchema,
-          tools.updateCustomerPaymentSourceSchema,
-          tools.deleteCustomerPaymentSourceSchema,
-
-          // Nested resource tools - Subscription relationships
-          tools.getSubscriptionChargesSchema,
-          tools.createSubscriptionChargeSchema,
-          tools.getSubscriptionLineItemsSchema,
-          tools.createSubscriptionLineItemSchema,
-          tools.updateSubscriptionLineItemSchema,
-          tools.deleteSubscriptionLineItemSchema,
-          tools.getSubscriptionNotesSchema,
-          tools.createSubscriptionNoteSchema,
-          tools.updateSubscriptionNoteSchema,
-          tools.deleteSubscriptionNoteSchema,
-          tools.getSubscriptionDeliveryScheduleSchema,
-          tools.updateSubscriptionDeliveryScheduleSchema,
-          tools.pauseSubscriptionSchema,
-          tools.resumeSubscriptionSchema,
-
-          // Nested resource tools - Address relationships
-          tools.getAddressSubscriptionsSchema,
-          tools.getAddressChargesSchema,
-
-          // Line item tools
-          tools.getOrderLineItemsSchema,
-          tools.getChargeLineItemsSchema,
-          tools.updateChargeLineItemSchema,
-          tools.getChargeAttemptsSchema,
-
-          // Collection management tools
-          tools.createCollectionSchema,
-          tools.updateCollectionSchema,
-          tools.deleteCollectionSchema,
-          tools.updateShopSchema,
-
           // Bulk operation tools
           tools.bulkUpdateSubscriptionsSchema,
           tools.bulkSkipChargesSchema,
@@ -282,7 +259,7 @@ class RechargeServer {
 
     // Handle tool calls
     this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
-      const { name, arguments: args } = request.params;
+      const { name } = request.params;
 
       try {
         switch (name) {
@@ -295,6 +272,22 @@ class RechargeServer {
             return await this.toolHandlers.handleUpdateCustomer(request.params.arguments);
           case 'recharge_create_customer':
             return await this.toolHandlers.handleCreateCustomer(request.params.arguments);
+          case 'recharge_get_customer_addresses':
+            return await this.toolHandlers.handleGetCustomerAddresses(request.params.arguments);
+          case 'recharge_get_customer_subscriptions':
+            return await this.toolHandlers.handleGetCustomerSubscriptions(request.params.arguments);
+          case 'recharge_get_customer_orders':
+            return await this.toolHandlers.handleGetCustomerOrders(request.params.arguments);
+          case 'recharge_get_customer_charges':
+            return await this.toolHandlers.handleGetCustomerCharges(request.params.arguments);
+          case 'recharge_get_customer_payment_sources':
+            return await this.toolHandlers.handleGetCustomerPaymentSources(request.params.arguments);
+          case 'recharge_create_customer_payment_source':
+            return await this.toolHandlers.handleCreateCustomerPaymentSource(request.params.arguments);
+          case 'recharge_update_customer_payment_source':
+            return await this.toolHandlers.handleUpdateCustomerPaymentSource(request.params.arguments);
+          case 'recharge_delete_customer_payment_source':
+            return await this.toolHandlers.handleDeleteCustomerPaymentSource(request.params.arguments);
 
           // Subscription tools
           case 'recharge_get_subscriptions':
@@ -309,11 +302,48 @@ class RechargeServer {
             return await this.toolHandlers.handleCancelSubscription(request.params.arguments);
           case 'recharge_activate_subscription':
             return await this.toolHandlers.handleActivateSubscription(request.params.arguments);
-
+          case 'recharge_skip_subscription_charge':
+            return await this.toolHandlers.handleSkipSubscriptionCharge(request.params.arguments);
+          case 'recharge_unskip_subscription_charge':
+            return await this.toolHandlers.handleUnskipSubscriptionCharge(request.params.arguments);
           case 'recharge_swap_subscription':
             return await this.toolHandlers.handleSwapSubscription(request.params.arguments);
           case 'recharge_set_next_charge_date':
             return await this.toolHandlers.handleSetNextChargeDate(request.params.arguments);
+          case 'recharge_get_subscription_charges':
+            return await this.toolHandlers.handleGetSubscriptionCharges(request.params.arguments);
+          case 'recharge_create_subscription_charge':
+            return await this.toolHandlers.handleCreateSubscriptionCharge(request.params.arguments);
+          case 'recharge_get_subscription_line_items':
+            return await this.toolHandlers.handleGetSubscriptionLineItems(request.params.arguments);
+          case 'recharge_create_subscription_line_item':
+            return await this.toolHandlers.handleCreateSubscriptionLineItem(request.params.arguments);
+          case 'recharge_update_subscription_line_item':
+            return await this.toolHandlers.handleUpdateSubscriptionLineItem(request.params.arguments);
+          case 'recharge_delete_subscription_line_item':
+            return await this.toolHandlers.handleDeleteSubscriptionLineItem(request.params.arguments);
+          case 'recharge_get_subscription_notes':
+            return await this.toolHandlers.handleGetSubscriptionNotes(request.params.arguments);
+          case 'recharge_create_subscription_note':
+            return await this.toolHandlers.handleCreateSubscriptionNote(request.params.arguments);
+          case 'recharge_update_subscription_note':
+            return await this.toolHandlers.handleUpdateSubscriptionNote(request.params.arguments);
+          case 'recharge_delete_subscription_note':
+            return await this.toolHandlers.handleDeleteSubscriptionNote(request.params.arguments);
+          case 'recharge_get_subscription_delivery_schedule':
+            return await this.toolHandlers.handleGetSubscriptionDeliverySchedule(request.params.arguments);
+          case 'recharge_update_subscription_delivery_schedule':
+            return await this.toolHandlers.handleUpdateSubscriptionDeliverySchedule(request.params.arguments);
+          case 'recharge_pause_subscription':
+            return await this.toolHandlers.handlePauseSubscription(request.params.arguments);
+          case 'recharge_resume_subscription':
+            return await this.toolHandlers.handleResumeSubscription(request.params.arguments);
+          case 'recharge_get_subscription_discounts':
+            return await this.toolHandlers.handleGetSubscriptionDiscounts(request.params.arguments);
+          case 'recharge_apply_subscription_discount':
+            return await this.toolHandlers.handleApplySubscriptionDiscount(request.params.arguments);
+          case 'recharge_remove_subscription_discount':
+            return await this.toolHandlers.handleRemoveSubscriptionDiscount(request.params.arguments);
 
           // Product tools
           case 'recharge_get_products':
@@ -326,19 +356,322 @@ class RechargeServer {
             return await this.toolHandlers.handleGetOrders(request.params.arguments);
           case 'recharge_get_order':
             return await this.toolHandlers.handleGetOrder(request.params.arguments);
+          case 'recharge_update_order':
+            return await this.toolHandlers.handleUpdateOrder(request.params.arguments);
+          case 'recharge_delete_order':
+            return await this.toolHandlers.handleDeleteOrder(request.params.arguments);
+          case 'recharge_clone_order':
+            return await this.toolHandlers.handleCloneOrder(request.params.arguments);
+          case 'recharge_get_order_line_items':
+            return await this.toolHandlers.handleGetOrderLineItems(request.params.arguments);
+          case 'recharge_get_order_discounts':
+            return await this.toolHandlers.handleGetOrderDiscounts(request.params.arguments);
 
           // Charge tools
           case 'recharge_get_charges':
             return await this.toolHandlers.handleGetCharges(request.params.arguments);
           case 'recharge_get_charge':
             return await this.toolHandlers.handleGetCharge(request.params.arguments);
-
           case 'recharge_create_charge':
             return await this.toolHandlers.handleCreateCharge(request.params.arguments);
           case 'recharge_update_charge':
             return await this.toolHandlers.handleUpdateCharge(request.params.arguments);
           case 'recharge_delete_charge':
             return await this.toolHandlers.handleDeleteCharge(request.params.arguments);
+          case 'recharge_skip_charge':
+            return await this.toolHandlers.handleSkipCharge(request.params.arguments);
+          case 'recharge_process_charge':
+            return await this.toolHandlers.handleProcessCharge(request.params.arguments);
+          case 'recharge_unskip_charge':
+            return await this.toolHandlers.handleUnskipCharge(request.params.arguments);
+          case 'recharge_delay_charge':
+            return await this.toolHandlers.handleDelayCharge(request.params.arguments);
+          case 'recharge_refund_charge':
+            return await this.toolHandlers.handleRefundCharge(request.params.arguments);
+          case 'recharge_get_charge_line_items':
+            return await this.toolHandlers.handleGetChargeLineItems(request.params.arguments);
+          case 'recharge_update_charge_line_item':
+            return await this.toolHandlers.handleUpdateChargeLineItem(request.params.arguments);
+          case 'recharge_get_charge_attempts':
+            return await this.toolHandlers.handleGetChargeAttempts(request.params.arguments);
+          case 'recharge_get_charge_discounts':
+            return await this.toolHandlers.handleGetChargeDiscounts(request.params.arguments);
+          case 'recharge_apply_charge_discount':
+            return await this.toolHandlers.handleApplyChargeDiscount(request.params.arguments);
+          case 'recharge_remove_charge_discount':
+            return await this.toolHandlers.handleRemoveChargeDiscount(request.params.arguments);
+
+          // Address tools
+          tools.getAddressesSchema,
+          tools.getAddressSchema,
+          tools.updateAddressSchema,
+          tools.createAddressSchema,
+          tools.deleteAddressSchema,
+          tools.validateAddressSchema,
+          tools.getAddressSubscriptionsSchema,
+          tools.getAddressChargesSchema,
+
+          // Discount tools
+          tools.getDiscountsSchema,
+          tools.getDiscountSchema,
+          tools.updateDiscountSchema,
+          tools.deleteDiscountSchema,
+          tools.createDiscountSchema,
+
+          // Metafield tools
+          tools.getMetafieldsSchema,
+          tools.getMetafieldSchema,
+          tools.updateMetafieldSchema,
+          tools.deleteMetafieldSchema,
+          tools.createMetafieldSchema,
+
+          // Webhook tools
+          tools.getWebhooksSchema,
+          tools.getWebhookSchema,
+          tools.updateWebhookSchema,
+          tools.deleteWebhookSchema,
+          tools.createWebhookSchema,
+
+          // Payment method tools
+          tools.getPaymentMethodsSchema,
+          tools.getPaymentMethodSchema,
+          tools.updatePaymentMethodSchema,
+
+          // Checkout tools
+          tools.getCheckoutsSchema,
+          tools.getCheckoutSchema,
+          tools.updateCheckoutSchema,
+          tools.processCheckoutSchema,
+          tools.createCheckoutSchema,
+
+          // One-time product tools
+          tools.getOnetimesSchema,
+          tools.getOnetimeSchema,
+          tools.updateOnetimeSchema,
+          tools.deleteOnetimeSchema,
+          tools.createOnetimeSchema,
+
+          // Store credit tools
+          tools.getStoreCreditsSchema,
+          tools.getStoreCreditSchema,
+          tools.updateStoreCreditSchema,
+          tools.createStoreCreditSchema,
+
+          // Shop tools
+          tools.getShopSchema,
+          tools.updateShopSchema,
+
+          // Collection tools
+          tools.getCollectionsSchema,
+          tools.getCollectionSchema,
+          tools.createCollectionSchema,
+          tools.updateCollectionSchema,
+          tools.deleteCollectionSchema,
+
+          // Analytics tools
+          tools.getSubscriptionAnalyticsSchema,
+          tools.getCustomerAnalyticsSchema,
+
+          // Customer portal tools
+          tools.getCustomerPortalSessionSchema,
+          tools.createCustomerPortalSessionSchema,
+
+          // Bundle selection tools
+          tools.getBundleSelectionsSchema,
+          tools.getBundleSelectionSchema,
+          tools.createBundleSelectionSchema,
+          tools.updateBundleSelectionSchema,
+          tools.deleteBundleSelectionSchema,
+
+          // Retention strategy tools
+          tools.getRetentionStrategiesSchema,
+          tools.getRetentionStrategySchema,
+
+          // Async batch tools
+          tools.getAsyncBatchesSchema,
+          tools.getAsyncBatchSchema,
+          tools.createAsyncBatchSchema,
+
+          // Notification tools
+          tools.getNotificationsSchema,
+          tools.getNotificationSchema,
+
+          // Plan tools
+          tools.getPlansSchema,
+          tools.getPlanSchema,
+          tools.createPlanSchema,
+          tools.updatePlanSchema,
+          tools.deletePlanSchema,
+
+          // Subscription plan tools
+          tools.getSubscriptionPlansSchema,
+          tools.getSubscriptionPlanSchema,
+          tools.createSubscriptionPlanSchema,
+          tools.updateSubscriptionPlanSchema,
+          tools.deleteSubscriptionPlanSchema,
+
+          // Shipping rate tools
+          tools.getShippingRatesSchema,
+          tools.getShippingRateSchema,
+          tools.createShippingRateSchema,
+          tools.updateShippingRateSchema,
+          tools.deleteShippingRateSchema,
+
+          // Tax line tools
+          tools.getTaxLinesSchema,
+          tools.getTaxLineSchema,
+
+          // Bulk operation tools
+          tools.bulkUpdateSubscriptionsSchema,
+          tools.bulkSkipChargesSchema,
+          tools.bulkUnskipChargesSchema,
+        ],
+      };
+    });
+
+    // Handle tool calls
+    this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
+      const { name } = request.params;
+
+      try {
+        switch (name) {
+          // Customer tools
+          case 'recharge_get_customers':
+            return await this.toolHandlers.handleGetCustomers(request.params.arguments);
+          case 'recharge_get_customer':
+            return await this.toolHandlers.handleGetCustomer(request.params.arguments);
+          case 'recharge_update_customer':
+            return await this.toolHandlers.handleUpdateCustomer(request.params.arguments);
+          case 'recharge_create_customer':
+            return await this.toolHandlers.handleCreateCustomer(request.params.arguments);
+          case 'recharge_get_customer_addresses':
+            return await this.toolHandlers.handleGetCustomerAddresses(request.params.arguments);
+          case 'recharge_get_customer_subscriptions':
+            return await this.toolHandlers.handleGetCustomerSubscriptions(request.params.arguments);
+          case 'recharge_get_customer_orders':
+            return await this.toolHandlers.handleGetCustomerOrders(request.params.arguments);
+          case 'recharge_get_customer_charges':
+            return await this.toolHandlers.handleGetCustomerCharges(request.params.arguments);
+          case 'recharge_get_customer_payment_sources':
+            return await this.toolHandlers.handleGetCustomerPaymentSources(request.params.arguments);
+          case 'recharge_create_customer_payment_source':
+            return await this.toolHandlers.handleCreateCustomerPaymentSource(request.params.arguments);
+          case 'recharge_update_customer_payment_source':
+            return await this.toolHandlers.handleUpdateCustomerPaymentSource(request.params.arguments);
+          case 'recharge_delete_customer_payment_source':
+            return await this.toolHandlers.handleDeleteCustomerPaymentSource(request.params.arguments);
+
+          // Subscription tools
+          case 'recharge_get_subscriptions':
+            return await this.toolHandlers.handleGetSubscriptions(request.params.arguments);
+          case 'recharge_create_subscription':
+            return await this.toolHandlers.handleCreateSubscription(request.params.arguments);
+          case 'recharge_get_subscription':
+            return await this.toolHandlers.handleGetSubscription(request.params.arguments);
+          case 'recharge_update_subscription':
+            return await this.toolHandlers.handleUpdateSubscription(request.params.arguments);
+          case 'recharge_cancel_subscription':
+            return await this.toolHandlers.handleCancelSubscription(request.params.arguments);
+          case 'recharge_activate_subscription':
+            return await this.toolHandlers.handleActivateSubscription(request.params.arguments);
+          case 'recharge_skip_subscription_charge':
+            return await this.toolHandlers.handleSkipSubscriptionCharge(request.params.arguments);
+          case 'recharge_unskip_subscription_charge':
+            return await this.toolHandlers.handleUnskipSubscriptionCharge(request.params.arguments);
+          case 'recharge_swap_subscription':
+            return await this.toolHandlers.handleSwapSubscription(request.params.arguments);
+          case 'recharge_set_next_charge_date':
+            return await this.toolHandlers.handleSetNextChargeDate(request.params.arguments);
+          case 'recharge_get_subscription_charges':
+            return await this.toolHandlers.handleGetSubscriptionCharges(request.params.arguments);
+          case 'recharge_create_subscription_charge':
+            return await this.toolHandlers.handleCreateSubscriptionCharge(request.params.arguments);
+          case 'recharge_get_subscription_line_items':
+            return await this.toolHandlers.handleGetSubscriptionLineItems(request.params.arguments);
+          case 'recharge_create_subscription_line_item':
+            return await this.toolHandlers.handleCreateSubscriptionLineItem(request.params.arguments);
+          case 'recharge_update_subscription_line_item':
+            return await this.toolHandlers.handleUpdateSubscriptionLineItem(request.params.arguments);
+          case 'recharge_delete_subscription_line_item':
+            return await this.toolHandlers.handleDeleteSubscriptionLineItem(request.params.arguments);
+          case 'recharge_get_subscription_notes':
+            return await this.toolHandlers.handleGetSubscriptionNotes(request.params.arguments);
+          case 'recharge_create_subscription_note':
+            return await this.toolHandlers.handleCreateSubscriptionNote(request.params.arguments);
+          case 'recharge_update_subscription_note':
+            return await this.toolHandlers.handleUpdateSubscriptionNote(request.params.arguments);
+          case 'recharge_delete_subscription_note':
+            return await this.toolHandlers.handleDeleteSubscriptionNote(request.params.arguments);
+          case 'recharge_get_subscription_delivery_schedule':
+            return await this.toolHandlers.handleGetSubscriptionDeliverySchedule(request.params.arguments);
+          case 'recharge_update_subscription_delivery_schedule':
+            return await this.toolHandlers.handleUpdateSubscriptionDeliverySchedule(request.params.arguments);
+          case 'recharge_pause_subscription':
+            return await this.toolHandlers.handlePauseSubscription(request.params.arguments);
+          case 'recharge_resume_subscription':
+            return await this.toolHandlers.handleResumeSubscription(request.params.arguments);
+          case 'recharge_get_subscription_discounts':
+            return await this.toolHandlers.handleGetSubscriptionDiscounts(request.params.arguments);
+          case 'recharge_apply_subscription_discount':
+            return await this.toolHandlers.handleApplySubscriptionDiscount(request.params.arguments);
+          case 'recharge_remove_subscription_discount':
+            return await this.toolHandlers.handleRemoveSubscriptionDiscount(request.params.arguments);
+
+          // Product tools
+          case 'recharge_get_products':
+            return await this.toolHandlers.handleGetProducts(request.params.arguments);
+          case 'recharge_get_product':
+            return await this.toolHandlers.handleGetProduct(request.params.arguments);
+
+          // Order tools
+          case 'recharge_get_orders':
+            return await this.toolHandlers.handleGetOrders(request.params.arguments);
+          case 'recharge_get_order':
+            return await this.toolHandlers.handleGetOrder(request.params.arguments);
+          case 'recharge_update_order':
+            return await this.toolHandlers.handleUpdateOrder(request.params.arguments);
+          case 'recharge_delete_order':
+            return await this.toolHandlers.handleDeleteOrder(request.params.arguments);
+          case 'recharge_clone_order':
+            return await this.toolHandlers.handleCloneOrder(request.params.arguments);
+          case 'recharge_get_order_line_items':
+            return await this.toolHandlers.handleGetOrderLineItems(request.params.arguments);
+          case 'recharge_get_order_discounts':
+            return await this.toolHandlers.handleGetOrderDiscounts(request.params.arguments);
+
+          // Charge tools
+          case 'recharge_get_charges':
+            return await this.toolHandlers.handleGetCharges(request.params.arguments);
+          case 'recharge_get_charge':
+            return await this.toolHandlers.handleGetCharge(request.params.arguments);
+          case 'recharge_create_charge':
+            return await this.toolHandlers.handleCreateCharge(request.params.arguments);
+          case 'recharge_update_charge':
+            return await this.toolHandlers.handleUpdateCharge(request.params.arguments);
+          case 'recharge_delete_charge':
+            return await this.toolHandlers.handleDeleteCharge(request.params.arguments);
+          case 'recharge_skip_charge':
+            return await this.toolHandlers.handleSkipCharge(request.params.arguments);
+          case 'recharge_process_charge':
+            return await this.toolHandlers.handleProcessCharge(request.params.arguments);
+          case 'recharge_unskip_charge':
+            return await this.toolHandlers.handleUnskipCharge(request.params.arguments);
+          case 'recharge_delay_charge':
+            return await this.toolHandlers.handleDelayCharge(request.params.arguments);
+          case 'recharge_refund_charge':
+            return await this.toolHandlers.handleRefundCharge(request.params.arguments);
+          case 'recharge_get_charge_line_items':
+            return await this.toolHandlers.handleGetChargeLineItems(request.params.arguments);
+          case 'recharge_update_charge_line_item':
+            return await this.toolHandlers.handleUpdateChargeLineItem(request.params.arguments);
+          case 'recharge_get_charge_attempts':
+            return await this.toolHandlers.handleGetChargeAttempts(request.params.arguments);
+          case 'recharge_get_charge_discounts':
+            return await this.toolHandlers.handleGetChargeDiscounts(request.params.arguments);
+          case 'recharge_apply_charge_discount':
+            return await this.toolHandlers.handleApplyChargeDiscount(request.params.arguments);
+          case 'recharge_remove_charge_discount':
+            return await this.toolHandlers.handleRemoveChargeDiscount(request.params.arguments);
 
           // Address tools
           case 'recharge_get_addresses':
@@ -349,11 +682,14 @@ class RechargeServer {
             return await this.toolHandlers.handleUpdateAddress(request.params.arguments);
           case 'recharge_create_address':
             return await this.toolHandlers.handleCreateAddress(request.params.arguments);
-
           case 'recharge_delete_address':
             return await this.toolHandlers.handleDeleteAddress(request.params.arguments);
           case 'recharge_validate_address':
             return await this.toolHandlers.handleValidateAddress(request.params.arguments);
+          case 'recharge_get_address_subscriptions':
+            return await this.toolHandlers.handleGetAddressSubscriptions(request.params.arguments);
+          case 'recharge_get_address_charges':
+            return await this.toolHandlers.handleGetAddressCharges(request.params.arguments);
 
           // Discount tools
           case 'recharge_get_discounts':
@@ -411,7 +747,7 @@ class RechargeServer {
           case 'recharge_create_checkout':
             return await this.toolHandlers.handleCreateCheckout(request.params.arguments);
 
-          // Onetime tools
+          // One-time product tools
           case 'recharge_get_onetimes':
             return await this.toolHandlers.handleGetOnetimes(request.params.arguments);
           case 'recharge_get_onetime':
@@ -433,28 +769,9 @@ class RechargeServer {
           case 'recharge_create_store_credit':
             return await this.toolHandlers.handleCreateStoreCredit(request.params.arguments);
 
-          // Charge action tools
-          case 'recharge_skip_charge':
-            return await this.toolHandlers.handleSkipCharge(request.params.arguments);
-          case 'recharge_process_charge':
-            return await this.toolHandlers.handleProcessCharge(request.params.arguments);
-          case 'recharge_unskip_charge':
-            return await this.toolHandlers.handleUnskipCharge(request.params.arguments);
-          case 'recharge_delay_charge':
-            return await this.toolHandlers.handleDelayCharge(request.params.arguments);
-          case 'recharge_refund_charge':
-            return await this.toolHandlers.handleRefundCharge(request.params.arguments);
-
-          // Subscription action tools
-          case 'recharge_skip_subscription_charge':
-            return await this.toolHandlers.handleSkipSubscriptionCharge(request.params.arguments);
-          case 'recharge_unskip_subscription_charge':
-            return await this.toolHandlers.handleUnskipSubscriptionCharge(request.params.arguments);
-
           // Shop tools
           case 'recharge_get_shop':
             return await this.toolHandlers.handleGetShop(request.params.arguments);
-
           case 'recharge_update_shop':
             return await this.toolHandlers.handleUpdateShop(request.params.arguments);
 
@@ -463,7 +780,6 @@ class RechargeServer {
             return await this.toolHandlers.handleGetCollections(request.params.arguments);
           case 'recharge_get_collection':
             return await this.toolHandlers.handleGetCollection(request.params.arguments);
-
           case 'recharge_create_collection':
             return await this.toolHandlers.handleCreateCollection(request.params.arguments);
           case 'recharge_update_collection':
@@ -476,14 +792,6 @@ class RechargeServer {
             return await this.toolHandlers.handleGetSubscriptionAnalytics(request.params.arguments);
           case 'recharge_get_customer_analytics':
             return await this.toolHandlers.handleGetCustomerAnalytics(request.params.arguments);
-
-          // Order action tools
-          case 'recharge_update_order':
-            return await this.toolHandlers.handleUpdateOrder(request.params.arguments);
-          case 'recharge_delete_order':
-            return await this.toolHandlers.handleDeleteOrder(request.params.arguments);
-          case 'recharge_clone_order':
-            return await this.toolHandlers.handleCloneOrder(request.params.arguments);
 
           // Customer portal tools
           case 'recharge_get_customer_portal_session':
@@ -565,91 +873,6 @@ class RechargeServer {
           case 'recharge_get_tax_line':
             return await this.toolHandlers.handleGetTaxLine(request.params.arguments);
 
-          // Subscription discount tools
-          case 'recharge_get_subscription_discounts':
-            return await this.toolHandlers.handleGetSubscriptionDiscounts(request.params.arguments);
-          case 'recharge_apply_subscription_discount':
-            return await this.toolHandlers.handleApplySubscriptionDiscount(request.params.arguments);
-          case 'recharge_remove_subscription_discount':
-            return await this.toolHandlers.handleRemoveSubscriptionDiscount(request.params.arguments);
-
-          // Order discount tools
-          case 'recharge_get_order_discounts':
-            return await this.toolHandlers.handleGetOrderDiscounts(request.params.arguments);
-
-          // Charge discount tools
-          case 'recharge_get_charge_discounts':
-            return await this.toolHandlers.handleGetChargeDiscounts(request.params.arguments);
-          case 'recharge_apply_charge_discount':
-            return await this.toolHandlers.handleApplyChargeDiscount(request.params.arguments);
-          case 'recharge_remove_charge_discount':
-            return await this.toolHandlers.handleRemoveChargeDiscount(request.params.arguments);
-
-          // Nested resource tools - Customer relationships
-          case 'recharge_get_customer_addresses':
-            return await this.toolHandlers.handleGetCustomerAddresses(request.params.arguments);
-          case 'recharge_get_customer_subscriptions':
-            return await this.toolHandlers.handleGetCustomerSubscriptions(request.params.arguments);
-          case 'recharge_get_customer_orders':
-            return await this.toolHandlers.handleGetCustomerOrders(request.params.arguments);
-          case 'recharge_get_customer_charges':
-            return await this.toolHandlers.handleGetCustomerCharges(request.params.arguments);
-          case 'recharge_get_customer_payment_sources':
-            return await this.toolHandlers.handleGetCustomerPaymentSources(request.params.arguments);
-          case 'recharge_create_customer_payment_source':
-            return await this.toolHandlers.handleCreateCustomerPaymentSource(request.params.arguments);
-          case 'recharge_update_customer_payment_source':
-            return await this.toolHandlers.handleUpdateCustomerPaymentSource(request.params.arguments);
-          case 'recharge_delete_customer_payment_source':
-            return await this.toolHandlers.handleDeleteCustomerPaymentSource(request.params.arguments);
-
-          // Nested resource tools - Subscription relationships
-          case 'recharge_get_subscription_charges':
-            return await this.toolHandlers.handleGetSubscriptionCharges(request.params.arguments);
-          case 'recharge_create_subscription_charge':
-            return await this.toolHandlers.handleCreateSubscriptionCharge(request.params.arguments);
-          case 'recharge_get_subscription_line_items':
-            return await this.toolHandlers.handleGetSubscriptionLineItems(request.params.arguments);
-          case 'recharge_create_subscription_line_item':
-            return await this.toolHandlers.handleCreateSubscriptionLineItem(request.params.arguments);
-          case 'recharge_update_subscription_line_item':
-            return await this.toolHandlers.handleUpdateSubscriptionLineItem(request.params.arguments);
-          case 'recharge_delete_subscription_line_item':
-            return await this.toolHandlers.handleDeleteSubscriptionLineItem(request.params.arguments);
-          case 'recharge_get_subscription_notes':
-            return await this.toolHandlers.handleGetSubscriptionNotes(request.params.arguments);
-          case 'recharge_create_subscription_note':
-            return await this.toolHandlers.handleCreateSubscriptionNote(request.params.arguments);
-          case 'recharge_update_subscription_note':
-            return await this.toolHandlers.handleUpdateSubscriptionNote(request.params.arguments);
-          case 'recharge_delete_subscription_note':
-            return await this.toolHandlers.handleDeleteSubscriptionNote(request.params.arguments);
-          case 'recharge_get_subscription_delivery_schedule':
-            return await this.toolHandlers.handleGetSubscriptionDeliverySchedule(request.params.arguments);
-          case 'recharge_update_subscription_delivery_schedule':
-            return await this.toolHandlers.handleUpdateSubscriptionDeliverySchedule(request.params.arguments);
-          case 'recharge_pause_subscription':
-            return await this.toolHandlers.handlePauseSubscription(request.params.arguments);
-          case 'recharge_resume_subscription':
-            return await this.toolHandlers.handleResumeSubscription(request.params.arguments);
-
-          // Nested resource tools - Address relationships
-          case 'recharge_get_address_subscriptions':
-            return await this.toolHandlers.handleGetAddressSubscriptions(request.params.arguments);
-          case 'recharge_get_address_charges':
-            return await this.toolHandlers.handleGetAddressCharges(request.params.arguments);
-
-          // Line item tools
-          case 'recharge_get_order_line_items':
-            return await this.toolHandlers.handleGetOrderLineItems(request.params.arguments);
-          case 'recharge_get_charge_line_items':
-            return await this.toolHandlers.handleGetChargeLineItems(request.params.arguments);
-          case 'recharge_update_charge_line_item':
-            return await this.toolHandlers.handleUpdateChargeLineItem(request.params.arguments);
-          case 'recharge_get_charge_attempts':
-            return await this.toolHandlers.handleGetChargeAttempts(request.params.arguments);
-
-          // Collection management tools
           // Bulk operation tools
           case 'recharge_bulk_update_subscriptions':
             return await this.toolHandlers.handleBulkUpdateSubscriptions(request.params.arguments);
@@ -657,16 +880,6 @@ class RechargeServer {
             return await this.toolHandlers.handleBulkSkipCharges(request.params.arguments);
           case 'recharge_bulk_unskip_charges':
             return await this.toolHandlers.handleBulkUnskipCharges(request.params.arguments);
-
-          // Collection management tools (moved to correct location)
-          case 'recharge_create_collection':
-            return await this.toolHandlers.handleCreateCollection(request.params.arguments);
-          case 'recharge_update_collection':
-            return await this.toolHandlers.handleUpdateCollection(request.params.arguments);
-          case 'recharge_delete_collection':
-            return await this.toolHandlers.handleDeleteCollection(request.params.arguments);
-          case 'recharge_update_shop':
-            return await this.toolHandlers.handleUpdateShop(request.params.arguments);
 
           default:
             throw new Error(`Unknown tool: ${name}`);
