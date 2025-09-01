@@ -295,13 +295,6 @@ export class RechargeClient {
     });
   }
 
-  async validateAddress(addressData) {
-    return this.request('/addresses/validate', {
-      method: 'POST',
-      body: JSON.stringify(addressData)
-    });
-  }
-
   // Discount methods
   async getDiscounts(params = {}) {
     const searchParams = this.buildQueryParams(params);

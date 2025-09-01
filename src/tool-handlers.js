@@ -1440,6 +1440,341 @@ export class RechargeToolHandlers {
     }
   }
 
+  // Nested resource handlers - Customer relationships
+  async handleGetCustomerAddresses(args) {
+    try {
+      this.validateRequired(args, ['customer_id']);
+      const client = this.createClient(args);
+      const { api_key, customer_id, ...params } = this.sanitizeArgs(args);
+      const data = await client.getCustomerAddresses(customer_id, params);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('retrieving customer addresses', error);
+    }
+  }
+
+  async handleGetCustomerSubscriptions(args) {
+    try {
+      this.validateRequired(args, ['customer_id']);
+      const client = this.createClient(args);
+      const { api_key, customer_id, ...params } = this.sanitizeArgs(args);
+      const data = await client.getCustomerSubscriptions(customer_id, params);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('retrieving customer subscriptions', error);
+    }
+  }
+
+  async handleGetCustomerOrders(args) {
+    try {
+      this.validateRequired(args, ['customer_id']);
+      const client = this.createClient(args);
+      const { api_key, customer_id, ...params } = this.sanitizeArgs(args);
+      const data = await client.getCustomerOrders(customer_id, params);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('retrieving customer orders', error);
+    }
+  }
+
+  async handleGetCustomerCharges(args) {
+    try {
+      this.validateRequired(args, ['customer_id']);
+      const client = this.createClient(args);
+      const { api_key, customer_id, ...params } = this.sanitizeArgs(args);
+      const data = await client.getCustomerCharges(customer_id, params);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('retrieving customer charges', error);
+    }
+  }
+
+  async handleGetCustomerPaymentSources(args) {
+    try {
+      this.validateRequired(args, ['customer_id']);
+      const client = this.createClient(args);
+      const { api_key, customer_id, ...params } = this.sanitizeArgs(args);
+      const data = await client.getCustomerPaymentSources(customer_id, params);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('retrieving customer payment sources', error);
+    }
+  }
+
+  async handleCreateCustomerPaymentSource(args) {
+    try {
+      this.validateRequired(args, ['customer_id', 'payment_token', 'payment_type']);
+      const client = this.createClient(args);
+      const { api_key, customer_id, ...paymentSourceData } = this.sanitizeArgs(args);
+      const data = await client.createCustomerPaymentSource(customer_id, paymentSourceData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('creating customer payment source', error);
+    }
+  }
+
+  async handleUpdateCustomerPaymentSource(args) {
+    try {
+      this.validateRequired(args, ['customer_id', 'payment_source_id']);
+      const client = this.createClient(args);
+      const { api_key, customer_id, payment_source_id, ...paymentSourceData } = this.sanitizeArgs(args);
+      const data = await client.updateCustomerPaymentSource(customer_id, payment_source_id, paymentSourceData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('updating customer payment source', error);
+    }
+  }
+
+  async handleDeleteCustomerPaymentSource(args) {
+    try {
+      this.validateRequired(args, ['customer_id', 'payment_source_id']);
+      const client = this.createClient(args);
+      const data = await client.deleteCustomerPaymentSource(args.customer_id, args.payment_source_id);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('deleting customer payment source', error);
+    }
+  }
+
+  // Nested resource handlers - Subscription relationships
+  async handleGetSubscriptionCharges(args) {
+    try {
+      this.validateRequired(args, ['subscription_id']);
+      const client = this.createClient(args);
+      const { api_key, subscription_id, ...params } = this.sanitizeArgs(args);
+      const data = await client.getSubscriptionCharges(subscription_id, params);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('retrieving subscription charges', error);
+    }
+  }
+
+  async handleCreateSubscriptionCharge(args) {
+    try {
+      this.validateRequired(args, ['subscription_id']);
+      const client = this.createClient(args);
+      const { api_key, subscription_id, ...chargeData } = this.sanitizeArgs(args);
+      const data = await client.createSubscriptionCharge(subscription_id, chargeData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('creating subscription charge', error);
+    }
+  }
+
+  async handleGetSubscriptionLineItems(args) {
+    try {
+      this.validateRequired(args, ['subscription_id']);
+      const client = this.createClient(args);
+      const { api_key, subscription_id, ...params } = this.sanitizeArgs(args);
+      const data = await client.getSubscriptionLineItems(subscription_id, params);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('retrieving subscription line items', error);
+    }
+  }
+
+  async handleCreateSubscriptionLineItem(args) {
+    try {
+      this.validateRequired(args, ['subscription_id', 'shopify_variant_id', 'quantity']);
+      const client = this.createClient(args);
+      const { api_key, subscription_id, ...lineItemData } = this.sanitizeArgs(args);
+      const data = await client.createSubscriptionLineItem(subscription_id, lineItemData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('creating subscription line item', error);
+    }
+  }
+
+  async handleUpdateSubscriptionLineItem(args) {
+    try {
+      this.validateRequired(args, ['subscription_id', 'line_item_id']);
+      const client = this.createClient(args);
+      const { api_key, subscription_id, line_item_id, ...lineItemData } = this.sanitizeArgs(args);
+      const data = await client.updateSubscriptionLineItem(subscription_id, line_item_id, lineItemData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('updating subscription line item', error);
+    }
+  }
+
+  async handleDeleteSubscriptionLineItem(args) {
+    try {
+      this.validateRequired(args, ['subscription_id', 'line_item_id']);
+      const client = this.createClient(args);
+      const data = await client.deleteSubscriptionLineItem(args.subscription_id, args.line_item_id);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('deleting subscription line item', error);
+    }
+  }
+
+  async handleGetSubscriptionNotes(args) {
+    try {
+      this.validateRequired(args, ['subscription_id']);
+      const client = this.createClient(args);
+      const { api_key, subscription_id, ...params } = this.sanitizeArgs(args);
+      const data = await client.getSubscriptionNotes(subscription_id, params);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('retrieving subscription notes', error);
+    }
+  }
+
+  async handleCreateSubscriptionNote(args) {
+    try {
+      this.validateRequired(args, ['subscription_id', 'body']);
+      const client = this.createClient(args);
+      const { api_key, subscription_id, ...noteData } = this.sanitizeArgs(args);
+      const data = await client.createSubscriptionNote(subscription_id, noteData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('creating subscription note', error);
+    }
+  }
+
+  async handleUpdateSubscriptionNote(args) {
+    try {
+      this.validateRequired(args, ['subscription_id', 'note_id']);
+      const client = this.createClient(args);
+      const { api_key, subscription_id, note_id, ...noteData } = this.sanitizeArgs(args);
+      const data = await client.updateSubscriptionNote(subscription_id, note_id, noteData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('updating subscription note', error);
+    }
+  }
+
+  async handleDeleteSubscriptionNote(args) {
+    try {
+      this.validateRequired(args, ['subscription_id', 'note_id']);
+      const client = this.createClient(args);
+      const data = await client.deleteSubscriptionNote(args.subscription_id, args.note_id);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('deleting subscription note', error);
+    }
+  }
+
+  async handleGetSubscriptionDeliverySchedule(args) {
+    try {
+      this.validateRequired(args, ['subscription_id']);
+      const client = this.createClient(args);
+      const data = await client.getSubscriptionDeliverySchedule(args.subscription_id);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('retrieving subscription delivery schedule', error);
+    }
+  }
+
+  async handleUpdateSubscriptionDeliverySchedule(args) {
+    try {
+      this.validateRequired(args, ['subscription_id', 'delivery_schedule']);
+      const client = this.createClient(args);
+      const { api_key, subscription_id, ...scheduleData } = this.sanitizeArgs(args);
+      const data = await client.updateSubscriptionDeliverySchedule(subscription_id, scheduleData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('updating subscription delivery schedule', error);
+    }
+  }
+
+  async handlePauseSubscription(args) {
+    try {
+      this.validateRequired(args, ['subscription_id']);
+      const client = this.createClient(args);
+      const { api_key, subscription_id, ...pauseData } = this.sanitizeArgs(args);
+      const data = await client.pauseSubscription(subscription_id, pauseData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('pausing subscription', error);
+    }
+  }
+
+  async handleResumeSubscription(args) {
+    try {
+      this.validateRequired(args, ['subscription_id']);
+      const client = this.createClient(args);
+      const data = await client.resumeSubscription(args.subscription_id);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('resuming subscription', error);
+    }
+  }
+
+  // Nested resource handlers - Address relationships
+  async handleGetAddressSubscriptions(args) {
+    try {
+      this.validateRequired(args, ['address_id']);
+      const client = this.createClient(args);
+      const { api_key, address_id, ...params } = this.sanitizeArgs(args);
+      const data = await client.getAddressSubscriptions(address_id, params);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('retrieving address subscriptions', error);
+    }
+  }
+
+  async handleGetAddressCharges(args) {
+    try {
+      this.validateRequired(args, ['address_id']);
+      const client = this.createClient(args);
+      const { api_key, address_id, ...params } = this.sanitizeArgs(args);
+      const data = await client.getAddressCharges(address_id, params);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('retrieving address charges', error);
+    }
+  }
+
+  // Line item handlers
+  async handleGetOrderLineItems(args) {
+    try {
+      this.validateRequired(args, ['order_id']);
+      const client = this.createClient(args);
+      const { api_key, order_id, ...params } = this.sanitizeArgs(args);
+      const data = await client.getOrderLineItems(order_id, params);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('retrieving order line items', error);
+    }
+  }
+
+  async handleGetChargeLineItems(args) {
+    try {
+      this.validateRequired(args, ['charge_id']);
+      const client = this.createClient(args);
+      const { api_key, charge_id, ...params } = this.sanitizeArgs(args);
+      const data = await client.getChargeLineItems(charge_id, params);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('retrieving charge line items', error);
+    }
+  }
+
+  async handleUpdateChargeLineItem(args) {
+    try {
+      this.validateRequired(args, ['charge_id', 'line_item_id']);
+      const client = this.createClient(args);
+      const { api_key, charge_id, line_item_id, ...lineItemData } = this.sanitizeArgs(args);
+      const data = await client.updateChargeLineItem(charge_id, line_item_id, lineItemData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('updating charge line item', error);
+    }
+  }
+
+  async handleGetChargeAttempts(args) {
+    try {
+      this.validateRequired(args, ['charge_id']);
+      const client = this.createClient(args);
+      const { api_key, charge_id, ...params } = this.sanitizeArgs(args);
+      const data = await client.getChargeAttempts(charge_id, params);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('retrieving charge attempts', error);
+    }
+  }
+
   // Bulk operation handlers
   async handleBulkUpdateSubscriptions(args) {
     try {
