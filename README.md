@@ -17,6 +17,7 @@ A comprehensive **local** Model Context Protocol (MCP) server that provides **13
 - [Best Practices](#best-practices)
 - [Troubleshooting](#troubleshooting)
 - [API Coverage](#api-coverage)
+- [Project Structure](#project-structure)
 - [Contributing](#contributing)
 - [Security](#security)
 - [Changelog](#changelog)
@@ -26,10 +27,10 @@ A comprehensive **local** Model Context Protocol (MCP) server that provides **13
 
 This MCP server provides **complete access to 100% of the Recharge API v2021-11**, enabling AI assistants to:
 
-- **Manage Customers**: Create, update, and retrieve customer information
+- **Manage Customers**: Create, update, and retrieve customer information with nested relationships
 - **Handle Subscriptions**: Complete lifecycle management including creation, updates, cancellation, reactivation, line items, notes, and delivery schedules
-- **Process Orders**: View and manage order history and details
-- **Manage Charges**: Handle billing, refunds, charge scheduling, and payment attempts
+- **Process Orders**: View and manage order history and details with line items
+- **Manage Charges**: Handle billing, refunds, charge scheduling, payment attempts, and line item modifications
 - **Address Management**: Complete address lifecycle with validation and nested relationships
 - **Discount Management**: Advanced discount system with resource-specific application
 - **Line Item Management**: Add, remove, and modify subscription and order contents
@@ -111,7 +112,7 @@ This MCP server provides **complete access to 100% of the Recharge API v2021-11*
 
 ## API Key Configuration
 
-The MCP server supports two methods for API key configuration:
+The MCP server supports three methods for API key configuration:
 
 ### Method 1: Environment Variable (Server-wide)
 Set `RECHARGE_API_KEY` in your environment or `.env` file. This key will be used as a fallback when no client-specific key is provided.
@@ -251,7 +252,7 @@ For other MCP-compatible clients, configure them to run this server as a local p
 
 ### **Complete API Coverage**
 - **130+ Tools** covering 100% of Recharge API v2021-11
-- **25+ Resource Categories** with full CRUD operations
+- **15+ Resource Categories** with full CRUD operations
 - **Nested Resource Relationships** for comprehensive data access
 - **Advanced Subscription Features** including pause/resume, delivery schedules
 - **Bulk Operations** for efficient large-scale management
@@ -384,7 +385,7 @@ For other MCP-compatible clients, configure them to run this server as a local p
 
 ### **Complete Tool Inventory: 130+ Tools**
 
-### Customer Tools
+### Customer Tools (12 tools)
 - `recharge_get_customers` - Retrieve customers with filtering and pagination
 - `recharge_get_customer` - Get a specific customer by ID  
 - `recharge_update_customer` - Update customer information
@@ -398,7 +399,7 @@ For other MCP-compatible clients, configure them to run this server as a local p
 - `recharge_update_customer_payment_source` - Update a customer payment source
 - `recharge_delete_customer_payment_source` - Delete a customer payment source
 
-### Subscription Tools
+### Subscription Tools (29 tools)
 - `recharge_get_subscriptions` - Retrieve subscriptions with filtering and pagination
 - `recharge_create_subscription` - Create a new subscription
 - `recharge_get_subscription` - Get a specific subscription by ID
@@ -427,11 +428,11 @@ For other MCP-compatible clients, configure them to run this server as a local p
 - `recharge_apply_subscription_discount` - Apply a discount to a subscription
 - `recharge_remove_subscription_discount` - Remove a discount from a subscription
 
-### Product Tools
+### Product Tools (2 tools)
 - `recharge_get_products` - Retrieve products with filtering and pagination
 - `recharge_get_product` - Get a specific product by ID
 
-### Order Tools
+### Order Tools (8 tools)
 - `recharge_get_orders` - Retrieve orders with filtering and pagination
 - `recharge_get_order` - Get a specific order by ID
 - `recharge_update_order` - Update order details
@@ -440,7 +441,7 @@ For other MCP-compatible clients, configure them to run this server as a local p
 - `recharge_get_order_line_items` - Retrieve line items for a specific order
 - `recharge_get_order_discounts` - Retrieve discounts applied to an order
 
-### Charge Tools
+### Charge Tools (15 tools)
 - `recharge_get_charges` - Retrieve charges with filtering and pagination
 - `recharge_get_charge` - Get a specific charge by ID
 - `recharge_create_charge` - Create a new charge
@@ -458,7 +459,7 @@ For other MCP-compatible clients, configure them to run this server as a local p
 - `recharge_apply_charge_discount` - Apply a discount to a charge
 - `recharge_remove_charge_discount` - Remove a discount from a charge
 
-### Address Tools
+### Address Tools (10 tools)
 - `recharge_get_addresses` - Retrieve addresses with filtering and pagination
 - `recharge_get_address` - Get a specific address by ID
 - `recharge_update_address` - Update address details
@@ -468,130 +469,115 @@ For other MCP-compatible clients, configure them to run this server as a local p
 - `recharge_get_address_subscriptions` - Retrieve subscriptions for a specific address
 - `recharge_get_address_charges` - Retrieve charges for a specific address
 
-### Discount Tools
+### Discount Tools (12 tools)
 - `recharge_get_discounts` - Retrieve discounts with filtering and pagination
 - `recharge_get_discount` - Get a specific discount by ID
 - `recharge_update_discount` - Update discount details
 - `recharge_delete_discount` - Delete a discount
 - `recharge_create_discount` - Create a new discount
 
-### Metafield Tools
+### Metafield Tools (5 tools)
 - `recharge_get_metafields` - Retrieve metafields with filtering and pagination
 - `recharge_get_metafield` - Get a specific metafield by ID
 - `recharge_update_metafield` - Update metafield details
 - `recharge_delete_metafield` - Delete a metafield
 - `recharge_create_metafield` - Create a new metafield
 
-### Webhook Tools
+### Webhook Tools (5 tools)
 - `recharge_get_webhooks` - Retrieve webhooks with pagination
 - `recharge_get_webhook` - Get a specific webhook by ID
 - `recharge_update_webhook` - Update webhook details
 - `recharge_delete_webhook` - Delete a webhook
 - `recharge_create_webhook` - Create a new webhook
 
-### Payment Method Tools
+### Payment Method Tools (3 tools)
 - `recharge_get_payment_methods` - Retrieve payment methods with filtering
 - `recharge_get_payment_method` - Get a specific payment method by ID
 - `recharge_update_payment_method` - Update payment method details
 
-### Checkout Tools
+### Checkout Tools (5 tools)
 - `recharge_get_checkouts` - Retrieve checkouts with pagination
 - `recharge_get_checkout` - Get a specific checkout by token
 - `recharge_update_checkout` - Update checkout details
 - `recharge_process_checkout` - Process a checkout to complete purchase
 - `recharge_create_checkout` - Create a new checkout
 
-### One-time Product Tools
+### One-time Product Tools (5 tools)
 - `recharge_get_onetimes` - Retrieve one-time products with filtering
 - `recharge_get_onetime` - Get a specific one-time product by ID
 - `recharge_update_onetime` - Update one-time product details
 - `recharge_delete_onetime` - Delete a one-time product
 - `recharge_create_onetime` - Create a new one-time product
 
-### Store Credit Tools
+### Store Credit Tools (4 tools)
 - `recharge_get_store_credits` - Retrieve store credits with filtering
 - `recharge_get_store_credit` - Get a specific store credit by ID
 - `recharge_update_store_credit` - Update store credit details
 - `recharge_create_store_credit` - Create a new store credit
 
-### Shop Tools
+### Shop Tools (2 tools)
 - `recharge_get_shop` - Get shop information
 - `recharge_update_shop` - Update shop configuration
 
-### Collection Tools
+### Collection Tools (5 tools)
 - `recharge_get_collections` - Retrieve product collections with pagination
 - `recharge_get_collection` - Get a specific collection by ID
 - `recharge_create_collection` - Create a new collection
 - `recharge_update_collection` - Update an existing collection
 - `recharge_delete_collection` - Delete a collection
 
-### Analytics Tools
+### Analytics Tools (2 tools)
 - `recharge_get_subscription_analytics` - Get subscription analytics data
 - `recharge_get_customer_analytics` - Get customer analytics data
 
-### Customer Portal Tools
+### Customer Portal Tools (2 tools)
 - `recharge_get_customer_portal_session` - Get customer portal session information
 - `recharge_create_customer_portal_session` - Create a customer portal session
 
-### Bundle Selection Tools
+### Bundle Selection Tools (5 tools)
 - `recharge_get_bundle_selections` - Retrieve bundle selections with filtering
 - `recharge_get_bundle_selection` - Get a specific bundle selection by ID
 - `recharge_create_bundle_selection` - Create a new bundle selection
 - `recharge_update_bundle_selection` - Update bundle selection details
 - `recharge_delete_bundle_selection` - Delete a bundle selection
 
-### Retention Strategy Tools
+### Retention Strategy Tools (2 tools)
 - `recharge_get_retention_strategies` - Retrieve retention strategies with pagination
 - `recharge_get_retention_strategy` - Get a specific retention strategy by ID
 
-### Async Batch Tools
+### Async Batch Tools (3 tools)
 - `recharge_get_async_batches` - Retrieve async batches with pagination
 - `recharge_get_async_batch` - Get a specific async batch by ID
 - `recharge_create_async_batch` - Create a new async batch
 
-### Notification Tools
+### Notification Tools (2 tools)
 - `recharge_get_notifications` - Retrieve notifications with filtering
 - `recharge_get_notification` - Get a specific notification by ID
 
-### Plan Tools
+### Plan Tools (10 tools)
 - `recharge_get_plans` - Retrieve plans with filtering and pagination
 - `recharge_get_plan` - Get a specific plan by ID
 - `recharge_create_plan` - Create a new plan
 - `recharge_update_plan` - Update plan details
 - `recharge_delete_plan` - Delete a plan
-
-### Subscription Plan Tools
 - `recharge_get_subscription_plans` - Retrieve subscription plans with filtering and pagination
 - `recharge_get_subscription_plan` - Get a specific subscription plan by ID
 - `recharge_create_subscription_plan` - Create a new subscription plan
 - `recharge_update_subscription_plan` - Update subscription plan details
 - `recharge_delete_subscription_plan` - Delete a subscription plan
 
-### Shipping Rate Tools
+### Shipping Rate Tools (5 tools)
 - `recharge_get_shipping_rates` - Retrieve shipping rates with filtering and pagination
 - `recharge_get_shipping_rate` - Get a specific shipping rate by ID
 - `recharge_create_shipping_rate` - Create a new shipping rate
 - `recharge_update_shipping_rate` - Update shipping rate details
 - `recharge_delete_shipping_rate` - Delete a shipping rate
 
-### Tax Line Tools
+### Tax Line Tools (2 tools)
 - `recharge_get_tax_lines` - Retrieve tax lines with filtering and pagination
 - `recharge_get_tax_line` - Get a specific tax line by ID
 
-### Subscription Discount Tools
-- `recharge_get_subscription_discounts` - Retrieve discounts applied to a subscription
-- `recharge_apply_subscription_discount` - Apply a discount to a subscription
-- `recharge_remove_subscription_discount` - Remove a discount from a subscription
-
-### Order Discount Tools
-- `recharge_get_order_discounts` - Retrieve discounts applied to an order
-
-### Charge Discount Tools
-- `recharge_get_charge_discounts` - Retrieve discounts applied to a charge
-- `recharge_apply_charge_discount` - Apply a discount to a charge
-- `recharge_remove_charge_discount` - Remove a discount from a charge
-
-### Bulk Operation Tools
+### Bulk Operation Tools (3 tools)
 - `recharge_bulk_update_subscriptions` - Bulk update multiple subscriptions
 - `recharge_bulk_skip_charges` - Bulk skip multiple charges
 - `recharge_bulk_unskip_charges` - Bulk unskip multiple charges
@@ -1096,20 +1082,19 @@ This MCP server provides **100% coverage** of the Recharge API v2021-11:
 
 ### **Complete Resource Coverage:**
 - ✅ **Customers** (12 tools) - Full CRUD + nested resources + payment sources
-- ✅ **Subscriptions** (23 tools) - Complete lifecycle + line items + notes + schedules
+- ✅ **Subscriptions** (29 tools) - Complete lifecycle + line items + notes + schedules
 - ✅ **Products** (2 tools) - Catalog access
-- ✅ **Orders** (7 tools) - Full CRUD + line items + discounts
-- ✅ **Charges** (12 tools) - Complete CRUD + actions + attempts + discounts
-- ✅ **Addresses** (8 tools) - Full CRUD + validation + relationships
-- ✅ **Discounts** (5 tools) - Full CRUD + resource-specific application
+- ✅ **Orders** (8 tools) - Full CRUD + line items + discounts
+- ✅ **Charges** (15 tools) - Complete CRUD + actions + attempts + discounts
+- ✅ **Addresses** (10 tools) - Full CRUD + validation + relationships
+- ✅ **Discounts** (12 tools) - Full CRUD + resource-specific application
 - ✅ **Metafields** (5 tools) - Custom data for all resource types
 - ✅ **Webhooks** (5 tools) - Event notification management
 - ✅ **Payment Methods** (3 tools) - Payment processing
 - ✅ **Checkouts** (5 tools) - One-time purchase processing
 - ✅ **One-time Products** (5 tools) - Non-recurring item management
 - ✅ **Store Credits** (4 tools) - Credit management system
-- ✅ **Plans** (5 tools) - Subscription template management
-- ✅ **Subscription Plans** (5 tools) - Advanced plan configurations
+- ✅ **Plans** (10 tools) - Subscription template management
 - ✅ **Shipping Rates** (5 tools) - Shipping cost management
 - ✅ **Tax Lines** (2 tools) - Tax calculation access
 - ✅ **Bundle Selections** (5 tools) - Product bundle management
@@ -1131,6 +1116,52 @@ This MCP server provides **100% coverage** of the Recharge API v2021-11:
 - **Resource-specific Discounts** - Advanced promotion management
 
 ### **Total: 130+ Tools covering 95+ API Endpoints**
+
+## Project Structure
+
+The project is organized into logical, focused modules:
+
+```
+recharge-mcp-server/
+├── index.js                    # Main server entry point
+├── package.json                # Project configuration
+├── README.md                   # This documentation
+├── LICENSE                     # MIT license
+├── .env.example               # Environment configuration template
+├── scripts/
+│   └── validate.sh            # Validation script
+└── src/
+    ├── recharge-client.js     # Recharge API client
+    ├── tool-handlers.js       # Tool execution handlers
+    └── tools/                 # Tool schema definitions
+        ├── index.js           # Central tool exports
+        ├── customer-tools.js  # Customer management tools
+        ├── subscription-tools.js # Subscription management tools
+        ├── product-tools.js   # Product catalog tools
+        ├── order-tools.js     # Order management tools
+        ├── charge-tools.js    # Charge management tools
+        ├── address-tools.js   # Address management tools
+        ├── discount-tools.js  # Discount management tools
+        ├── metafield-tools.js # Metafield management tools
+        ├── webhook-tools.js   # Webhook management tools
+        ├── payment-tools.js   # Payment method tools
+        ├── checkout-tools.js  # Checkout processing tools
+        ├── shop-tools.js      # Shop configuration tools
+        ├── collection-tools.js # Collection management tools
+        ├── analytics-tools.js # Analytics and reporting tools
+        ├── portal-tools.js    # Customer portal tools
+        ├── plan-tools.js      # Plan management tools
+        ├── shipping-tools.js  # Shipping rate tools
+        ├── tax-tools.js       # Tax line tools
+        ├── bulk-tools.js      # Bulk operation tools
+        └── advanced-tools.js  # Advanced features (onetimes, credits, etc.)
+```
+
+### **Architecture Benefits:**
+- **Modular Design**: Each file has a single responsibility
+- **Easy Maintenance**: Related functionality is grouped together
+- **Clear Organization**: Logical separation by business domain
+- **Scalable Structure**: Easy to add new features and tools
 
 ## API Documentation
 
@@ -1222,6 +1253,7 @@ We take security seriously and will respond promptly to legitimate security conc
 
 #### **Added**
 - **Complete API Coverage**: 130+ tools covering 100% of Recharge API v2021-11
+- **Modular Tool Organization**: Reorganized tools into logical, focused files
 - **Nested Resource Relationships**: Customer addresses, subscriptions, orders, charges
 - **Subscription Line Item Management**: Add, update, remove items from subscriptions
 - **Subscription Notes System**: Customer service note management
@@ -1241,6 +1273,7 @@ We take security seriously and will respond promptly to legitimate security conc
 - **Input Validation**: Comprehensive parameter validation
 - **Documentation**: Complete usage examples and troubleshooting
 - **Security**: Enhanced API key handling and validation
+- **Project Structure**: Clean, modular organization
 
 #### **Technical Improvements**
 - **Modular Architecture**: Clean separation of concerns across multiple files
