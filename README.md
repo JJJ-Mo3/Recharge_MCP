@@ -218,7 +218,7 @@ Add to your Cursor settings or create a `.cursor/settings.json` file in your pro
       "command": "node",
       "args": ["/absolute/path/to/recharge-mcp-server/index.js"],
       "env": {
-        "RECHARGE_API_KEY": "sk_live_your_private_app_api_key_here"
+        "RECHARGE_API_KEY": "your_api_key_here"
       }
     }
   }
@@ -1075,8 +1075,8 @@ NODE_ENV=development npm run dev
 
 ### Common Error Messages
 
-- **"API key is required"**: Set `RECHARGE_API_KEY` or provide `api_key` parameter
-- **"Recharge API error 401"**: Invalid or expired API key
+- **"API key is required"**: Set `RECHARGE_API_KEY` environment variable or provide `api_key` parameter
+- **"Recharge API error 401"**: Invalid, expired, or wrong type of API key (ensure you're using a Private App API key)
 - **"Recharge API error 429"**: Rate limit exceeded (will auto-retry)
 - **"Request timeout"**: Increase `RECHARGE_API_TIMEOUT` or check network
 - **"Missing required fields"**: Check tool documentation for required parameters
