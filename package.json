@@ -7,10 +7,10 @@
   "scripts": {
     "start": "node index.js",
     "dev": "node --watch index.js",
-    "test": "npm run validate && echo \"✅ All validations passed\"",
+    "test": "npm run validate",
     "validate": "node -c index.js && node -c src/recharge-client.js && node -c src/tool-handlers.js && node -c src/tools/index.js",
-    "prestart": "echo \"🚀 Starting Recharge MCP Server...\"",
-    "postinstall": "echo \"📦 Dependencies installed. Run 'npm run validate' to check setup.\""
+    "lint": "echo \"No linting configured - consider adding ESLint for production use\"",
+    "check": "npm run validate && echo \"✅ All validations passed\""
   },
   "keywords": [
     "mcp", 
