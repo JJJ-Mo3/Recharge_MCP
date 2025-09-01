@@ -2,7 +2,7 @@ import { RechargeClient } from './recharge-client.js';
 
 /**
  * Tool handlers for Recharge MCP server
- * Handles all tool execution and API interactions
+ * Handles all tool execution and API communication
  */
 export class RechargeToolHandlers {
   constructor(defaultApiKey = null) {
@@ -17,7 +17,7 @@ export class RechargeToolHandlers {
   }
 
   /**
-   * Create Recharge client with appropriate API key
+   * Create client instance with appropriate API key
    */
   createClient(args) {
     const apiKey = this.getApiKey(args);
@@ -25,14 +25,28 @@ export class RechargeToolHandlers {
   }
 
   /**
-   * Handle errors consistently
+   * Format successful response
    */
-  handleError(error, operation) {
+  formatResponse(data) {
     return {
       content: [
         {
           type: 'text',
-          text: `Error ${operation}: ${error.message}`,
+          text: JSON.stringify(data, null, 2),
+        },
+      ],
+    };
+  }
+
+  /**
+   * Format error response
+   */
+  formatError(error) {
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `Error: ${error.message}`,
         },
       ],
       isError: true,
@@ -43,69 +57,42 @@ export class RechargeToolHandlers {
   async handleGetCustomers(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getCustomers(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getCustomers(args);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving customers');
+      return this.formatError(error);
     }
   }
 
   async handleGetCustomer(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getCustomer(args.customer_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getCustomer(args.customer_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving customer');
-    }
-  }
-
-  async handleCreateCustomer(args) {
-    try {
-      const client = this.createClient(args);
-      const result = await client.createCustomer(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
-    } catch (error) {
-      return this.handleError(error, 'creating customer');
+      return this.formatError(error);
     }
   }
 
   async handleUpdateCustomer(args) {
     try {
       const client = this.createClient(args);
-      const { customer_id, ...updateData } = args;
-      const result = await client.updateCustomer(customer_id, updateData);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { customer_id, api_key, ...updateData } = args;
+      const data = await client.updateCustomer(customer_id, updateData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'updating customer');
+      return this.formatError(error);
+    }
+  }
+
+  async handleCreateCustomer(args) {
+    try {
+      const client = this.createClient(args);
+      const { api_key, ...customerData } = args;
+      const data = await client.createCustomer(customerData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
     }
   }
 
@@ -113,139 +100,84 @@ export class RechargeToolHandlers {
   async handleGetSubscriptions(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getSubscriptions(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getSubscriptions(args);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving subscriptions');
+      return this.formatError(error);
     }
   }
 
   async handleCreateSubscription(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.createSubscription(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { api_key, ...subscriptionData } = args;
+      const data = await client.createSubscription(subscriptionData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'creating subscription');
+      return this.formatError(error);
     }
   }
 
   async handleGetSubscription(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getSubscription(args.subscription_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getSubscription(args.subscription_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving subscription');
+      return this.formatError(error);
     }
   }
 
   async handleUpdateSubscription(args) {
     try {
       const client = this.createClient(args);
-      const { subscription_id, ...updateData } = args;
-      const result = await client.updateSubscription(subscription_id, updateData);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { subscription_id, api_key, ...updateData } = args;
+      const data = await client.updateSubscription(subscription_id, updateData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'updating subscription');
+      return this.formatError(error);
     }
   }
 
   async handleCancelSubscription(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.cancelSubscription(args.subscription_id, args.cancellation_reason);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.cancelSubscription(args.subscription_id, args.cancellation_reason);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'cancelling subscription');
+      return this.formatError(error);
     }
   }
 
   async handleActivateSubscription(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.activateSubscription(args.subscription_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.activateSubscription(args.subscription_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'activating subscription');
+      return this.formatError(error);
     }
   }
 
   async handleSwapSubscription(args) {
     try {
       const client = this.createClient(args);
-      const { subscription_id, ...swapData } = args;
-      const result = await client.swapSubscription(subscription_id, swapData);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { subscription_id, api_key, ...swapData } = args;
+      const data = await client.swapSubscription(subscription_id, swapData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'swapping subscription');
+      return this.formatError(error);
     }
   }
 
   async handleSetNextChargeDate(args) {
     try {
       const client = this.createClient(args);
-      const { subscription_id, ...dateData } = args;
-      const result = await client.setNextChargeDate(subscription_id, dateData);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { subscription_id, api_key, ...dateData } = args;
+      const data = await client.setNextChargeDate(subscription_id, dateData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'setting next charge date');
+      return this.formatError(error);
     }
   }
 
@@ -253,34 +185,20 @@ export class RechargeToolHandlers {
   async handleGetProducts(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getProducts(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getProducts(args);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving products');
+      return this.formatError(error);
     }
   }
 
   async handleGetProduct(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getProduct(args.product_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getProduct(args.product_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving product');
+      return this.formatError(error);
     }
   }
 
@@ -288,86 +206,51 @@ export class RechargeToolHandlers {
   async handleGetOrders(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getOrders(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getOrders(args);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving orders');
+      return this.formatError(error);
     }
   }
 
   async handleGetOrder(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getOrder(args.order_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getOrder(args.order_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving order');
+      return this.formatError(error);
     }
   }
 
   async handleUpdateOrder(args) {
     try {
       const client = this.createClient(args);
-      const { order_id, ...updateData } = args;
-      const result = await client.updateOrder(order_id, updateData);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { order_id, api_key, ...updateData } = args;
+      const data = await client.updateOrder(order_id, updateData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'updating order');
+      return this.formatError(error);
     }
   }
 
   async handleDeleteOrder(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.deleteOrder(args.order_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.deleteOrder(args.order_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'deleting order');
+      return this.formatError(error);
     }
   }
 
   async handleCloneOrder(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.cloneOrder(args.order_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.cloneOrder(args.order_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'cloning order');
+      return this.formatError(error);
     }
   }
 
@@ -375,173 +258,104 @@ export class RechargeToolHandlers {
   async handleGetCharges(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getCharges(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getCharges(args);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving charges');
+      return this.formatError(error);
     }
   }
 
   async handleGetCharge(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getCharge(args.charge_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getCharge(args.charge_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving charge');
+      return this.formatError(error);
     }
   }
 
   async handleCreateCharge(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.createCharge(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { api_key, ...chargeData } = args;
+      const data = await client.createCharge(chargeData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'creating charge');
+      return this.formatError(error);
     }
   }
 
   async handleUpdateCharge(args) {
     try {
       const client = this.createClient(args);
-      const { charge_id, ...updateData } = args;
-      const result = await client.updateCharge(charge_id, updateData);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { charge_id, api_key, ...updateData } = args;
+      const data = await client.updateCharge(charge_id, updateData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'updating charge');
+      return this.formatError(error);
     }
   }
 
   async handleDeleteCharge(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.deleteCharge(args.charge_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.deleteCharge(args.charge_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'deleting charge');
+      return this.formatError(error);
     }
   }
 
   async handleSkipCharge(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.skipCharge(args.charge_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.skipCharge(args.charge_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'skipping charge');
+      return this.formatError(error);
     }
   }
 
   async handleProcessCharge(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.processCharge(args.charge_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.processCharge(args.charge_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'processing charge');
+      return this.formatError(error);
     }
   }
 
   async handleUnskipCharge(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.unskipCharge(args.charge_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.unskipCharge(args.charge_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'unskipping charge');
+      return this.formatError(error);
     }
   }
 
   async handleDelayCharge(args) {
     try {
       const client = this.createClient(args);
-      const { charge_id, ...delayData } = args;
-      const result = await client.delayCharge(charge_id, delayData);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { charge_id, api_key, ...delayData } = args;
+      const data = await client.delayCharge(charge_id, delayData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'delaying charge');
+      return this.formatError(error);
     }
   }
 
   async handleRefundCharge(args) {
     try {
       const client = this.createClient(args);
-      const { charge_id, ...refundData } = args;
-      const result = await client.refundCharge(charge_id, refundData);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { charge_id, api_key, ...refundData } = args;
+      const data = await client.refundCharge(charge_id, refundData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'refunding charge');
+      return this.formatError(error);
     }
   }
 
@@ -549,103 +363,63 @@ export class RechargeToolHandlers {
   async handleGetAddresses(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getAddresses(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getAddresses(args);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving addresses');
+      return this.formatError(error);
     }
   }
 
   async handleGetAddress(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getAddress(args.address_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getAddress(args.address_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving address');
-    }
-  }
-
-  async handleCreateAddress(args) {
-    try {
-      const client = this.createClient(args);
-      const result = await client.createAddress(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
-    } catch (error) {
-      return this.handleError(error, 'creating address');
+      return this.formatError(error);
     }
   }
 
   async handleUpdateAddress(args) {
     try {
       const client = this.createClient(args);
-      const { address_id, ...updateData } = args;
-      const result = await client.updateAddress(address_id, updateData);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { address_id, api_key, ...updateData } = args;
+      const data = await client.updateAddress(address_id, updateData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'updating address');
+      return this.formatError(error);
+    }
+  }
+
+  async handleCreateAddress(args) {
+    try {
+      const client = this.createClient(args);
+      const { api_key, ...addressData } = args;
+      const data = await client.createAddress(addressData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
     }
   }
 
   async handleDeleteAddress(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.deleteAddress(args.address_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.deleteAddress(args.address_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'deleting address');
+      return this.formatError(error);
     }
   }
 
   async handleValidateAddress(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.validateAddress(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { api_key, ...addressData } = args;
+      const data = await client.validateAddress(addressData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'validating address');
+      return this.formatError(error);
     }
   }
 
@@ -653,86 +427,52 @@ export class RechargeToolHandlers {
   async handleGetDiscounts(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getDiscounts(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getDiscounts(args);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving discounts');
+      return this.formatError(error);
     }
   }
 
   async handleGetDiscount(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getDiscount(args.discount_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getDiscount(args.discount_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving discount');
-    }
-  }
-
-  async handleCreateDiscount(args) {
-    try {
-      const client = this.createClient(args);
-      const result = await client.createDiscount(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
-    } catch (error) {
-      return this.handleError(error, 'creating discount');
+      return this.formatError(error);
     }
   }
 
   async handleUpdateDiscount(args) {
     try {
       const client = this.createClient(args);
-      const { discount_id, ...updateData } = args;
-      const result = await client.updateDiscount(discount_id, updateData);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { discount_id, api_key, ...updateData } = args;
+      const data = await client.updateDiscount(discount_id, updateData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'updating discount');
+      return this.formatError(error);
     }
   }
 
   async handleDeleteDiscount(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.deleteDiscount(args.discount_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.deleteDiscount(args.discount_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'deleting discount');
+      return this.formatError(error);
+    }
+  }
+
+  async handleCreateDiscount(args) {
+    try {
+      const client = this.createClient(args);
+      const { api_key, ...discountData } = args;
+      const data = await client.createDiscount(discountData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
     }
   }
 
@@ -740,86 +480,52 @@ export class RechargeToolHandlers {
   async handleGetMetafields(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getMetafields(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getMetafields(args);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving metafields');
+      return this.formatError(error);
     }
   }
 
   async handleGetMetafield(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getMetafield(args.metafield_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getMetafield(args.metafield_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving metafield');
-    }
-  }
-
-  async handleCreateMetafield(args) {
-    try {
-      const client = this.createClient(args);
-      const result = await client.createMetafield(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
-    } catch (error) {
-      return this.handleError(error, 'creating metafield');
+      return this.formatError(error);
     }
   }
 
   async handleUpdateMetafield(args) {
     try {
       const client = this.createClient(args);
-      const { metafield_id, ...updateData } = args;
-      const result = await client.updateMetafield(metafield_id, updateData);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { metafield_id, api_key, ...updateData } = args;
+      const data = await client.updateMetafield(metafield_id, updateData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'updating metafield');
+      return this.formatError(error);
     }
   }
 
   async handleDeleteMetafield(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.deleteMetafield(args.metafield_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.deleteMetafield(args.metafield_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'deleting metafield');
+      return this.formatError(error);
+    }
+  }
+
+  async handleCreateMetafield(args) {
+    try {
+      const client = this.createClient(args);
+      const { api_key, ...metafieldData } = args;
+      const data = await client.createMetafield(metafieldData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
     }
   }
 
@@ -827,86 +533,52 @@ export class RechargeToolHandlers {
   async handleGetWebhooks(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getWebhooks(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getWebhooks(args);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving webhooks');
+      return this.formatError(error);
     }
   }
 
   async handleGetWebhook(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getWebhook(args.webhook_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getWebhook(args.webhook_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving webhook');
-    }
-  }
-
-  async handleCreateWebhook(args) {
-    try {
-      const client = this.createClient(args);
-      const result = await client.createWebhook(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
-    } catch (error) {
-      return this.handleError(error, 'creating webhook');
+      return this.formatError(error);
     }
   }
 
   async handleUpdateWebhook(args) {
     try {
       const client = this.createClient(args);
-      const { webhook_id, ...updateData } = args;
-      const result = await client.updateWebhook(webhook_id, updateData);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { webhook_id, api_key, ...updateData } = args;
+      const data = await client.updateWebhook(webhook_id, updateData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'updating webhook');
+      return this.formatError(error);
     }
   }
 
   async handleDeleteWebhook(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.deleteWebhook(args.webhook_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.deleteWebhook(args.webhook_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'deleting webhook');
+      return this.formatError(error);
+    }
+  }
+
+  async handleCreateWebhook(args) {
+    try {
+      const client = this.createClient(args);
+      const { api_key, ...webhookData } = args;
+      const data = await client.createWebhook(webhookData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
     }
   }
 
@@ -914,52 +586,31 @@ export class RechargeToolHandlers {
   async handleGetPaymentMethods(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getPaymentMethods(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getPaymentMethods(args);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving payment methods');
+      return this.formatError(error);
     }
   }
 
   async handleGetPaymentMethod(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getPaymentMethod(args.payment_method_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getPaymentMethod(args.payment_method_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving payment method');
+      return this.formatError(error);
     }
   }
 
   async handleUpdatePaymentMethod(args) {
     try {
       const client = this.createClient(args);
-      const { payment_method_id, ...updateData } = args;
-      const result = await client.updatePaymentMethod(payment_method_id, updateData);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { payment_method_id, api_key, ...updateData } = args;
+      const data = await client.updatePaymentMethod(payment_method_id, updateData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'updating payment method');
+      return this.formatError(error);
     }
   }
 
@@ -967,86 +618,52 @@ export class RechargeToolHandlers {
   async handleGetCheckouts(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getCheckouts(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getCheckouts(args);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving checkouts');
+      return this.formatError(error);
     }
   }
 
   async handleGetCheckout(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getCheckout(args.checkout_token);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getCheckout(args.checkout_token);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving checkout');
-    }
-  }
-
-  async handleCreateCheckout(args) {
-    try {
-      const client = this.createClient(args);
-      const result = await client.createCheckout(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
-    } catch (error) {
-      return this.handleError(error, 'creating checkout');
+      return this.formatError(error);
     }
   }
 
   async handleUpdateCheckout(args) {
     try {
       const client = this.createClient(args);
-      const { checkout_token, ...updateData } = args;
-      const result = await client.updateCheckout(checkout_token, updateData);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { checkout_token, api_key, ...updateData } = args;
+      const data = await client.updateCheckout(checkout_token, updateData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'updating checkout');
+      return this.formatError(error);
     }
   }
 
   async handleProcessCheckout(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.processCheckout(args.checkout_token);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.processCheckout(args.checkout_token);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'processing checkout');
+      return this.formatError(error);
+    }
+  }
+
+  async handleCreateCheckout(args) {
+    try {
+      const client = this.createClient(args);
+      const { api_key, ...checkoutData } = args;
+      const data = await client.createCheckout(checkoutData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
     }
   }
 
@@ -1054,86 +671,52 @@ export class RechargeToolHandlers {
   async handleGetOnetimes(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getOnetimes(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getOnetimes(args);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving onetimes');
+      return this.formatError(error);
     }
   }
 
   async handleGetOnetime(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getOnetime(args.onetime_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getOnetime(args.onetime_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving onetime');
-    }
-  }
-
-  async handleCreateOnetime(args) {
-    try {
-      const client = this.createClient(args);
-      const result = await client.createOnetime(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
-    } catch (error) {
-      return this.handleError(error, 'creating onetime');
+      return this.formatError(error);
     }
   }
 
   async handleUpdateOnetime(args) {
     try {
       const client = this.createClient(args);
-      const { onetime_id, ...updateData } = args;
-      const result = await client.updateOnetime(onetime_id, updateData);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { onetime_id, api_key, ...updateData } = args;
+      const data = await client.updateOnetime(onetime_id, updateData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'updating onetime');
+      return this.formatError(error);
     }
   }
 
   async handleDeleteOnetime(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.deleteOnetime(args.onetime_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.deleteOnetime(args.onetime_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'deleting onetime');
+      return this.formatError(error);
+    }
+  }
+
+  async handleCreateOnetime(args) {
+    try {
+      const client = this.createClient(args);
+      const { api_key, ...onetimeData } = args;
+      const data = await client.createOnetime(onetimeData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
     }
   }
 
@@ -1141,104 +724,63 @@ export class RechargeToolHandlers {
   async handleGetStoreCredits(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getStoreCredits(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getStoreCredits(args);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving store credits');
+      return this.formatError(error);
     }
   }
 
   async handleGetStoreCredit(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getStoreCredit(args.store_credit_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getStoreCredit(args.store_credit_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving store credit');
-    }
-  }
-
-  async handleCreateStoreCredit(args) {
-    try {
-      const client = this.createClient(args);
-      const result = await client.createStoreCredit(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
-    } catch (error) {
-      return this.handleError(error, 'creating store credit');
+      return this.formatError(error);
     }
   }
 
   async handleUpdateStoreCredit(args) {
     try {
       const client = this.createClient(args);
-      const { store_credit_id, ...updateData } = args;
-      const result = await client.updateStoreCredit(store_credit_id, updateData);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { store_credit_id, api_key, ...updateData } = args;
+      const data = await client.updateStoreCredit(store_credit_id, updateData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'updating store credit');
+      return this.formatError(error);
     }
   }
 
-  // Subscription charge action handlers
+  async handleCreateStoreCredit(args) {
+    try {
+      const client = this.createClient(args);
+      const { api_key, ...storeCreditData } = args;
+      const data = await client.createStoreCredit(storeCreditData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
+    }
+  }
+
+  // Subscription action handlers
   async handleSkipSubscriptionCharge(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.skipSubscriptionCharge(args.subscription_id, args.charge_date);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.skipSubscriptionCharge(args.subscription_id, args.charge_date);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'skipping subscription charge');
+      return this.formatError(error);
     }
   }
 
   async handleUnskipSubscriptionCharge(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.unskipSubscriptionCharge(args.subscription_id, args.charge_date);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.unskipSubscriptionCharge(args.subscription_id, args.charge_date);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'unskipping subscription charge');
+      return this.formatError(error);
     }
   }
 
@@ -1246,34 +788,21 @@ export class RechargeToolHandlers {
   async handleGetShop(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getShop();
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getShop();
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving shop');
+      return this.formatError(error);
     }
   }
 
   async handleUpdateShop(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.updateShop(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { api_key, ...shopData } = args;
+      const data = await client.updateShop(shopData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'updating shop');
+      return this.formatError(error);
     }
   }
 
@@ -1281,86 +810,52 @@ export class RechargeToolHandlers {
   async handleGetCollections(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getCollections(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getCollections(args);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving collections');
+      return this.formatError(error);
     }
   }
 
   async handleGetCollection(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getCollection(args.collection_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getCollection(args.collection_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving collection');
+      return this.formatError(error);
     }
   }
 
   async handleCreateCollection(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.createCollection(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { api_key, ...collectionData } = args;
+      const data = await client.createCollection(collectionData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'creating collection');
+      return this.formatError(error);
     }
   }
 
   async handleUpdateCollection(args) {
     try {
       const client = this.createClient(args);
-      const { collection_id, ...updateData } = args;
-      const result = await client.updateCollection(collection_id, updateData);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { collection_id, api_key, ...updateData } = args;
+      const data = await client.updateCollection(collection_id, updateData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'updating collection');
+      return this.formatError(error);
     }
   }
 
   async handleDeleteCollection(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.deleteCollection(args.collection_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.deleteCollection(args.collection_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'deleting collection');
+      return this.formatError(error);
     }
   }
 
@@ -1368,34 +863,20 @@ export class RechargeToolHandlers {
   async handleGetSubscriptionAnalytics(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getSubscriptionAnalytics(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getSubscriptionAnalytics(args);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving subscription analytics');
+      return this.formatError(error);
     }
   }
 
   async handleGetCustomerAnalytics(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getCustomerAnalytics(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getCustomerAnalytics(args);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving customer analytics');
+      return this.formatError(error);
     }
   }
 
@@ -1403,35 +884,21 @@ export class RechargeToolHandlers {
   async handleGetCustomerPortalSession(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getCustomerPortalSession(args.customer_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getCustomerPortalSession(args.customer_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving customer portal session');
+      return this.formatError(error);
     }
   }
 
   async handleCreateCustomerPortalSession(args) {
     try {
       const client = this.createClient(args);
-      const { customer_id, ...sessionData } = args;
-      const result = await client.createCustomerPortalSession(customer_id, sessionData);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { customer_id, api_key, ...sessionData } = args;
+      const data = await client.createCustomerPortalSession(customer_id, sessionData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'creating customer portal session');
+      return this.formatError(error);
     }
   }
 
@@ -1439,86 +906,52 @@ export class RechargeToolHandlers {
   async handleGetBundleSelections(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getBundleSelections(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getBundleSelections(args);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving bundle selections');
+      return this.formatError(error);
     }
   }
 
   async handleGetBundleSelection(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getBundleSelection(args.bundle_selection_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getBundleSelection(args.bundle_selection_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving bundle selection');
+      return this.formatError(error);
     }
   }
 
   async handleCreateBundleSelection(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.createBundleSelection(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { api_key, ...bundleData } = args;
+      const data = await client.createBundleSelection(bundleData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'creating bundle selection');
+      return this.formatError(error);
     }
   }
 
   async handleUpdateBundleSelection(args) {
     try {
       const client = this.createClient(args);
-      const { bundle_selection_id, ...updateData } = args;
-      const result = await client.updateBundleSelection(bundle_selection_id, updateData);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { bundle_selection_id, api_key, ...updateData } = args;
+      const data = await client.updateBundleSelection(bundle_selection_id, updateData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'updating bundle selection');
+      return this.formatError(error);
     }
   }
 
   async handleDeleteBundleSelection(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.deleteBundleSelection(args.bundle_selection_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.deleteBundleSelection(args.bundle_selection_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'deleting bundle selection');
+      return this.formatError(error);
     }
   }
 
@@ -1526,34 +959,20 @@ export class RechargeToolHandlers {
   async handleGetRetentionStrategies(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getRetentionStrategies(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getRetentionStrategies(args);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving retention strategies');
+      return this.formatError(error);
     }
   }
 
   async handleGetRetentionStrategy(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getRetentionStrategy(args.retention_strategy_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getRetentionStrategy(args.retention_strategy_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving retention strategy');
+      return this.formatError(error);
     }
   }
 
@@ -1561,51 +980,31 @@ export class RechargeToolHandlers {
   async handleGetAsyncBatches(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getAsyncBatches(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getAsyncBatches(args);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving async batches');
+      return this.formatError(error);
     }
   }
 
   async handleGetAsyncBatch(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getAsyncBatch(args.async_batch_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getAsyncBatch(args.async_batch_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving async batch');
+      return this.formatError(error);
     }
   }
 
   async handleCreateAsyncBatch(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.createAsyncBatch(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { api_key, ...batchData } = args;
+      const data = await client.createAsyncBatch(batchData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'creating async batch');
+      return this.formatError(error);
     }
   }
 
@@ -1613,34 +1012,20 @@ export class RechargeToolHandlers {
   async handleGetNotifications(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getNotifications(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getNotifications(args);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving notifications');
+      return this.formatError(error);
     }
   }
 
   async handleGetNotification(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getNotification(args.notification_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getNotification(args.notification_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving notification');
+      return this.formatError(error);
     }
   }
 
@@ -1648,86 +1033,52 @@ export class RechargeToolHandlers {
   async handleGetPlans(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getPlans(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getPlans(args);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving plans');
+      return this.formatError(error);
     }
   }
 
   async handleGetPlan(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getPlan(args.plan_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getPlan(args.plan_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving plan');
+      return this.formatError(error);
     }
   }
 
   async handleCreatePlan(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.createPlan(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { api_key, ...planData } = args;
+      const data = await client.createPlan(planData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'creating plan');
+      return this.formatError(error);
     }
   }
 
   async handleUpdatePlan(args) {
     try {
       const client = this.createClient(args);
-      const { plan_id, ...updateData } = args;
-      const result = await client.updatePlan(plan_id, updateData);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { plan_id, api_key, ...updateData } = args;
+      const data = await client.updatePlan(plan_id, updateData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'updating plan');
+      return this.formatError(error);
     }
   }
 
   async handleDeletePlan(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.deletePlan(args.plan_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.deletePlan(args.plan_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'deleting plan');
+      return this.formatError(error);
     }
   }
 
@@ -1735,86 +1086,52 @@ export class RechargeToolHandlers {
   async handleGetSubscriptionPlans(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getSubscriptionPlans(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getSubscriptionPlans(args);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving subscription plans');
+      return this.formatError(error);
     }
   }
 
   async handleGetSubscriptionPlan(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getSubscriptionPlan(args.subscription_plan_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getSubscriptionPlan(args.subscription_plan_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving subscription plan');
+      return this.formatError(error);
     }
   }
 
   async handleCreateSubscriptionPlan(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.createSubscriptionPlan(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { api_key, ...planData } = args;
+      const data = await client.createSubscriptionPlan(planData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'creating subscription plan');
+      return this.formatError(error);
     }
   }
 
   async handleUpdateSubscriptionPlan(args) {
     try {
       const client = this.createClient(args);
-      const { subscription_plan_id, ...updateData } = args;
-      const result = await client.updateSubscriptionPlan(subscription_plan_id, updateData);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { subscription_plan_id, api_key, ...updateData } = args;
+      const data = await client.updateSubscriptionPlan(subscription_plan_id, updateData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'updating subscription plan');
+      return this.formatError(error);
     }
   }
 
   async handleDeleteSubscriptionPlan(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.deleteSubscriptionPlan(args.subscription_plan_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.deleteSubscriptionPlan(args.subscription_plan_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'deleting subscription plan');
+      return this.formatError(error);
     }
   }
 
@@ -1822,86 +1139,52 @@ export class RechargeToolHandlers {
   async handleGetShippingRates(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getShippingRates(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getShippingRates(args);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving shipping rates');
+      return this.formatError(error);
     }
   }
 
   async handleGetShippingRate(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getShippingRate(args.shipping_rate_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getShippingRate(args.shipping_rate_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving shipping rate');
+      return this.formatError(error);
     }
   }
 
   async handleCreateShippingRate(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.createShippingRate(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { api_key, ...rateData } = args;
+      const data = await client.createShippingRate(rateData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'creating shipping rate');
+      return this.formatError(error);
     }
   }
 
   async handleUpdateShippingRate(args) {
     try {
       const client = this.createClient(args);
-      const { shipping_rate_id, ...updateData } = args;
-      const result = await client.updateShippingRate(shipping_rate_id, updateData);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { shipping_rate_id, api_key, ...updateData } = args;
+      const data = await client.updateShippingRate(shipping_rate_id, updateData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'updating shipping rate');
+      return this.formatError(error);
     }
   }
 
   async handleDeleteShippingRate(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.deleteShippingRate(args.shipping_rate_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.deleteShippingRate(args.shipping_rate_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'deleting shipping rate');
+      return this.formatError(error);
     }
   }
 
@@ -1909,86 +1192,95 @@ export class RechargeToolHandlers {
   async handleGetTaxLines(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getTaxLines(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getTaxLines(args);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving tax lines');
+      return this.formatError(error);
     }
   }
 
   async handleGetTaxLine(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getTaxLine(args.tax_line_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getTaxLine(args.tax_line_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving tax line');
+      return this.formatError(error);
     }
   }
 
-  // Bulk operation handlers
-  async handleBulkUpdateSubscriptions(args) {
+  // Subscription discount handlers
+  async handleGetSubscriptionDiscounts(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.bulkUpdateSubscriptions(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getSubscriptionDiscounts(args.subscription_id, args);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'bulk updating subscriptions');
+      return this.formatError(error);
     }
   }
 
-  async handleBulkSkipCharges(args) {
+  async handleApplySubscriptionDiscount(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.bulkSkipCharges(args.charge_ids);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { subscription_id, api_key, ...discountData } = args;
+      const data = await client.applySubscriptionDiscount(subscription_id, discountData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'bulk skipping charges');
+      return this.formatError(error);
     }
   }
 
-  async handleBulkUnskipCharges(args) {
+  async handleRemoveSubscriptionDiscount(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.bulkUnskipCharges(args.charge_ids);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.removeSubscriptionDiscount(args.subscription_id, args.discount_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'bulk unskipping charges');
+      return this.formatError(error);
+    }
+  }
+
+  // Order discount handlers
+  async handleGetOrderDiscounts(args) {
+    try {
+      const client = this.createClient(args);
+      const data = await client.getOrderDiscounts(args.order_id, args);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
+    }
+  }
+
+  // Charge discount handlers
+  async handleGetChargeDiscounts(args) {
+    try {
+      const client = this.createClient(args);
+      const data = await client.getChargeDiscounts(args.charge_id, args);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
+    }
+  }
+
+  async handleApplyChargeDiscount(args) {
+    try {
+      const client = this.createClient(args);
+      const { charge_id, api_key, ...discountData } = args;
+      const data = await client.applyChargeDiscount(charge_id, discountData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
+    }
+  }
+
+  async handleRemoveChargeDiscount(args) {
+    try {
+      const client = this.createClient(args);
+      const data = await client.removeChargeDiscount(args.charge_id, args.discount_id);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
     }
   }
 
@@ -1996,143 +1288,82 @@ export class RechargeToolHandlers {
   async handleGetCustomerAddresses(args) {
     try {
       const client = this.createClient(args);
-      const { customer_id, ...params } = args;
-      const result = await client.getCustomerAddresses(customer_id, params);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getCustomerAddresses(args.customer_id, args);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving customer addresses');
+      return this.formatError(error);
     }
   }
 
   async handleGetCustomerSubscriptions(args) {
     try {
       const client = this.createClient(args);
-      const { customer_id, ...params } = args;
-      const result = await client.getCustomerSubscriptions(customer_id, params);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getCustomerSubscriptions(args.customer_id, args);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving customer subscriptions');
+      return this.formatError(error);
     }
   }
 
   async handleGetCustomerOrders(args) {
     try {
       const client = this.createClient(args);
-      const { customer_id, ...params } = args;
-      const result = await client.getCustomerOrders(customer_id, params);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getCustomerOrders(args.customer_id, args);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving customer orders');
+      return this.formatError(error);
     }
   }
 
   async handleGetCustomerCharges(args) {
     try {
       const client = this.createClient(args);
-      const { customer_id, ...params } = args;
-      const result = await client.getCustomerCharges(customer_id, params);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getCustomerCharges(args.customer_id, args);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving customer charges');
+      return this.formatError(error);
     }
   }
 
   async handleGetCustomerPaymentSources(args) {
     try {
       const client = this.createClient(args);
-      const { customer_id, ...params } = args;
-      const result = await client.getCustomerPaymentSources(customer_id, params);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getCustomerPaymentSources(args.customer_id, args);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving customer payment sources');
+      return this.formatError(error);
     }
   }
 
   async handleCreateCustomerPaymentSource(args) {
     try {
       const client = this.createClient(args);
-      const { customer_id, ...paymentSourceData } = args;
-      const result = await client.createCustomerPaymentSource(customer_id, paymentSourceData);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { customer_id, api_key, ...paymentData } = args;
+      const data = await client.createCustomerPaymentSource(customer_id, paymentData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'creating customer payment source');
+      return this.formatError(error);
     }
   }
 
   async handleUpdateCustomerPaymentSource(args) {
     try {
       const client = this.createClient(args);
-      const { customer_id, payment_source_id, ...updateData } = args;
-      const result = await client.updateCustomerPaymentSource(customer_id, payment_source_id, updateData);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { customer_id, payment_source_id, api_key, ...updateData } = args;
+      const data = await client.updateCustomerPaymentSource(customer_id, payment_source_id, updateData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'updating customer payment source');
+      return this.formatError(error);
     }
   }
 
   async handleDeleteCustomerPaymentSource(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.deleteCustomerPaymentSource(args.customer_id, args.payment_source_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.deleteCustomerPaymentSource(args.customer_id, args.payment_source_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'deleting customer payment source');
+      return this.formatError(error);
     }
   }
 
@@ -2140,248 +1371,147 @@ export class RechargeToolHandlers {
   async handleGetSubscriptionCharges(args) {
     try {
       const client = this.createClient(args);
-      const { subscription_id, ...params } = args;
-      const result = await client.getSubscriptionCharges(subscription_id, params);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getSubscriptionCharges(args.subscription_id, args);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving subscription charges');
+      return this.formatError(error);
     }
   }
 
   async handleCreateSubscriptionCharge(args) {
     try {
       const client = this.createClient(args);
-      const { subscription_id, ...chargeData } = args;
-      const result = await client.createSubscriptionCharge(subscription_id, chargeData);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { subscription_id, api_key, ...chargeData } = args;
+      const data = await client.createSubscriptionCharge(subscription_id, chargeData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'creating subscription charge');
+      return this.formatError(error);
     }
   }
 
   async handleGetSubscriptionLineItems(args) {
     try {
       const client = this.createClient(args);
-      const { subscription_id, ...params } = args;
-      const result = await client.getSubscriptionLineItems(subscription_id, params);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getSubscriptionLineItems(args.subscription_id, args);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving subscription line items');
+      return this.formatError(error);
     }
   }
 
   async handleCreateSubscriptionLineItem(args) {
     try {
       const client = this.createClient(args);
-      const { subscription_id, ...lineItemData } = args;
-      const result = await client.createSubscriptionLineItem(subscription_id, lineItemData);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { subscription_id, api_key, ...lineItemData } = args;
+      const data = await client.createSubscriptionLineItem(subscription_id, lineItemData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'creating subscription line item');
+      return this.formatError(error);
     }
   }
 
   async handleUpdateSubscriptionLineItem(args) {
     try {
       const client = this.createClient(args);
-      const { subscription_id, line_item_id, ...updateData } = args;
-      const result = await client.updateSubscriptionLineItem(subscription_id, line_item_id, updateData);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { subscription_id, line_item_id, api_key, ...updateData } = args;
+      const data = await client.updateSubscriptionLineItem(subscription_id, line_item_id, updateData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'updating subscription line item');
+      return this.formatError(error);
     }
   }
 
   async handleDeleteSubscriptionLineItem(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.deleteSubscriptionLineItem(args.subscription_id, args.line_item_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.deleteSubscriptionLineItem(args.subscription_id, args.line_item_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'deleting subscription line item');
+      return this.formatError(error);
     }
   }
 
   async handleGetSubscriptionNotes(args) {
     try {
       const client = this.createClient(args);
-      const { subscription_id, ...params } = args;
-      const result = await client.getSubscriptionNotes(subscription_id, params);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getSubscriptionNotes(args.subscription_id, args);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving subscription notes');
+      return this.formatError(error);
     }
   }
 
   async handleCreateSubscriptionNote(args) {
     try {
       const client = this.createClient(args);
-      const { subscription_id, ...noteData } = args;
-      const result = await client.createSubscriptionNote(subscription_id, noteData);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { subscription_id, api_key, ...noteData } = args;
+      const data = await client.createSubscriptionNote(subscription_id, noteData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'creating subscription note');
+      return this.formatError(error);
     }
   }
 
   async handleUpdateSubscriptionNote(args) {
     try {
       const client = this.createClient(args);
-      const { subscription_id, note_id, ...updateData } = args;
-      const result = await client.updateSubscriptionNote(subscription_id, note_id, updateData);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { subscription_id, note_id, api_key, ...updateData } = args;
+      const data = await client.updateSubscriptionNote(subscription_id, note_id, updateData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'updating subscription note');
+      return this.formatError(error);
     }
   }
 
   async handleDeleteSubscriptionNote(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.deleteSubscriptionNote(args.subscription_id, args.note_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.deleteSubscriptionNote(args.subscription_id, args.note_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'deleting subscription note');
+      return this.formatError(error);
     }
   }
 
   async handleGetSubscriptionDeliverySchedule(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.getSubscriptionDeliverySchedule(args.subscription_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getSubscriptionDeliverySchedule(args.subscription_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving subscription delivery schedule');
+      return this.formatError(error);
     }
   }
 
   async handleUpdateSubscriptionDeliverySchedule(args) {
     try {
       const client = this.createClient(args);
-      const { subscription_id, ...scheduleData } = args;
-      const result = await client.updateSubscriptionDeliverySchedule(subscription_id, scheduleData);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { subscription_id, api_key, ...scheduleData } = args;
+      const data = await client.updateSubscriptionDeliverySchedule(subscription_id, scheduleData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'updating subscription delivery schedule');
+      return this.formatError(error);
     }
   }
 
   async handlePauseSubscription(args) {
     try {
       const client = this.createClient(args);
-      const { subscription_id, ...pauseData } = args;
-      const result = await client.pauseSubscription(subscription_id, pauseData);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { subscription_id, api_key, ...pauseData } = args;
+      const data = await client.pauseSubscription(subscription_id, pauseData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'pausing subscription');
+      return this.formatError(error);
     }
   }
 
   async handleResumeSubscription(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.resumeSubscription(args.subscription_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.resumeSubscription(args.subscription_id);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'resuming subscription');
+      return this.formatError(error);
     }
   }
 
@@ -2389,36 +1519,20 @@ export class RechargeToolHandlers {
   async handleGetAddressSubscriptions(args) {
     try {
       const client = this.createClient(args);
-      const { address_id, ...params } = args;
-      const result = await client.getAddressSubscriptions(address_id, params);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getAddressSubscriptions(args.address_id, args);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving address subscriptions');
+      return this.formatError(error);
     }
   }
 
   async handleGetAddressCharges(args) {
     try {
       const client = this.createClient(args);
-      const { address_id, ...params } = args;
-      const result = await client.getAddressCharges(address_id, params);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getAddressCharges(args.address_id, args);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving address charges');
+      return this.formatError(error);
     }
   }
 
@@ -2426,197 +1540,73 @@ export class RechargeToolHandlers {
   async handleGetOrderLineItems(args) {
     try {
       const client = this.createClient(args);
-      const { order_id, ...params } = args;
-      const result = await client.getOrderLineItems(order_id, params);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getOrderLineItems(args.order_id, args);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving order line items');
+      return this.formatError(error);
     }
   }
 
   async handleGetChargeLineItems(args) {
     try {
       const client = this.createClient(args);
-      const { charge_id, ...params } = args;
-      const result = await client.getChargeLineItems(charge_id, params);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getChargeLineItems(args.charge_id, args);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving charge line items');
+      return this.formatError(error);
     }
   }
 
   async handleUpdateChargeLineItem(args) {
     try {
       const client = this.createClient(args);
-      const { charge_id, line_item_id, ...updateData } = args;
-      const result = await client.updateChargeLineItem(charge_id, line_item_id, updateData);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { charge_id, line_item_id, api_key, ...updateData } = args;
+      const data = await client.updateChargeLineItem(charge_id, line_item_id, updateData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'updating charge line item');
+      return this.formatError(error);
     }
   }
 
   async handleGetChargeAttempts(args) {
     try {
       const client = this.createClient(args);
-      const { charge_id, ...params } = args;
-      const result = await client.getChargeAttempts(charge_id, params);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.getChargeAttempts(args.charge_id, args);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving charge attempts');
+      return this.formatError(error);
     }
   }
 
-  // Discount application handlers
-  async handleGetSubscriptionDiscounts(args) {
+  // Bulk operation handlers
+  async handleBulkUpdateSubscriptions(args) {
     try {
       const client = this.createClient(args);
-      const { subscription_id, ...params } = args;
-      const result = await client.getSubscriptionDiscounts(subscription_id, params);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const { api_key, ...bulkData } = args;
+      const data = await client.bulkUpdateSubscriptions(bulkData);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'retrieving subscription discounts');
+      return this.formatError(error);
     }
   }
 
-  async handleApplySubscriptionDiscount(args) {
+  async handleBulkSkipCharges(args) {
     try {
       const client = this.createClient(args);
-      const { subscription_id, ...discountData } = args;
-      const result = await client.applySubscriptionDiscount(subscription_id, discountData);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.bulkSkipCharges(args.charge_ids);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'applying subscription discount');
+      return this.formatError(error);
     }
   }
 
-  async handleRemoveSubscriptionDiscount(args) {
+  async handleBulkUnskipCharges(args) {
     try {
       const client = this.createClient(args);
-      const result = await client.removeSubscriptionDiscount(args.subscription_id, args.discount_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
+      const data = await client.bulkUnskipCharges(args.charge_ids);
+      return this.formatResponse(data);
     } catch (error) {
-      return this.handleError(error, 'removing subscription discount');
-    }
-  }
-
-  async handleGetOrderDiscounts(args) {
-    try {
-      const client = this.createClient(args);
-      const { order_id, ...params } = args;
-      const result = await client.getOrderDiscounts(order_id, params);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
-    } catch (error) {
-      return this.handleError(error, 'retrieving order discounts');
-    }
-  }
-
-  async handleGetChargeDiscounts(args) {
-    try {
-      const client = this.createClient(args);
-      const { charge_id, ...params } = args;
-      const result = await client.getChargeDiscounts(charge_id, params);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
-    } catch (error) {
-      return this.handleError(error, 'retrieving charge discounts');
-    }
-  }
-
-  async handleApplyChargeDiscount(args) {
-    try {
-      const client = this.createClient(args);
-      const { charge_id, ...discountData } = args;
-      const result = await client.applyChargeDiscount(charge_id, discountData);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
-    } catch (error) {
-      return this.handleError(error, 'applying charge discount');
-    }
-  }
-
-  async handleRemoveChargeDiscount(args) {
-    try {
-      const client = this.createClient(args);
-      const result = await client.removeChargeDiscount(args.charge_id, args.discount_id);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
-    } catch (error) {
-      return this.handleError(error, 'removing charge discount');
+      return this.formatError(error);
     }
   }
 }

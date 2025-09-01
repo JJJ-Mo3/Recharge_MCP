@@ -475,6 +475,13 @@ For other MCP-compatible clients, configure them to run this server as a local p
 - `recharge_update_discount` - Update discount details
 - `recharge_delete_discount` - Delete a discount
 - `recharge_create_discount` - Create a new discount
+- `recharge_get_subscription_discounts` - Retrieve discounts applied to a subscription
+- `recharge_apply_subscription_discount` - Apply a discount to a subscription
+- `recharge_remove_subscription_discount` - Remove a discount from a subscription
+- `recharge_get_order_discounts` - Retrieve discounts applied to an order
+- `recharge_get_charge_discounts` - Retrieve discounts applied to a charge
+- `recharge_apply_charge_discount` - Apply a discount to a charge
+- `recharge_remove_charge_discount` - Remove a discount from a charge
 
 ### Metafield Tools (5 tools)
 - `recharge_get_metafields` - Retrieve metafields with filtering and pagination
@@ -955,7 +962,7 @@ All tools return responses in the following format:
   "content": [
     {
       "type": "text",
-      "text": "Error retrieving customer: Recharge API error 404: Customer not found"
+      "text": "Error: Recharge API error 404: Customer not found"
     }
   ],
   "isError": true
