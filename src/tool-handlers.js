@@ -1393,4 +1393,100 @@ export class RechargeToolHandlers {
       return this.formatError('removing charge discount', error);
     }
   }
+
+  // Nested resource tools - Customer relationships
+  async handleGetCustomerAddresses(args) {
+    try {
+      this.validateRequired(args, ['customer_id']);
+      const client = this.createClient(args);
+      const { api_key, customer_id, ...params } = this.sanitizeArgs(args);
+      const data = await client.getCustomerAddresses(customer_id, params);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('retrieving customer addresses', error);
+    }
+  }
+
+  async handleGetCustomerSubscriptions(args) {
+    try {
+      this.validateRequired(args, ['customer_id']);
+      const client = this.createClient(args);
+      const { api_key, customer_id, ...params } = this.sanitizeArgs(args);
+      const data = await client.getCustomerSubscriptions(customer_id, params);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('retrieving customer subscriptions', error);
+    }
+  }
+
+  async handleGetCustomerOrders(args) {
+    try {
+      this.validateRequired(args, ['customer_id']);
+      const client = this.createClient(args);
+      const { api_key, customer_id, ...params } = this.sanitizeArgs(args);
+      const data = await client.getCustomerOrders(customer_id, params);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('retrieving customer orders', error);
+    }
+  }
+
+  async handleGetCustomerCharges(args) {
+    try {
+      this.validateRequired(args, ['customer_id']);
+      const client = this.createClient(args);
+      const { api_key, customer_id, ...params } = this.sanitizeArgs(args);
+      const data = await client.getCustomerCharges(customer_id, params);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('retrieving customer charges', error);
+    }
+  }
+
+  async handleGetCustomerPaymentSources(args) {
+    try {
+      this.validateRequired(args, ['customer_id']);
+      const client = this.createClient(args);
+      const { api_key, customer_id, ...params } = this.sanitizeArgs(args);
+      const data = await client.getCustomerPaymentSources(customer_id, params);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('retrieving customer payment sources', error);
+    }
+  }
+
+  async handleCreateCustomerPaymentSource(args) {
+    try {
+      this.validateRequired(args, ['customer_id', 'payment_token', 'payment_type']);
+      const client = this.createClient(args);
+      const { api_key, customer_id, ...paymentSourceData } = this.sanitizeArgs(args);
+      const data = await client.createCustomerPaymentSource(customer_id, paymentSourceData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('creating customer payment source', error);
+    }
+  }
+
+  async handleUpdateCustomerPaymentSource(args) {
+    try {
+      this.validateRequired(args, ['customer_id', 'payment_source_id']);
+      const client = this.createClient(args);
+      const { api_key, customer_id, payment_source_id, ...paymentSourceData } = this.sanitizeArgs(args);
+      const data = await client.updateCustomerPaymentSource(customer_id, payment_source_id, paymentSourceData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('updating customer payment source', error);
+    }
+  }
+
+  async handleDeleteCustomerPaymentSource(args) {
+    try {
+      this.validateRequired(args, ['customer_id', 'payment_source_id']);
+      const client = this.createClient(args);
+      const data = await client.deleteCustomerPaymentSource(args.customer_id, args.payment_source_id);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('deleting customer payment source', error);
+    }
+  }
 }
