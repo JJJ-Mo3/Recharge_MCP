@@ -1610,3 +1610,352 @@ export class RechargeToolHandlers {
     }
   }
 }
+  // Bundle selection handlers
+  async handleGetBundleSelections(args) {
+    try {
+      const client = this.createClient(args);
+      const data = await client.getBundleSelections(args);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
+    }
+  }
+
+  async handleGetBundleSelection(args) {
+    try {
+      const client = this.createClient(args);
+      const data = await client.getBundleSelection(args.bundle_selection_id);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
+    }
+  }
+
+  async handleCreateBundleSelection(args) {
+    try {
+      const client = this.createClient(args);
+      const { api_key, ...bundleData } = args;
+      const data = await client.createBundleSelection(bundleData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
+    }
+  }
+
+  async handleUpdateBundleSelection(args) {
+    try {
+      const client = this.createClient(args);
+      const { bundle_selection_id, api_key, ...updateData } = args;
+      const data = await client.updateBundleSelection(bundle_selection_id, updateData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
+    }
+  }
+
+  async handleDeleteBundleSelection(args) {
+    try {
+      const client = this.createClient(args);
+      const data = await client.deleteBundleSelection(args.bundle_selection_id);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
+    }
+  }
+
+  // Retention strategy handlers
+  async handleGetRetentionStrategies(args) {
+    try {
+      const client = this.createClient(args);
+      const data = await client.getRetentionStrategies(args);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
+    }
+  }
+
+  async handleGetRetentionStrategy(args) {
+    try {
+      const client = this.createClient(args);
+      const data = await client.getRetentionStrategy(args.retention_strategy_id);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
+    }
+  }
+
+  // Async batch handlers
+  async handleGetAsyncBatches(args) {
+    try {
+      const client = this.createClient(args);
+      const data = await client.getAsyncBatches(args);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
+    }
+  }
+
+  async handleGetAsyncBatch(args) {
+    try {
+      const client = this.createClient(args);
+      const data = await client.getAsyncBatch(args.async_batch_id);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
+    }
+  }
+
+  async handleCreateAsyncBatch(args) {
+    try {
+      const client = this.createClient(args);
+      const { api_key, ...batchData } = args;
+      const data = await client.createAsyncBatch(batchData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
+    }
+  }
+
+  // Notification handlers
+  async handleGetNotifications(args) {
+    try {
+      const client = this.createClient(args);
+      const data = await client.getNotifications(args);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
+    }
+  }
+
+  async handleGetNotification(args) {
+    try {
+      const client = this.createClient(args);
+      const data = await client.getNotification(args.notification_id);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
+    }
+  }
+
+  // Plan handlers
+  async handleGetPlans(args) {
+    try {
+      const client = this.createClient(args);
+      const data = await client.getPlans(args);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
+    }
+  }
+
+  async handleGetPlan(args) {
+    try {
+      const client = this.createClient(args);
+      const data = await client.getPlan(args.plan_id);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
+    }
+  }
+
+  async handleCreatePlan(args) {
+    try {
+      const client = this.createClient(args);
+      const { api_key, ...planData } = args;
+      const data = await client.createPlan(planData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
+    }
+  }
+
+  async handleUpdatePlan(args) {
+    try {
+      const client = this.createClient(args);
+      const { plan_id, api_key, ...updateData } = args;
+      const data = await client.updatePlan(plan_id, updateData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
+    }
+  }
+
+  async handleDeletePlan(args) {
+    try {
+      const client = this.createClient(args);
+      const data = await client.deletePlan(args.plan_id);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
+    }
+  }
+
+  // Subscription plan handlers
+  async handleGetSubscriptionPlans(args) {
+    try {
+      const client = this.createClient(args);
+      const data = await client.getSubscriptionPlans(args);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
+    }
+  }
+
+  async handleGetSubscriptionPlan(args) {
+    try {
+      const client = this.createClient(args);
+      const data = await client.getSubscriptionPlan(args.subscription_plan_id);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
+    }
+  }
+
+  async handleCreateSubscriptionPlan(args) {
+    try {
+      const client = this.createClient(args);
+      const { api_key, ...planData } = args;
+      const data = await client.createSubscriptionPlan(planData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
+    }
+  }
+
+  async handleUpdateSubscriptionPlan(args) {
+    try {
+      const client = this.createClient(args);
+      const { subscription_plan_id, api_key, ...updateData } = args;
+      const data = await client.updateSubscriptionPlan(subscription_plan_id, updateData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
+    }
+  }
+
+  async handleDeleteSubscriptionPlan(args) {
+    try {
+      const client = this.createClient(args);
+      const data = await client.deleteSubscriptionPlan(args.subscription_plan_id);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
+    }
+  }
+
+  // Shipping rate handlers
+  async handleGetShippingRates(args) {
+    try {
+      const client = this.createClient(args);
+      const data = await client.getShippingRates(args);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
+    }
+  }
+
+  async handleGetShippingRate(args) {
+    try {
+      const client = this.createClient(args);
+      const data = await client.getShippingRate(args.shipping_rate_id);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
+    }
+  }
+
+  async handleCreateShippingRate(args) {
+    try {
+      const client = this.createClient(args);
+      const { api_key, ...rateData } = args;
+      const data = await client.createShippingRate(rateData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
+    }
+  }
+
+  async handleUpdateShippingRate(args) {
+    try {
+      const client = this.createClient(args);
+      const { shipping_rate_id, api_key, ...updateData } = args;
+      const data = await client.updateShippingRate(shipping_rate_id, updateData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
+    }
+  }
+
+  async handleDeleteShippingRate(args) {
+    try {
+      const client = this.createClient(args);
+      const data = await client.deleteShippingRate(args.shipping_rate_id);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
+    }
+  }
+
+  // Tax line handlers
+  async handleGetTaxLines(args) {
+    try {
+      const client = this.createClient(args);
+      const data = await client.getTaxLines(args);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
+    }
+  }
+
+  async handleGetTaxLine(args) {
+    try {
+      const client = this.createClient(args);
+      const data = await client.getTaxLine(args.tax_line_id);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
+    }
+  }
+
+  // Analytics handlers
+  async handleGetSubscriptionAnalytics(args) {
+    try {
+      const client = this.createClient(args);
+      const data = await client.getSubscriptionAnalytics(args);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
+    }
+  }
+
+  async handleGetCustomerAnalytics(args) {
+    try {
+      const client = this.createClient(args);
+      const data = await client.getCustomerAnalytics(args);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
+    }
+  }
+
+  // Customer portal handlers
+  async handleGetCustomerPortalSession(args) {
+    try {
+      const client = this.createClient(args);
+      const data = await client.getCustomerPortalSession(args.customer_id);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
+    }
+  }
+
+  async handleCreateCustomerPortalSession(args) {
+    try {
+      const client = this.createClient(args);
+      const { customer_id, api_key, ...sessionData } = args;
+      const data = await client.createCustomerPortalSession(customer_id, sessionData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError(error);
+    }
+  }
