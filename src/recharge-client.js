@@ -445,6 +445,7 @@ export class RechargeClient {
   }
 
   // Shop methods
+
   // Bundle selection methods
   async getBundleSelections(params = {}) {
     const searchParams = this.buildQueryParams(params);
@@ -959,27 +960,6 @@ export class RechargeClient {
       method: 'POST'
     });
   }
-
-  // Collection management (missing CRUD operations)
-  // Subscription discount methods
-  async getSubscriptionDiscounts(subscriptionId, params = {}) {
-    const searchParams = this.buildQueryParams(params);
-    return this.request(`/subscriptions/${subscriptionId}/discounts?${searchParams}`);
-  }
-
-  async applySubscriptionDiscount(subscriptionId, discountData) {
-    return this.request(`/subscriptions/${subscriptionId}/discounts`, {
-      method: 'POST',
-      body: JSON.stringify(discountData)
-    });
-  }
-
-  async removeSubscriptionDiscount(subscriptionId, discountId) {
-    return this.request(`/subscriptions/${subscriptionId}/discounts/${discountId}`, {
-      method: 'DELETE'
-    });
-  }
-
   // Order discount methods
   async getOrderDiscounts(orderId, params = {}) {
     const searchParams = this.buildQueryParams(params);
