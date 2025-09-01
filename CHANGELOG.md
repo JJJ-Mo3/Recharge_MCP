@@ -13,25 +13,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Input sanitization and validation improvements
 - Security policy (SECURITY.md) with best practices
 - Comprehensive .gitignore file
-- Enhanced health check endpoint with API configuration status
 - Quick Start section in README for faster onboarding
-- Verbose mode for validation script
 - Additional npm scripts for better developer experience
 
 ### Changed
 - Improved retry logic with exponential backoff instead of linear delays
 - Enhanced query parameter building with null/undefined filtering
 - Better error messages with more context and troubleshooting guidance
-- Improved Docker configuration with better health checks and security
-- Enhanced validation script with more comprehensive checks
 - Updated documentation with better organization and troubleshooting
 - Improved package.json with better metadata and scripts
 
 ### Fixed
-- Fixed duplicate validation in scripts/validate.sh
 - Improved error handling for edge cases in API responses
 - Better handling of empty or invalid query parameters
-- Enhanced Docker health check reliability
 - Fixed potential security issues with input validation
 
 ### Security
@@ -49,9 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Flexible API key configuration (environment variable + per-request override)
 - Full CRUD operations for customers, subscriptions, orders, charges
 - Advanced features: analytics, webhooks, bundle selections, retention strategies
-- Docker and Kubernetes deployment configurations
 - Comprehensive documentation with setup guides for multiple MCP clients
-- Health check endpoints for deployment platforms
 - Retry logic and timeout handling for API requests
 - Input validation and error handling
 - Support for Claude Desktop, Continue, Cursor, and VSCode with Copilot
@@ -82,26 +74,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Timeout handling for API requests
 - Input validation for all endpoints
 - Structured logging
-- Health check endpoints
-- Docker multi-stage builds
-- Kubernetes deployment with HPA and network policies
 - Environment-based configuration
 
 ### Documentation
 - Complete README with setup instructions
 - API usage examples for all 70+ tools
 - MCP client configuration guides
-- Docker and Kubernetes deployment guides
 - Troubleshooting section
 - Best practices guide
 - Sample usage for all endpoints
-
-### Deployment
-- Docker support with health checks
-- Docker Compose configuration
-- Kubernetes manifests with production-ready configuration
-- Support for Vercel, Netlify, Railway, Render, and Fly.io
-- Automated deployment scripts
 
 ## [1.0.0] - 2024-01-01
 

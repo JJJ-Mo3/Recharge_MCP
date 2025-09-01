@@ -7,18 +7,9 @@
   "scripts": {
     "start": "node index.js",
     "dev": "node --watch index.js",
-    "build": "npm run validate && npm run build:prepare && echo \"✅ Build completed successfully. Ready for deployment.\"",
-    "build:prepare": "mkdir -p dist && cp package.json dist/ && cp index.js dist/ && cp -r src dist/",
     "test": "npm run validate && echo \"✅ All validations passed\"",
     "validate": "node -c index.js && node -c src/recharge-client.js && node -c src/tool-handlers.js && node -c src/tools/index.js",
     "prestart": "echo \"🚀 Starting Recharge MCP Server...\"",
-    "lint": "echo 'Linting completed - no linter configured'",
-    "format": "echo 'Formatting completed - no formatter configured'",
-    "validate:full": "./scripts/validate.sh",
-    "docker:build": "./scripts/docker-build.sh",
-    "docker:run": "./scripts/docker-run.sh",
-    "health": "curl -f http://localhost:3000/health || echo 'Health check failed - server may not be running'",
-    "clean": "rm -rf dist node_modules/.cache",
     "postinstall": "echo \"📦 Dependencies installed. Run 'npm run validate' to check setup.\""
   },
   "keywords": [

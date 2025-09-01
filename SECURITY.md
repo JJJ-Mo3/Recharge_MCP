@@ -42,28 +42,18 @@ When using the Recharge MCP Server:
 
 #### Network Security
 - **Use HTTPS** for all API communications (enforced by default)
-- **Implement proper firewall rules** if deploying remotely
-- **Use VPNs or private networks** for sensitive deployments
-- **Monitor network traffic** for unusual patterns
-
-#### Container Security (if using Docker)
-- **Keep base images updated** regularly
-- **Scan images for vulnerabilities** before deployment
-- **Use non-root users** (implemented by default)
-- **Limit container resources** and capabilities
-- **Use secrets management** for sensitive configuration
+- **Secure local environment** where the MCP server runs
+- **Monitor local network traffic** for unusual patterns
 
 #### Access Control
 - **Limit MCP client access** to authorized users only
 - **Implement proper authentication** in your MCP client setup
-- **Use role-based access control** where applicable
 - **Audit access logs** regularly
 
 #### Data Protection
 - **Encrypt sensitive data** at rest and in transit
 - **Implement proper data retention policies**
 - **Follow GDPR/CCPA requirements** if applicable
-- **Sanitize logs** to avoid exposing sensitive information
 
 ### Known Security Considerations
 
@@ -74,18 +64,16 @@ When using the Recharge MCP Server:
 
 #### Rate Limiting
 - The server implements client-side retry logic
-- No built-in rate limiting (relies on Recharge API limits)
-- Consider implementing additional rate limiting for high-volume use
+- Relies on Recharge API limits
+- Consider implementing additional rate limiting for high-volume local use
 
 #### Input Validation
 - All inputs are validated before sending to Recharge API
-- SQL injection is not applicable (no database)
-- XSS is not applicable (no web interface)
+- No database or web interface vulnerabilities
 
 #### Network Communications
 - All API communications use HTTPS
 - Request/response data is handled securely
-- No sensitive data is cached or persisted
 
 ### Security Updates
 
@@ -105,15 +93,13 @@ This project aims to comply with:
 
 ### Security Checklist for Deployments
 
-Before deploying to production:
+Before using in production:
 
 - [ ] API keys are stored securely (environment variables, not code)
 - [ ] All dependencies are up to date
-- [ ] Container images are scanned for vulnerabilities
-- [ ] Network access is properly restricted
+- [ ] Local environment is secure
 - [ ] Logging is configured but doesn't expose sensitive data
 - [ ] Monitoring and alerting are set up
-- [ ] Backup and recovery procedures are tested
 - [ ] Security incident response plan is in place
 
 ### Contact

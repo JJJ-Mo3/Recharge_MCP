@@ -21,29 +21,6 @@ import {
 import { RechargeToolHandlers } from './src/tool-handlers.js';
 import * as tools from './src/tools/index.js';
 
-// Validate Node.js version
-const nodeVersion = process.version;
-const majorVersion = parseInt(nodeVersion.slice(1).split('.')[0]);
-if (majorVersion < 18) {
-  console.error(`❌ Node.js version ${nodeVersion} is not supported. Please use Node.js 18 or higher.`);
-  process.exit(1);
-}
-
-// Health check endpoint for deployment platforms
-const healthCheck = () => {
-  return {
-    status: 'healthy',
-    timestamp: new Date().toISOString(),
-    version: '1.1.0',
-    node_version: process.version,
-    uptime: process.uptime(),
-    memory_usage: process.memoryUsage(),
-    environment: process.env.NODE_ENV || 'development',
-    api_configured: !!process.env.RECHARGE_API_KEY,
-    api_url: process.env.RECHARGE_API_URL || 'https://api.rechargeapps.com'
-  };
-};
-
 /**
  * Recharge MCP Server
  * 
@@ -488,46 +465,8 @@ class RechargeServer {
   }
 }
 
-// Export for serverless platforms
-export const handler = async (event, context) => {
-  // Handle different serverless platform event formats
-  const path = event.path || event.rawPath || event.url || '/';
-  
-  if (path === '/health' || path.includes('/health')) {
-    return {
-      statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(healthCheck())
-    };
-  }
-  
-  // Handle API routes
-  if (path.startsWith('/api/')) {
-    return {
-      statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        message: 'Recharge MCP Server API',
-        version: '1.1.0',
-        endpoints: ['/health']
-      })
-    };
-  }
-  
-  // Default response for MCP server
-  return {
-    statusCode: 200,
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      message: 'Recharge MCP Server',
-      description: 'Use stdio transport for MCP communication',
-      version: '1.1.0'
-    })
-  };
-};
-
 // Start the server
-if (!process.env.NETLIFY && import.meta.url === new URL(process.argv[1], import.meta.url).href) {
+if (import.meta.url === new URL(process.argv[1], import.meta.url).href) {
   const server = new RechargeServer();
   server.run().catch((error) => {
     console.error('Failed to start server:', error);

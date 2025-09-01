@@ -72,9 +72,6 @@ npm start
 
 # Validate code syntax
 npm run validate
-
-# Run validation script
-./scripts/validate.sh
 ```
 
 ## Contributing Guidelines
@@ -118,13 +115,6 @@ git checkout -b fix/issue-description
 ```bash
 # Validate syntax
 npm run validate
-
-# Run validation script
-./scripts/validate.sh
-
-# Test with Docker (optional)
-./scripts/docker-build.sh
-./scripts/docker-run.sh
 ```
 
 ### 4. Commit Your Changes
