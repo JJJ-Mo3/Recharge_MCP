@@ -455,11 +455,21 @@ class RechargeServer {
           case 'recharge_get_shop':
             return await this.toolHandlers.handleGetShop(request.params.arguments);
 
+          case 'recharge_update_shop':
+            return await this.toolHandlers.handleUpdateShop(request.params.arguments);
+
           // Collection tools
           case 'recharge_get_collections':
             return await this.toolHandlers.handleGetCollections(request.params.arguments);
           case 'recharge_get_collection':
             return await this.toolHandlers.handleGetCollection(request.params.arguments);
+
+          case 'recharge_create_collection':
+            return await this.toolHandlers.handleCreateCollection(request.params.arguments);
+          case 'recharge_update_collection':
+            return await this.toolHandlers.handleUpdateCollection(request.params.arguments);
+          case 'recharge_delete_collection':
+            return await this.toolHandlers.handleDeleteCollection(request.params.arguments);
 
           // Analytics tools
           case 'recharge_get_subscription_analytics':

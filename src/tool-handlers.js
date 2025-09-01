@@ -868,6 +868,17 @@ export class RechargeToolHandlers {
     }
   }
 
+  async handleUpdateShop(args) {
+    try {
+      const client = this.createClient(args);
+      const { api_key, ...shopData } = this.sanitizeArgs(args);
+      const data = await client.updateShop(shopData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('updating shop', error);
+    }
+  }
+
   // Collection handlers
   async handleGetCollections(args) {
     try {
@@ -888,6 +899,41 @@ export class RechargeToolHandlers {
       return this.formatResponse(data);
     } catch (error) {
       return this.formatError('retrieving collection', error);
+    }
+  }
+
+  async handleCreateCollection(args) {
+    try {
+      this.validateRequired(args, ['name']);
+      const client = this.createClient(args);
+      const { api_key, ...collectionData } = this.sanitizeArgs(args);
+      const data = await client.createCollection(collectionData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('creating collection', error);
+    }
+  }
+
+  async handleUpdateCollection(args) {
+    try {
+      this.validateRequired(args, ['collection_id']);
+      const client = this.createClient(args);
+      const { api_key, collection_id, ...collectionData } = this.sanitizeArgs(args);
+      const data = await client.updateCollection(collection_id, collectionData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('updating collection', error);
+    }
+  }
+
+  async handleDeleteCollection(args) {
+    try {
+      this.validateRequired(args, ['collection_id']);
+      const client = this.createClient(args);
+      const data = await client.deleteCollection(args.collection_id);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('deleting collection', error);
     }
   }
 
@@ -1391,6 +1437,41 @@ export class RechargeToolHandlers {
       return this.formatResponse(data);
     } catch (error) {
       return this.formatError('removing charge discount', error);
+    }
+  }
+
+  // Bulk operation handlers
+  async handleBulkUpdateSubscriptions(args) {
+    try {
+      this.validateRequired(args, ['subscriptions']);
+      const client = this.createClient(args);
+      const { api_key, ...bulkData } = this.sanitizeArgs(args);
+      const data = await client.bulkUpdateSubscriptions(bulkData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('bulk updating subscriptions', error);
+    }
+  }
+
+  async handleBulkSkipCharges(args) {
+    try {
+      this.validateRequired(args, ['charge_ids']);
+      const client = this.createClient(args);
+      const data = await client.bulkSkipCharges(args.charge_ids);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('bulk skipping charges', error);
+    }
+  }
+
+  async handleBulkUnskipCharges(args) {
+    try {
+      this.validateRequired(args, ['charge_ids']);
+      const client = this.createClient(args);
+      const data = await client.bulkUnskipCharges(args.charge_ids);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('bulk unskipping charges', error);
     }
   }
 }

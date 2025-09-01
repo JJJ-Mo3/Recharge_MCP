@@ -947,4 +947,77 @@ export class RechargeClient {
     });
   }
 
+  // Shop update method
+  async updateShop(shopData) {
+    return this.request('/shop', {
+      method: 'PUT',
+      body: JSON.stringify(shopData)
+    });
+  }
+
+  // Subscription discount methods
+  async getSubscriptionDiscounts(subscriptionId, params = {}) {
+    const searchParams = this.buildQueryParams(params);
+    return this.request(`/subscriptions/${subscriptionId}/discounts?${searchParams}`);
+  }
+
+  async applySubscriptionDiscount(subscriptionId, discountData) {
+    return this.request(`/subscriptions/${subscriptionId}/discounts`, {
+      method: 'POST',
+      body: JSON.stringify(discountData)
+    });
+  }
+
+  async removeSubscriptionDiscount(subscriptionId, discountId) {
+    return this.request(`/subscriptions/${subscriptionId}/discounts/${discountId}`, {
+      method: 'DELETE'
+    });
+  }
+
+  // Order discount methods
+  async getOrderDiscounts(orderId, params = {}) {
+    const searchParams = this.buildQueryParams(params);
+    return this.request(`/orders/${orderId}/discounts?${searchParams}`);
+  }
+
+  // Charge discount methods
+  async getChargeDiscounts(chargeId, params = {}) {
+    const searchParams = this.buildQueryParams(params);
+    return this.request(`/charges/${chargeId}/discounts?${searchParams}`);
+  }
+
+  async applyChargeDiscount(chargeId, discountData) {
+    return this.request(`/charges/${chargeId}/discounts`, {
+      method: 'POST',
+      body: JSON.stringify(discountData)
+    });
+  }
+
+  async removeChargeDiscount(chargeId, discountId) {
+    return this.request(`/charges/${chargeId}/discounts/${discountId}`, {
+      method: 'DELETE'
+    });
+  }
+
+  // Bulk operation methods
+  async bulkUpdateSubscriptions(subscriptionsData) {
+    return this.request('/subscriptions/bulk_update', {
+      method: 'POST',
+      body: JSON.stringify(subscriptionsData)
+    });
+  }
+
+  async bulkSkipCharges(chargeIds) {
+    return this.request('/charges/bulk_skip', {
+      method: 'POST',
+      body: JSON.stringify({ charge_ids: chargeIds })
+    });
+  }
+
+  async bulkUnskipCharges(chargeIds) {
+    return this.request('/charges/bulk_unskip', {
+      method: 'POST',
+      body: JSON.stringify({ charge_ids: chargeIds })
+    });
+  }
 }
