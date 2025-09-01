@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.1.1] - 2024-01-21
 
 ### Added
+- **Missing API endpoints**: Added subscription swap, set next charge date, charge CRUD operations
+- **Address validation**: Added address validation and deletion endpoints
+- **Plan management**: Added complete plan and subscription plan management tools
 - Comprehensive JSDoc documentation throughout codebase
 - Enhanced error handling with exponential backoff retry logic
 - Input sanitization and validation improvements

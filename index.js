@@ -69,6 +69,8 @@ class RechargeServer {
           tools.updateSubscriptionSchema,
           tools.cancelSubscriptionSchema,
           tools.activateSubscriptionSchema,
+          tools.swapSubscriptionSchema,
+          tools.setNextChargeDateSchema,
 
           // Product tools
           tools.getProductsSchema,
@@ -81,12 +83,17 @@ class RechargeServer {
           // Charge tools
           tools.getChargesSchema,
           tools.getChargeSchema,
+          tools.createChargeSchema,
+          tools.updateChargeSchema,
+          tools.deleteChargeSchema,
 
           // Address tools
           tools.getAddressesSchema,
           tools.getAddressSchema,
           tools.updateAddressSchema,
           tools.createAddressSchema,
+          tools.deleteAddressSchema,
+          tools.validateAddressSchema,
 
           // Discount tools
           tools.getDiscountsSchema,
@@ -184,6 +191,20 @@ class RechargeServer {
           // Notification tools
           tools.getNotificationsSchema,
           tools.getNotificationSchema,
+
+          // Plan tools
+          tools.getPlansSchema,
+          tools.getPlanSchema,
+          tools.createPlanSchema,
+          tools.updatePlanSchema,
+          tools.deletePlanSchema,
+
+          // Subscription plan tools
+          tools.getSubscriptionPlansSchema,
+          tools.getSubscriptionPlanSchema,
+          tools.createSubscriptionPlanSchema,
+          tools.updateSubscriptionPlanSchema,
+          tools.deleteSubscriptionPlanSchema,
         ],
       };
     });
@@ -218,6 +239,11 @@ class RechargeServer {
           case 'recharge_activate_subscription':
             return await this.toolHandlers.handleActivateSubscription(request.params.arguments);
 
+          case 'recharge_swap_subscription':
+            return await this.toolHandlers.handleSwapSubscription(request.params.arguments);
+          case 'recharge_set_next_charge_date':
+            return await this.toolHandlers.handleSetNextChargeDate(request.params.arguments);
+
           // Product tools
           case 'recharge_get_products':
             return await this.toolHandlers.handleGetProducts(request.params.arguments);
@@ -236,6 +262,13 @@ class RechargeServer {
           case 'recharge_get_charge':
             return await this.toolHandlers.handleGetCharge(request.params.arguments);
 
+          case 'recharge_create_charge':
+            return await this.toolHandlers.handleCreateCharge(request.params.arguments);
+          case 'recharge_update_charge':
+            return await this.toolHandlers.handleUpdateCharge(request.params.arguments);
+          case 'recharge_delete_charge':
+            return await this.toolHandlers.handleDeleteCharge(request.params.arguments);
+
           // Address tools
           case 'recharge_get_addresses':
             return await this.toolHandlers.handleGetAddresses(request.params.arguments);
@@ -245,6 +278,11 @@ class RechargeServer {
             return await this.toolHandlers.handleUpdateAddress(request.params.arguments);
           case 'recharge_create_address':
             return await this.toolHandlers.handleCreateAddress(request.params.arguments);
+
+          case 'recharge_delete_address':
+            return await this.toolHandlers.handleDeleteAddress(request.params.arguments);
+          case 'recharge_validate_address':
+            return await this.toolHandlers.handleValidateAddress(request.params.arguments);
 
           // Discount tools
           case 'recharge_get_discounts':
@@ -403,6 +441,30 @@ class RechargeServer {
             return await this.toolHandlers.handleGetNotifications(request.params.arguments);
           case 'recharge_get_notification':
             return await this.toolHandlers.handleGetNotification(request.params.arguments);
+
+          // Plan tools
+          case 'recharge_get_plans':
+            return await this.toolHandlers.handleGetPlans(request.params.arguments);
+          case 'recharge_get_plan':
+            return await this.toolHandlers.handleGetPlan(request.params.arguments);
+          case 'recharge_create_plan':
+            return await this.toolHandlers.handleCreatePlan(request.params.arguments);
+          case 'recharge_update_plan':
+            return await this.toolHandlers.handleUpdatePlan(request.params.arguments);
+          case 'recharge_delete_plan':
+            return await this.toolHandlers.handleDeletePlan(request.params.arguments);
+
+          // Subscription plan tools
+          case 'recharge_get_subscription_plans':
+            return await this.toolHandlers.handleGetSubscriptionPlans(request.params.arguments);
+          case 'recharge_get_subscription_plan':
+            return await this.toolHandlers.handleGetSubscriptionPlan(request.params.arguments);
+          case 'recharge_create_subscription_plan':
+            return await this.toolHandlers.handleCreateSubscriptionPlan(request.params.arguments);
+          case 'recharge_update_subscription_plan':
+            return await this.toolHandlers.handleUpdateSubscriptionPlan(request.params.arguments);
+          case 'recharge_delete_subscription_plan':
+            return await this.toolHandlers.handleDeleteSubscriptionPlan(request.params.arguments);
 
           default:
             throw new Error(`Unknown tool: ${name}`);

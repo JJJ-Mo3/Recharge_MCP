@@ -358,6 +358,8 @@ For other MCP-compatible clients, configure them to run this server as a local p
 - `recharge_activate_subscription` - Activate a cancelled subscription
 - `recharge_skip_subscription_charge` - Skip the next charge for a subscription
 - `recharge_unskip_subscription_charge` - Unskip a previously skipped subscription charge
+- `recharge_swap_subscription` - Swap a subscription to a different product variant
+- `recharge_set_next_charge_date` - Set the next charge date for a subscription
 
 ### Product Tools
 - `recharge_get_products` - Retrieve products with filtering and pagination
@@ -373,6 +375,9 @@ For other MCP-compatible clients, configure them to run this server as a local p
 ### Charge Tools
 - `recharge_get_charges` - Retrieve charges with filtering and pagination
 - `recharge_get_charge` - Get a specific charge by ID
+- `recharge_create_charge` - Create a new charge
+- `recharge_update_charge` - Update charge details
+- `recharge_delete_charge` - Delete a charge
 - `recharge_skip_charge` - Skip a specific charge
 - `recharge_process_charge` - Process a specific charge
 - `recharge_unskip_charge` - Unskip a previously skipped charge
@@ -384,6 +389,8 @@ For other MCP-compatible clients, configure them to run this server as a local p
 - `recharge_get_address` - Get a specific address by ID
 - `recharge_update_address` - Update address details
 - `recharge_create_address` - Create a new address
+- `recharge_delete_address` - Delete an address
+- `recharge_validate_address` - Validate an address
 
 ### Discount Tools
 - `recharge_get_discounts` - Retrieve discounts with filtering and pagination
@@ -465,6 +472,20 @@ For other MCP-compatible clients, configure them to run this server as a local p
 ### Notification Tools
 - `recharge_get_notifications` - Retrieve notifications with filtering
 - `recharge_get_notification` - Get a specific notification by ID
+
+### Plan Tools
+- `recharge_get_plans` - Retrieve plans with filtering and pagination
+- `recharge_get_plan` - Get a specific plan by ID
+- `recharge_create_plan` - Create a new plan
+- `recharge_update_plan` - Update plan details
+- `recharge_delete_plan` - Delete a plan
+
+### Subscription Plan Tools
+- `recharge_get_subscription_plans` - Retrieve subscription plans with filtering and pagination
+- `recharge_get_subscription_plan` - Get a specific subscription plan by ID
+- `recharge_create_subscription_plan` - Create a new subscription plan
+- `recharge_update_subscription_plan` - Update subscription plan details
+- `recharge_delete_subscription_plan` - Delete a subscription plan
 
 ## Sample Usage
 
@@ -559,6 +580,17 @@ Below are examples of how to use each tool with sample parameters and expected r
 }
 ```
 
+#### Swap Subscription
+```json
+{
+  "tool": "recharge_swap_subscription",
+  "arguments": {
+    "subscription_id": "456789",
+    "shopify_variant_id": "987654"
+  }
+}
+```
+
 ### Charge Management
 
 #### Skip Charge
@@ -583,6 +615,22 @@ Below are examples of how to use each tool with sample parameters and expected r
 }
 ```
 
+#### Create Charge
+```json
+{
+  "tool": "recharge_create_charge",
+  "arguments": {
+    "address_id": "789012",
+    "line_items": [
+      {
+        "variant_id": "345678",
+        "quantity": 2
+      }
+    ]
+  }
+}
+```
+
 ### Address Management
 
 #### Create Address
@@ -599,6 +647,20 @@ Below are examples of how to use each tool with sample parameters and expected r
     "country_code": "US",
     "zip": "10001",
     "phone": "+1234567890"
+  }
+}
+```
+
+#### Validate Address
+```json
+{
+  "tool": "recharge_validate_address",
+  "arguments": {
+    "address1": "123 Main St",
+    "city": "New York",
+    "province": "NY",
+    "country_code": "US",
+    "zip": "10001"
   }
 }
 ```
@@ -629,6 +691,19 @@ Below are examples of how to use each tool with sample parameters and expected r
   "arguments": {
     "address": "https://myapp.com/webhooks/recharge",
     "topic": "subscription/created"
+  }
+}
+```
+
+### Plan Management
+
+#### Create Plan
+```json
+{
+  "tool": "recharge_create_plan",
+  "arguments": {
+    "title": "Monthly Coffee Plan",
+    "description": "Premium coffee delivered monthly"
   }
 }
 ```

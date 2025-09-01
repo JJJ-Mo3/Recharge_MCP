@@ -194,6 +194,20 @@ export class RechargeClient {
     });
   }
 
+  async swapSubscription(subscriptionId, swapData) {
+    return this.request(`/subscriptions/${subscriptionId}/swap`, {
+      method: 'POST',
+      body: JSON.stringify(swapData)
+    });
+  }
+
+  async setNextChargeDate(subscriptionId, dateData) {
+    return this.request(`/subscriptions/${subscriptionId}/set_next_charge_date`, {
+      method: 'POST',
+      body: JSON.stringify(dateData)
+    });
+  }
+
   // Product methods
   async getProducts(params = {}) {
     const searchParams = this.buildQueryParams(params);
@@ -224,6 +238,26 @@ export class RechargeClient {
     return this.request(`/charges/${chargeId}`);
   }
 
+  async createCharge(chargeData) {
+    return this.request('/charges', {
+      method: 'POST',
+      body: JSON.stringify(chargeData)
+    });
+  }
+
+  async updateCharge(chargeId, chargeData) {
+    return this.request(`/charges/${chargeId}`, {
+      method: 'PUT',
+      body: JSON.stringify(chargeData)
+    });
+  }
+
+  async deleteCharge(chargeId) {
+    return this.request(`/charges/${chargeId}`, {
+      method: 'DELETE'
+    });
+  }
+
   // Address methods
   async getAddresses(params = {}) {
     const searchParams = this.buildQueryParams(params);
@@ -244,6 +278,13 @@ export class RechargeClient {
   async updateAddress(addressId, addressData) {
     return this.request(`/addresses/${addressId}`, {
       method: 'PUT',
+      body: JSON.stringify(addressData)
+    });
+  }
+
+  async validateAddress(addressData) {
+    return this.request('/addresses/validate', {
+      method: 'POST',
       body: JSON.stringify(addressData)
     });
   }
@@ -610,6 +651,66 @@ export class RechargeClient {
     return this.request(`/charges/${chargeId}/refund`, {
       method: 'POST',
       body: JSON.stringify(refundData)
+    });
+  }
+
+  // Plan methods
+  async getPlans(params = {}) {
+    const searchParams = this.buildQueryParams(params);
+    return this.request(`/plans?${searchParams}`);
+  }
+
+  async getPlan(planId) {
+    return this.request(`/plans/${planId}`);
+  }
+
+  async createPlan(planData) {
+    return this.request('/plans', {
+      method: 'POST',
+      body: JSON.stringify(planData)
+    });
+  }
+
+  async updatePlan(planId, planData) {
+    return this.request(`/plans/${planId}`, {
+      method: 'PUT',
+      body: JSON.stringify(planData)
+    });
+  }
+
+  async deletePlan(planId) {
+    return this.request(`/plans/${planId}`, {
+      method: 'DELETE'
+    });
+  }
+
+  // Subscription plan methods
+  async getSubscriptionPlans(params = {}) {
+    const searchParams = this.buildQueryParams(params);
+    return this.request(`/subscription_plans?${searchParams}`);
+  }
+
+  async getSubscriptionPlan(subscriptionPlanId) {
+    return this.request(`/subscription_plans/${subscriptionPlanId}`);
+  }
+
+  async createSubscriptionPlan(subscriptionPlanData) {
+    return this.request('/subscription_plans', {
+      method: 'POST',
+      body: JSON.stringify(subscriptionPlanData)
+    });
+  }
+
+  async updateSubscriptionPlan(subscriptionPlanId, subscriptionPlanData) {
+    return this.request(`/subscription_plans/${subscriptionPlanId}`, {
+      method: 'PUT',
+      body: JSON.stringify(subscriptionPlanData)
+    });
+  }
+
+  async deleteSubscriptionPlan(subscriptionPlanId) {
+    return this.request(`/subscription_plans/${subscriptionPlanId}`, {
+      method: 'DELETE'
     });
   }
 }

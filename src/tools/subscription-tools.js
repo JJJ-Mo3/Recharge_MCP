@@ -225,3 +225,49 @@ export const unskipSubscriptionChargeSchema = {
     required: ['subscription_id', 'charge_date']
   }
 };
+
+export const swapSubscriptionSchema = {
+  name: 'recharge_swap_subscription',
+  description: 'Swap a subscription to a different product variant',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      subscription_id: {
+        type: 'string',
+        description: 'The subscription ID'
+      },
+      shopify_variant_id: {
+        type: 'string',
+        description: 'New Shopify variant ID to swap to'
+      },
+      api_key: {
+        type: 'string',
+        description: 'Optional API key to override the default server API key'
+      }
+    },
+    required: ['subscription_id', 'shopify_variant_id']
+  }
+};
+
+export const setNextChargeDateSchema = {
+  name: 'recharge_set_next_charge_date',
+  description: 'Set the next charge date for a subscription',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      subscription_id: {
+        type: 'string',
+        description: 'The subscription ID'
+      },
+      date: {
+        type: 'string',
+        description: 'New next charge date (ISO 8601)'
+      },
+      api_key: {
+        type: 'string',
+        description: 'Optional API key to override the default server API key'
+      }
+    },
+    required: ['subscription_id', 'date']
+  }
+};

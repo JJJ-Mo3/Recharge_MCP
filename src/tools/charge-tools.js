@@ -163,3 +163,68 @@ export const delayChargeSchema = {
     required: ['charge_id', 'date']
   }
 };
+
+export const createChargeSchema = {
+  name: 'recharge_create_charge',
+  description: 'Create a new charge',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      address_id: {
+        type: 'string',
+        description: 'Address ID for the charge'
+      },
+      line_items: {
+        type: 'array',
+        description: 'Array of line items for the charge'
+      },
+      api_key: {
+        type: 'string',
+        description: 'Optional API key to override the default server API key'
+      }
+    },
+    required: ['address_id', 'line_items']
+  }
+};
+
+export const updateChargeSchema = {
+  name: 'recharge_update_charge',
+  description: 'Update an existing charge',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      charge_id: {
+        type: 'string',
+        description: 'The charge ID'
+      },
+      line_items: {
+        type: 'array',
+        description: 'Updated line items for the charge'
+      },
+      api_key: {
+        type: 'string',
+        description: 'Optional API key to override the default server API key'
+      }
+    },
+    required: ['charge_id']
+  }
+};
+
+export const deleteChargeSchema = {
+  name: 'recharge_delete_charge',
+  description: 'Delete a charge',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      charge_id: {
+        type: 'string',
+        description: 'The charge ID'
+      },
+      api_key: {
+        type: 'string',
+        description: 'Optional API key to override the default server API key'
+      }
+    },
+    required: ['charge_id']
+  }
+};

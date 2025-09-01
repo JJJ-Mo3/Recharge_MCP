@@ -158,3 +158,57 @@ export const createAddressSchema = {
     required: ['customer_id', 'first_name', 'last_name', 'address1', 'city', 'province', 'country_code', 'zip']
   }
 };
+
+export const deleteAddressSchema = {
+  name: 'recharge_delete_address',
+  description: 'Delete an address',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      address_id: {
+        type: 'string',
+        description: 'The address ID'
+      },
+      api_key: {
+        type: 'string',
+        description: 'Optional API key to override the default server API key'
+      }
+    },
+    required: ['address_id']
+  }
+};
+
+export const validateAddressSchema = {
+  name: 'recharge_validate_address',
+  description: 'Validate an address',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      address1: {
+        type: 'string',
+        description: 'Address line 1'
+      },
+      city: {
+        type: 'string',
+        description: 'City'
+      },
+      province: {
+        type: 'string',
+        description: 'Province/State'
+      },
+      country_code: {
+        type: 'string',
+        description: 'Country code (e.g., US, CA, GB)'
+      },
+      zip: {
+        type: 'string',
+        description: 'Postal/ZIP code'
+      },
+      api_key: {
+        type: 'string',
+        description: 'Optional API key to override the default server API key'
+      }
+    },
+    required: ['address1', 'city', 'province', 'country_code', 'zip']
+  }
+};

@@ -206,6 +206,30 @@ export class RechargeToolHandlers {
     }
   }
 
+  async handleSwapSubscription(args) {
+    try {
+      this.validateRequired(args, ['subscription_id', 'shopify_variant_id']);
+      const client = this.createClient(args);
+      const { api_key, subscription_id, ...swapData } = args;
+      const data = await client.swapSubscription(subscription_id, swapData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('swapping subscription', error);
+    }
+  }
+
+  async handleSetNextChargeDate(args) {
+    try {
+      this.validateRequired(args, ['subscription_id', 'date']);
+      const client = this.createClient(args);
+      const { api_key, subscription_id, ...dateData } = args;
+      const data = await client.setNextChargeDate(subscription_id, dateData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('setting next charge date', error);
+    }
+  }
+
   // Product handlers
   async handleGetProducts(args) {
     try {
@@ -275,6 +299,41 @@ export class RechargeToolHandlers {
     }
   }
 
+  async handleCreateCharge(args) {
+    try {
+      this.validateRequired(args, ['address_id', 'line_items']);
+      const client = this.createClient(args);
+      const { api_key, ...chargeData } = this.sanitizeArgs(args);
+      const data = await client.createCharge(chargeData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('creating charge', error);
+    }
+  }
+
+  async handleUpdateCharge(args) {
+    try {
+      this.validateRequired(args, ['charge_id']);
+      const client = this.createClient(args);
+      const { api_key, charge_id, ...chargeData } = this.sanitizeArgs(args);
+      const data = await client.updateCharge(charge_id, chargeData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('updating charge', error);
+    }
+  }
+
+  async handleDeleteCharge(args) {
+    try {
+      this.validateRequired(args, ['charge_id']);
+      const client = this.createClient(args);
+      const data = await client.deleteCharge(args.charge_id);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('deleting charge', error);
+    }
+  }
+
   // Address handlers
   async handleGetAddresses(args) {
     try {
@@ -319,6 +378,29 @@ export class RechargeToolHandlers {
       return this.formatResponse(data);
     } catch (error) {
       return this.formatError('updating address', error);
+    }
+  }
+
+  async handleDeleteAddress(args) {
+    try {
+      this.validateRequired(args, ['address_id']);
+      const client = this.createClient(args);
+      const data = await client.deleteAddress(args.address_id);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('deleting address', error);
+    }
+  }
+
+  async handleValidateAddress(args) {
+    try {
+      this.validateRequired(args, ['address1', 'city', 'province', 'country_code', 'zip']);
+      const client = this.createClient(args);
+      const { api_key, ...addressData } = this.sanitizeArgs(args);
+      const data = await client.validateAddress(addressData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('validating address', error);
     }
   }
 
@@ -1027,6 +1109,122 @@ export class RechargeToolHandlers {
       return this.formatResponse(data);
     } catch (error) {
       return this.formatError('retrieving notification', error);
+    }
+  }
+
+  // Plan handlers
+  async handleGetPlans(args) {
+    try {
+      const client = this.createClient(args);
+      const { api_key, ...params } = this.sanitizeArgs(args);
+      const data = await client.getPlans(params);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('retrieving plans', error);
+    }
+  }
+
+  async handleGetPlan(args) {
+    try {
+      this.validateRequired(args, ['plan_id']);
+      const client = this.createClient(args);
+      const data = await client.getPlan(args.plan_id);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('retrieving plan', error);
+    }
+  }
+
+  async handleCreatePlan(args) {
+    try {
+      this.validateRequired(args, ['title']);
+      const client = this.createClient(args);
+      const { api_key, ...planData } = this.sanitizeArgs(args);
+      const data = await client.createPlan(planData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('creating plan', error);
+    }
+  }
+
+  async handleUpdatePlan(args) {
+    try {
+      this.validateRequired(args, ['plan_id']);
+      const client = this.createClient(args);
+      const { api_key, plan_id, ...planData } = this.sanitizeArgs(args);
+      const data = await client.updatePlan(plan_id, planData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('updating plan', error);
+    }
+  }
+
+  async handleDeletePlan(args) {
+    try {
+      this.validateRequired(args, ['plan_id']);
+      const client = this.createClient(args);
+      const data = await client.deletePlan(args.plan_id);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('deleting plan', error);
+    }
+  }
+
+  // Subscription plan handlers
+  async handleGetSubscriptionPlans(args) {
+    try {
+      const client = this.createClient(args);
+      const { api_key, ...params } = this.sanitizeArgs(args);
+      const data = await client.getSubscriptionPlans(params);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('retrieving subscription plans', error);
+    }
+  }
+
+  async handleGetSubscriptionPlan(args) {
+    try {
+      this.validateRequired(args, ['subscription_plan_id']);
+      const client = this.createClient(args);
+      const data = await client.getSubscriptionPlan(args.subscription_plan_id);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('retrieving subscription plan', error);
+    }
+  }
+
+  async handleCreateSubscriptionPlan(args) {
+    try {
+      this.validateRequired(args, ['title']);
+      const client = this.createClient(args);
+      const { api_key, ...subscriptionPlanData } = this.sanitizeArgs(args);
+      const data = await client.createSubscriptionPlan(subscriptionPlanData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('creating subscription plan', error);
+    }
+  }
+
+  async handleUpdateSubscriptionPlan(args) {
+    try {
+      this.validateRequired(args, ['subscription_plan_id']);
+      const client = this.createClient(args);
+      const { api_key, subscription_plan_id, ...subscriptionPlanData } = this.sanitizeArgs(args);
+      const data = await client.updateSubscriptionPlan(subscription_plan_id, subscriptionPlanData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('updating subscription plan', error);
+    }
+  }
+
+  async handleDeleteSubscriptionPlan(args) {
+    try {
+      this.validateRequired(args, ['subscription_plan_id']);
+      const client = this.createClient(args);
+      const data = await client.deleteSubscriptionPlan(args.subscription_plan_id);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('deleting subscription plan', error);
     }
   }
 }
