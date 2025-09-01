@@ -125,3 +125,29 @@ export const cloneOrderSchema = {
     required: ['order_id']
   }
 };
+
+// Nested resource tools for orders
+export const getOrderLineItemsSchema = {
+  name: 'recharge_get_order_line_items',
+  description: 'Retrieve line items for a specific order',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      order_id: {
+        type: 'string',
+        description: 'The order ID'
+      },
+      limit: {
+        type: 'number',
+        description: 'Number of line items to retrieve (max 250)',
+        minimum: 1,
+        maximum: 250
+      },
+      api_key: {
+        type: 'string',
+        description: 'Optional API key to override the default server API key'
+      }
+    },
+    required: ['order_id']
+  }
+};

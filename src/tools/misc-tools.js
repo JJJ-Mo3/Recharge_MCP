@@ -58,6 +58,179 @@ export const getCollectionSchema = {
   }
 };
 
+export const createCollectionSchema = {
+  name: 'recharge_create_collection',
+  description: 'Create a new collection',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      name: {
+        type: 'string',
+        description: 'Collection name'
+      },
+      description: {
+        type: 'string',
+        description: 'Collection description'
+      },
+      api_key: {
+        type: 'string',
+        description: 'Optional API key to override the default server API key'
+      }
+    },
+    required: ['name']
+  }
+};
+
+export const updateCollectionSchema = {
+  name: 'recharge_update_collection',
+  description: 'Update an existing collection',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      collection_id: {
+        type: 'string',
+        description: 'The collection ID'
+      },
+      name: {
+        type: 'string',
+        description: 'Collection name'
+      },
+      description: {
+        type: 'string',
+        description: 'Collection description'
+      },
+      api_key: {
+        type: 'string',
+        description: 'Optional API key to override the default server API key'
+      }
+    },
+    required: ['collection_id']
+  }
+};
+
+export const deleteCollectionSchema = {
+  name: 'recharge_delete_collection',
+  description: 'Delete a collection',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      collection_id: {
+        type: 'string',
+        description: 'The collection ID'
+      },
+      api_key: {
+        type: 'string',
+        description: 'Optional API key to override the default server API key'
+      }
+    },
+    required: ['collection_id']
+  }
+};
+
+export const updateShopSchema = {
+  name: 'recharge_update_shop',
+  description: 'Update shop configuration',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      name: {
+        type: 'string',
+        description: 'Shop name'
+      },
+      email: {
+        type: 'string',
+        description: 'Shop email'
+      },
+      timezone: {
+        type: 'string',
+        description: 'Shop timezone'
+      },
+      api_key: {
+        type: 'string',
+        description: 'Optional API key to override the default server API key'
+      }
+    }
+  }
+};
+
+// Bulk operation tools
+export const bulkUpdateSubscriptionsSchema = {
+  name: 'recharge_bulk_update_subscriptions',
+  description: 'Bulk update multiple subscriptions',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      subscriptions: {
+        type: 'array',
+        description: 'Array of subscription updates',
+        items: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'string',
+              description: 'Subscription ID'
+            },
+            quantity: {
+              type: 'number',
+              description: 'Updated quantity'
+            }
+          },
+          required: ['id']
+        }
+      },
+      api_key: {
+        type: 'string',
+        description: 'Optional API key to override the default server API key'
+      }
+    },
+    required: ['subscriptions']
+  }
+};
+
+export const bulkSkipChargesSchema = {
+  name: 'recharge_bulk_skip_charges',
+  description: 'Bulk skip multiple charges',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      charge_ids: {
+        type: 'array',
+        description: 'Array of charge IDs to skip',
+        items: {
+          type: 'string'
+        }
+      },
+      api_key: {
+        type: 'string',
+        description: 'Optional API key to override the default server API key'
+      }
+    },
+    required: ['charge_ids']
+  }
+};
+
+export const bulkUnskipChargesSchema = {
+  name: 'recharge_bulk_unskip_charges',
+  description: 'Bulk unskip multiple charges',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      charge_ids: {
+        type: 'array',
+        description: 'Array of charge IDs to unskip',
+        items: {
+          type: 'string'
+        }
+      },
+      api_key: {
+        type: 'string',
+        description: 'Optional API key to override the default server API key'
+      }
+    },
+    required: ['charge_ids']
+  }
+};
+
 // Analytics tools
 export const getSubscriptionAnalyticsSchema = {
   name: 'recharge_get_subscription_analytics',

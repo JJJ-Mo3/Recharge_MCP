@@ -754,6 +754,229 @@ export class RechargeClient {
     });
   }
 
+  // Nested resource methods - Customer relationships
+  async getCustomerAddresses(customerId, params = {}) {
+    const searchParams = this.buildQueryParams(params);
+    return this.request(`/customers/${customerId}/addresses?${searchParams}`);
+  }
+
+  async getCustomerSubscriptions(customerId, params = {}) {
+    const searchParams = this.buildQueryParams(params);
+    return this.request(`/customers/${customerId}/subscriptions?${searchParams}`);
+  }
+
+  async getCustomerOrders(customerId, params = {}) {
+    const searchParams = this.buildQueryParams(params);
+    return this.request(`/customers/${customerId}/orders?${searchParams}`);
+  }
+
+  async getCustomerCharges(customerId, params = {}) {
+    const searchParams = this.buildQueryParams(params);
+    return this.request(`/customers/${customerId}/charges?${searchParams}`);
+  }
+
+  // Nested resource methods - Subscription relationships
+  async getSubscriptionCharges(subscriptionId, params = {}) {
+    const searchParams = this.buildQueryParams(params);
+    return this.request(`/subscriptions/${subscriptionId}/charges?${searchParams}`);
+  }
+
+  async createSubscriptionCharge(subscriptionId, chargeData) {
+    return this.request(`/subscriptions/${subscriptionId}/charges`, {
+      method: 'POST',
+      body: JSON.stringify(chargeData)
+    });
+  }
+
+  // Nested resource methods - Address relationships
+  async getAddressSubscriptions(addressId, params = {}) {
+    const searchParams = this.buildQueryParams(params);
+    return this.request(`/addresses/${addressId}/subscriptions?${searchParams}`);
+  }
+
+  async getAddressCharges(addressId, params = {}) {
+    const searchParams = this.buildQueryParams(params);
+    return this.request(`/addresses/${addressId}/charges?${searchParams}`);
+  }
+
+  // Line item management
+  async getSubscriptionLineItems(subscriptionId, params = {}) {
+    const searchParams = this.buildQueryParams(params);
+    return this.request(`/subscriptions/${subscriptionId}/line_items?${searchParams}`);
+  }
+
+  async createSubscriptionLineItem(subscriptionId, lineItemData) {
+    return this.request(`/subscriptions/${subscriptionId}/line_items`, {
+      method: 'POST',
+      body: JSON.stringify(lineItemData)
+    });
+  }
+
+  async updateSubscriptionLineItem(subscriptionId, lineItemId, lineItemData) {
+    return this.request(`/subscriptions/${subscriptionId}/line_items/${lineItemId}`, {
+      method: 'PUT',
+      body: JSON.stringify(lineItemData)
+    });
+  }
+
+  async deleteSubscriptionLineItem(subscriptionId, lineItemId) {
+    return this.request(`/subscriptions/${subscriptionId}/line_items/${lineItemId}`, {
+      method: 'DELETE'
+    });
+  }
+
+  async getOrderLineItems(orderId, params = {}) {
+    const searchParams = this.buildQueryParams(params);
+    return this.request(`/orders/${orderId}/line_items?${searchParams}`);
+  }
+
+  async getChargeLineItems(chargeId, params = {}) {
+    const searchParams = this.buildQueryParams(params);
+    return this.request(`/charges/${chargeId}/line_items?${searchParams}`);
+  }
+
+  async updateChargeLineItem(chargeId, lineItemId, lineItemData) {
+    return this.request(`/charges/${chargeId}/line_items/${lineItemId}`, {
+      method: 'PUT',
+      body: JSON.stringify(lineItemData)
+    });
+  }
+
+  // Subscription notes
+  async getSubscriptionNotes(subscriptionId, params = {}) {
+    const searchParams = this.buildQueryParams(params);
+    return this.request(`/subscriptions/${subscriptionId}/notes?${searchParams}`);
+  }
+
+  async createSubscriptionNote(subscriptionId, noteData) {
+    return this.request(`/subscriptions/${subscriptionId}/notes`, {
+      method: 'POST',
+      body: JSON.stringify(noteData)
+    });
+  }
+
+  async updateSubscriptionNote(subscriptionId, noteId, noteData) {
+    return this.request(`/subscriptions/${subscriptionId}/notes/${noteId}`, {
+      method: 'PUT',
+      body: JSON.stringify(noteData)
+    });
+  }
+
+  async deleteSubscriptionNote(subscriptionId, noteId) {
+    return this.request(`/subscriptions/${subscriptionId}/notes/${noteId}`, {
+      method: 'DELETE'
+    });
+  }
+
+  // Customer payment sources
+  async getCustomerPaymentSources(customerId, params = {}) {
+    const searchParams = this.buildQueryParams(params);
+    return this.request(`/customers/${customerId}/payment_sources?${searchParams}`);
+  }
+
+  async createCustomerPaymentSource(customerId, paymentSourceData) {
+    return this.request(`/customers/${customerId}/payment_sources`, {
+      method: 'POST',
+      body: JSON.stringify(paymentSourceData)
+    });
+  }
+
+  async updateCustomerPaymentSource(customerId, paymentSourceId, paymentSourceData) {
+    return this.request(`/customers/${customerId}/payment_sources/${paymentSourceId}`, {
+      method: 'PUT',
+      body: JSON.stringify(paymentSourceData)
+    });
+  }
+
+  async deleteCustomerPaymentSource(customerId, paymentSourceId) {
+    return this.request(`/customers/${customerId}/payment_sources/${paymentSourceId}`, {
+      method: 'DELETE'
+    });
+  }
+
+  // Subscription delivery schedules
+  async getSubscriptionDeliverySchedule(subscriptionId) {
+    return this.request(`/subscriptions/${subscriptionId}/delivery_schedule`);
+  }
+
+  async updateSubscriptionDeliverySchedule(subscriptionId, scheduleData) {
+    return this.request(`/subscriptions/${subscriptionId}/delivery_schedule`, {
+      method: 'PUT',
+      body: JSON.stringify(scheduleData)
+    });
+  }
+
+  // Charge attempts
+  async getChargeAttempts(chargeId, params = {}) {
+    const searchParams = this.buildQueryParams(params);
+    return this.request(`/charges/${chargeId}/charge_attempts?${searchParams}`);
+  }
+
+  // Subscription pause/resume
+  async pauseSubscription(subscriptionId, pauseData) {
+    return this.request(`/subscriptions/${subscriptionId}/pause`, {
+      method: 'POST',
+      body: JSON.stringify(pauseData)
+    });
+  }
+
+  async resumeSubscription(subscriptionId) {
+    return this.request(`/subscriptions/${subscriptionId}/resume`, {
+      method: 'POST'
+    });
+  }
+
+  // Collection management (missing CRUD operations)
+  async createCollection(collectionData) {
+    return this.request('/collections', {
+      method: 'POST',
+      body: JSON.stringify(collectionData)
+    });
+  }
+
+  async updateCollection(collectionId, collectionData) {
+    return this.request(`/collections/${collectionId}`, {
+      method: 'PUT',
+      body: JSON.stringify(collectionData)
+    });
+  }
+
+  async deleteCollection(collectionId) {
+    return this.request(`/collections/${collectionId}`, {
+      method: 'DELETE'
+    });
+  }
+
+  // Shop update (missing)
+  async updateShop(shopData) {
+    return this.request('/shop', {
+      method: 'PUT',
+      body: JSON.stringify(shopData)
+    });
+  }
+
+  // Bulk operations
+  async bulkUpdateSubscriptions(subscriptionData) {
+    return this.request('/subscriptions/bulk_update', {
+      method: 'POST',
+      body: JSON.stringify(subscriptionData)
+    });
+  }
+
+  async bulkSkipCharges(chargeData) {
+    return this.request('/charges/bulk_skip', {
+      method: 'POST',
+      body: JSON.stringify(chargeData)
+    });
+  }
+
+  async bulkUnskipCharges(chargeData) {
+    return this.request('/charges/bulk_unskip', {
+      method: 'POST',
+      body: JSON.stringify(chargeData)
+    });
+  }
+
   // Subscription discount methods
   async getSubscriptionDiscounts(subscriptionId, params = {}) {
     const searchParams = this.buildQueryParams(params);

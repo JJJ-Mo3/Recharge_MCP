@@ -212,3 +212,63 @@ export const validateAddressSchema = {
     required: ['address1', 'city', 'province', 'country_code', 'zip']
   }
 };
+
+// Nested resource tools for addresses
+export const getAddressSubscriptionsSchema = {
+  name: 'recharge_get_address_subscriptions',
+  description: 'Retrieve subscriptions for a specific address',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      address_id: {
+        type: 'string',
+        description: 'The address ID'
+      },
+      limit: {
+        type: 'number',
+        description: 'Number of subscriptions to retrieve (max 250)',
+        minimum: 1,
+        maximum: 250
+      },
+      status: {
+        type: 'string',
+        enum: ['active', 'cancelled', 'expired'],
+        description: 'Filter subscriptions by status'
+      },
+      api_key: {
+        type: 'string',
+        description: 'Optional API key to override the default server API key'
+      }
+    },
+    required: ['address_id']
+  }
+};
+
+export const getAddressChargesSchema = {
+  name: 'recharge_get_address_charges',
+  description: 'Retrieve charges for a specific address',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      address_id: {
+        type: 'string',
+        description: 'The address ID'
+      },
+      limit: {
+        type: 'number',
+        description: 'Number of charges to retrieve (max 250)',
+        minimum: 1,
+        maximum: 250
+      },
+      status: {
+        type: 'string',
+        description: 'Filter charges by status'
+      },
+      api_key: {
+        type: 'string',
+        description: 'Optional API key to override the default server API key'
+      }
+    },
+    required: ['address_id']
+  }
+};

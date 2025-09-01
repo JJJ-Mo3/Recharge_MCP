@@ -228,3 +228,81 @@ export const deleteChargeSchema = {
     required: ['charge_id']
   }
 };
+
+// Nested resource tools for charges
+export const getChargeLineItemsSchema = {
+  name: 'recharge_get_charge_line_items',
+  description: 'Retrieve line items for a specific charge',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      charge_id: {
+        type: 'string',
+        description: 'The charge ID'
+      },
+      limit: {
+        type: 'number',
+        description: 'Number of line items to retrieve (max 250)',
+        minimum: 1,
+        maximum: 250
+      },
+      api_key: {
+        type: 'string',
+        description: 'Optional API key to override the default server API key'
+      }
+    },
+    required: ['charge_id']
+  }
+};
+
+export const updateChargeLineItemSchema = {
+  name: 'recharge_update_charge_line_item',
+  description: 'Update a charge line item',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      charge_id: {
+        type: 'string',
+        description: 'The charge ID'
+      },
+      line_item_id: {
+        type: 'string',
+        description: 'The line item ID'
+      },
+      quantity: {
+        type: 'number',
+        description: 'Updated quantity'
+      },
+      api_key: {
+        type: 'string',
+        description: 'Optional API key to override the default server API key'
+      }
+    },
+    required: ['charge_id', 'line_item_id']
+  }
+};
+
+export const getChargeAttemptsSchema = {
+  name: 'recharge_get_charge_attempts',
+  description: 'Retrieve charge attempts for a specific charge',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      charge_id: {
+        type: 'string',
+        description: 'The charge ID'
+      },
+      limit: {
+        type: 'number',
+        description: 'Number of charge attempts to retrieve (max 250)',
+        minimum: 1,
+        maximum: 250
+      },
+      api_key: {
+        type: 'string',
+        description: 'Optional API key to override the default server API key'
+      }
+    },
+    required: ['charge_id']
+  }
+};
