@@ -295,6 +295,13 @@ export class RechargeClient {
     });
   }
 
+  async validateAddress(addressData) {
+    return this.request('/addresses/validate', {
+      method: 'POST',
+      body: JSON.stringify(addressData)
+    });
+  }
+
   // Discount methods
   async getDiscounts(params = {}) {
     const searchParams = this.buildQueryParams(params);
@@ -407,6 +414,13 @@ export class RechargeClient {
     return this.request('/shop');
   }
 
+  async updateShop(shopData) {
+    return this.request('/shop', {
+      method: 'PUT',
+      body: JSON.stringify(shopData)
+    });
+  }
+
   // Collection methods
   async getCollections(params = {}) {
     const searchParams = this.buildQueryParams(params);
@@ -417,6 +431,27 @@ export class RechargeClient {
     return this.request(`/collections/${collectionId}`);
   }
 
+  async createCollection(collectionData) {
+    return this.request('/collections', {
+      method: 'POST',
+      body: JSON.stringify(collectionData)
+    });
+  }
+
+  async updateCollection(collectionId, collectionData) {
+    return this.request(`/collections/${collectionId}`, {
+      method: 'PUT',
+      body: JSON.stringify(collectionData)
+    });
+  }
+
+  async deleteCollection(collectionId) {
+    return this.request(`/collections/${collectionId}`, {
+      method: 'DELETE'
+    });
+  }
+
+  // Shop methods
   // Bundle selection methods
   async getBundleSelections(params = {}) {
     const searchParams = this.buildQueryParams(params);
@@ -933,34 +968,6 @@ export class RechargeClient {
   }
 
   // Collection management (missing CRUD operations)
-  async createCollection(collectionData) {
-    return this.request('/collections', {
-      method: 'POST',
-      body: JSON.stringify(collectionData)
-    });
-  }
-
-  async updateCollection(collectionId, collectionData) {
-    return this.request(`/collections/${collectionId}`, {
-      method: 'PUT',
-      body: JSON.stringify(collectionData)
-    });
-  }
-
-  async deleteCollection(collectionId) {
-    return this.request(`/collections/${collectionId}`, {
-      method: 'DELETE'
-    });
-  }
-
-  // Shop update method
-  async updateShop(shopData) {
-    return this.request('/shop', {
-      method: 'PUT',
-      body: JSON.stringify(shopData)
-    });
-  }
-
   // Subscription discount methods
   async getSubscriptionDiscounts(subscriptionId, params = {}) {
     const searchParams = this.buildQueryParams(params);
