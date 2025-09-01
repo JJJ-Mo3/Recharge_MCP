@@ -17,6 +17,9 @@ A comprehensive **local** Model Context Protocol (MCP) server that provides **13
 - [Best Practices](#best-practices)
 - [Troubleshooting](#troubleshooting)
 - [API Coverage](#api-coverage)
+- [Contributing](#contributing)
+- [Security](#security)
+- [Changelog](#changelog)
 - [License](#license)
 
 ## Overview
@@ -1110,6 +1113,118 @@ This MCP server provides **100% coverage** of the Recharge API v2021-11:
 ## API Documentation
 
 This server implements endpoints from the Recharge API v2021-11. For detailed API documentation, visit: https://developer.rechargepayments.com/2021-11
+
+## Contributing
+
+We welcome contributions to improve the Recharge MCP Server! Here's how you can help:
+
+### **Development Setup**
+
+1. **Fork and clone the repository**
+2. **Install dependencies**: `npm install`
+3. **Set up environment**: `cp .env.example .env`
+4. **Validate setup**: `npm run check`
+
+### **Adding New Features**
+
+When adding new Recharge API endpoints:
+
+1. **Add client method** in `src/recharge-client.js`
+2. **Add tool schema** in appropriate `src/tools/*.js` file
+3. **Add handler method** in `src/tool-handlers.js`
+4. **Register tool** in `index.js`
+5. **Update documentation** in README.md
+6. **Test thoroughly** with real API calls
+
+### **Code Standards**
+
+- Use **ES modules** (`import`/`export`)
+- Follow **existing naming conventions** (`recharge_action_resource`)
+- Add **comprehensive error handling**
+- Include **JSDoc documentation**
+- Keep files **under 300 lines** when possible
+- Use **descriptive variable names**
+
+### **Testing**
+
+- Run `npm run validate` to check syntax
+- Test with real Recharge API keys when possible
+- Verify all required parameters are validated
+- Test error handling scenarios
+
+## Security
+
+### **API Key Security**
+
+**Critical Security Practices:**
+
+- **Never commit API keys** to version control
+- **Use environment variables** for API key storage
+- **Rotate API keys regularly** (recommended: every 90 days)
+- **Monitor API key usage** and set up alerts for unusual activity
+- **Use the principle of least privilege** - only grant necessary permissions
+
+### **Network Security**
+
+- **All API communications use HTTPS** (enforced by default)
+- **Secure your local environment** where the MCP server runs
+- **Monitor network traffic** for unusual patterns
+
+### **Access Control**
+
+- **Limit MCP client access** to authorized users only
+- **Implement proper authentication** in your MCP client setup
+- **Audit access logs** regularly
+
+### **Data Protection**
+
+- **Encrypt sensitive data** at rest and in transit
+- **Implement proper data retention policies**
+- **Follow GDPR/CCPA requirements** if applicable
+- **No API keys are logged or persisted** by the server
+
+### **Reporting Security Issues**
+
+If you discover a security vulnerability:
+
+1. **Do NOT create a public GitHub issue**
+2. **Contact the maintainers directly** via private communication
+3. **Provide clear description** of the vulnerability
+4. **Include steps to reproduce** if possible
+
+We take security seriously and will respond promptly to legitimate security concerns.
+
+## Changelog
+
+### **Version 1.1.0** - Current Release
+
+#### **Added**
+- **Complete API Coverage**: 130+ tools covering 100% of Recharge API v2021-11
+- **Nested Resource Relationships**: Customer addresses, subscriptions, orders, charges
+- **Subscription Line Item Management**: Add, update, remove items from subscriptions
+- **Subscription Notes System**: Customer service note management
+- **Customer Payment Source Management**: Full CRUD for payment methods
+- **Advanced Subscription Features**: Delivery schedules, pause/resume functionality
+- **Charge Attempt Tracking**: View payment attempt history
+- **Collection Management**: Create, update, delete product collections
+- **Shop Configuration Updates**: Modify shop settings
+- **Bulk Operations**: Mass subscription updates and charge management
+- **Plan Management**: Complete plan and subscription plan management tools
+- **Shipping Rate Management**: Full CRUD for shipping rates
+- **Tax Line Access**: View tax calculation details
+- **Resource-Specific Discounts**: Advanced discount application system
+
+#### **Enhanced**
+- **Error Handling**: Exponential backoff retry logic
+- **Input Validation**: Comprehensive parameter validation
+- **Documentation**: Complete usage examples and troubleshooting
+- **Security**: Enhanced API key handling and validation
+
+#### **Technical Improvements**
+- **Modular Architecture**: Clean separation of concerns across multiple files
+- **Comprehensive JSDoc**: Full code documentation
+- **Robust Error Handling**: Graceful handling of API errors and network issues
+- **Flexible Configuration**: Environment-based and per-request API key support
 
 ## License
 
