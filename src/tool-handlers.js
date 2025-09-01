@@ -234,7 +234,7 @@ export class RechargeToolHandlers {
   async handleGetProducts(args) {
     try {
       const client = this.createClient(args);
-      const { api_key, ...params } = args;
+      const { api_key, ...params } = this.sanitizeArgs(args);
       const data = await client.getProducts(params);
       return this.formatResponse(data);
     } catch (error) {
@@ -257,7 +257,7 @@ export class RechargeToolHandlers {
   async handleGetOrders(args) {
     try {
       const client = this.createClient(args);
-      const { api_key, ...params } = args;
+      const { api_key, ...params } = this.sanitizeArgs(args);
       const data = await client.getOrders(params);
       return this.formatResponse(data);
     } catch (error) {
@@ -280,7 +280,7 @@ export class RechargeToolHandlers {
   async handleGetCharges(args) {
     try {
       const client = this.createClient(args);
-      const { api_key, ...params } = args;
+      const { api_key, ...params } = this.sanitizeArgs(args);
       const data = await client.getCharges(params);
       return this.formatResponse(data);
     } catch (error) {
@@ -338,7 +338,7 @@ export class RechargeToolHandlers {
   async handleGetAddresses(args) {
     try {
       const client = this.createClient(args);
-      const { api_key, ...params } = args;
+      const { api_key, ...params } = this.sanitizeArgs(args);
       const data = await client.getAddresses(params);
       return this.formatResponse(data);
     } catch (error) {
@@ -361,7 +361,7 @@ export class RechargeToolHandlers {
     try {
       this.validateRequired(args, ['customer_id', 'first_name', 'last_name', 'address1', 'city', 'province', 'country_code', 'zip']);
       const client = this.createClient(args);
-      const { api_key, ...addressData } = args;
+      const { api_key, ...addressData } = this.sanitizeArgs(args);
       const data = await client.createAddress(addressData);
       return this.formatResponse(data);
     } catch (error) {
@@ -373,7 +373,7 @@ export class RechargeToolHandlers {
     try {
       this.validateRequired(args, ['address_id']);
       const client = this.createClient(args);
-      const { api_key, address_id, ...addressData } = args;
+      const { api_key, address_id, ...addressData } = this.sanitizeArgs(args);
       const data = await client.updateAddress(address_id, addressData);
       return this.formatResponse(data);
     } catch (error) {
@@ -408,7 +408,7 @@ export class RechargeToolHandlers {
   async handleGetDiscounts(args) {
     try {
       const client = this.createClient(args);
-      const { api_key, ...params } = args;
+      const { api_key, ...params } = this.sanitizeArgs(args);
       const data = await client.getDiscounts(params);
       return this.formatResponse(data);
     } catch (error) {
@@ -431,7 +431,7 @@ export class RechargeToolHandlers {
     try {
       this.validateRequired(args, ['code', 'value', 'value_type']);
       const client = this.createClient(args);
-      const { api_key, ...discountData } = args;
+      const { api_key, ...discountData } = this.sanitizeArgs(args);
       const data = await client.createDiscount(discountData);
       return this.formatResponse(data);
     } catch (error) {
@@ -443,7 +443,7 @@ export class RechargeToolHandlers {
     try {
       this.validateRequired(args, ['discount_id']);
       const client = this.createClient(args);
-      const { api_key, discount_id, ...discountData } = args;
+      const { api_key, discount_id, ...discountData } = this.sanitizeArgs(args);
       const data = await client.updateDiscount(discount_id, discountData);
       return this.formatResponse(data);
     } catch (error) {
@@ -466,7 +466,7 @@ export class RechargeToolHandlers {
   async handleGetMetafields(args) {
     try {
       const client = this.createClient(args);
-      const { api_key, ...params } = args;
+      const { api_key, ...params } = this.sanitizeArgs(args);
       const data = await client.getMetafields(params);
       return this.formatResponse(data);
     } catch (error) {
@@ -489,7 +489,7 @@ export class RechargeToolHandlers {
     try {
       this.validateRequired(args, ['namespace', 'key', 'value', 'value_type', 'owner_resource', 'owner_id']);
       const client = this.createClient(args);
-      const { api_key, ...metafieldData } = args;
+      const { api_key, ...metafieldData } = this.sanitizeArgs(args);
       const data = await client.createMetafield(metafieldData);
       return this.formatResponse(data);
     } catch (error) {
@@ -501,7 +501,7 @@ export class RechargeToolHandlers {
     try {
       this.validateRequired(args, ['metafield_id']);
       const client = this.createClient(args);
-      const { api_key, metafield_id, ...metafieldData } = args;
+      const { api_key, metafield_id, ...metafieldData } = this.sanitizeArgs(args);
       const data = await client.updateMetafield(metafield_id, metafieldData);
       return this.formatResponse(data);
     } catch (error) {
@@ -524,7 +524,7 @@ export class RechargeToolHandlers {
   async handleGetWebhooks(args) {
     try {
       const client = this.createClient(args);
-      const { api_key, ...params } = args;
+      const { api_key, ...params } = this.sanitizeArgs(args);
       const data = await client.getWebhooks(params);
       return this.formatResponse(data);
     } catch (error) {
@@ -547,7 +547,7 @@ export class RechargeToolHandlers {
     try {
       this.validateRequired(args, ['address', 'topic']);
       const client = this.createClient(args);
-      const { api_key, ...webhookData } = args;
+      const { api_key, ...webhookData } = this.sanitizeArgs(args);
       const data = await client.createWebhook(webhookData);
       return this.formatResponse(data);
     } catch (error) {
@@ -559,7 +559,7 @@ export class RechargeToolHandlers {
     try {
       this.validateRequired(args, ['webhook_id']);
       const client = this.createClient(args);
-      const { api_key, webhook_id, ...webhookData } = args;
+      const { api_key, webhook_id, ...webhookData } = this.sanitizeArgs(args);
       const data = await client.updateWebhook(webhook_id, webhookData);
       return this.formatResponse(data);
     } catch (error) {
@@ -582,7 +582,7 @@ export class RechargeToolHandlers {
   async handleGetPaymentMethods(args) {
     try {
       const client = this.createClient(args);
-      const { api_key, ...params } = args;
+      const { api_key, ...params } = this.sanitizeArgs(args);
       const data = await client.getPaymentMethods(params);
       return this.formatResponse(data);
     } catch (error) {
@@ -605,7 +605,7 @@ export class RechargeToolHandlers {
     try {
       this.validateRequired(args, ['payment_method_id']);
       const client = this.createClient(args);
-      const { api_key, payment_method_id, ...paymentMethodData } = args;
+      const { api_key, payment_method_id, ...paymentMethodData } = this.sanitizeArgs(args);
       const data = await client.updatePaymentMethod(payment_method_id, paymentMethodData);
       return this.formatResponse(data);
     } catch (error) {
@@ -617,7 +617,7 @@ export class RechargeToolHandlers {
   async handleGetCheckouts(args) {
     try {
       const client = this.createClient(args);
-      const { api_key, ...params } = args;
+      const { api_key, ...params } = this.sanitizeArgs(args);
       const data = await client.getCheckouts(params);
       return this.formatResponse(data);
     } catch (error) {
@@ -640,7 +640,7 @@ export class RechargeToolHandlers {
     try {
       this.validateRequired(args, ['line_items']);
       const client = this.createClient(args);
-      const { api_key, ...checkoutData } = args;
+      const { api_key, ...checkoutData } = this.sanitizeArgs(args);
       const data = await client.createCheckout(checkoutData);
       return this.formatResponse(data);
     } catch (error) {
@@ -652,7 +652,7 @@ export class RechargeToolHandlers {
     try {
       this.validateRequired(args, ['checkout_token']);
       const client = this.createClient(args);
-      const { api_key, checkout_token, ...checkoutData } = args;
+      const { api_key, checkout_token, ...checkoutData } = this.sanitizeArgs(args);
       const data = await client.updateCheckout(checkout_token, checkoutData);
       return this.formatResponse(data);
     } catch (error) {
@@ -675,7 +675,7 @@ export class RechargeToolHandlers {
   async handleGetOnetimes(args) {
     try {
       const client = this.createClient(args);
-      const { api_key, ...params } = args;
+      const { api_key, ...params } = this.sanitizeArgs(args);
       const data = await client.getOnetimes(params);
       return this.formatResponse(data);
     } catch (error) {
@@ -698,7 +698,7 @@ export class RechargeToolHandlers {
     try {
       this.validateRequired(args, ['address_id', 'next_charge_scheduled_at', 'product_title', 'price', 'quantity', 'shopify_variant_id']);
       const client = this.createClient(args);
-      const { api_key, ...onetimeData } = args;
+      const { api_key, ...onetimeData } = this.sanitizeArgs(args);
       const data = await client.createOnetime(onetimeData);
       return this.formatResponse(data);
     } catch (error) {
@@ -710,7 +710,7 @@ export class RechargeToolHandlers {
     try {
       this.validateRequired(args, ['onetime_id']);
       const client = this.createClient(args);
-      const { api_key, onetime_id, ...onetimeData } = args;
+      const { api_key, onetime_id, ...onetimeData } = this.sanitizeArgs(args);
       const data = await client.updateOnetime(onetime_id, onetimeData);
       return this.formatResponse(data);
     } catch (error) {
@@ -733,7 +733,7 @@ export class RechargeToolHandlers {
   async handleGetStoreCredits(args) {
     try {
       const client = this.createClient(args);
-      const { api_key, ...params } = args;
+      const { api_key, ...params } = this.sanitizeArgs(args);
       const data = await client.getStoreCredits(params);
       return this.formatResponse(data);
     } catch (error) {
@@ -756,7 +756,7 @@ export class RechargeToolHandlers {
     try {
       this.validateRequired(args, ['amount', 'customer_id']);
       const client = this.createClient(args);
-      const { api_key, ...storeCreditData } = args;
+      const { api_key, ...storeCreditData } = this.sanitizeArgs(args);
       const data = await client.createStoreCredit(storeCreditData);
       return this.formatResponse(data);
     } catch (error) {
@@ -768,7 +768,7 @@ export class RechargeToolHandlers {
     try {
       this.validateRequired(args, ['store_credit_id']);
       const client = this.createClient(args);
-      const { api_key, store_credit_id, ...storeCreditData } = args;
+      const { api_key, store_credit_id, ...storeCreditData } = this.sanitizeArgs(args);
       const data = await client.updateStoreCredit(store_credit_id, storeCreditData);
       return this.formatResponse(data);
     } catch (error) {
@@ -872,7 +872,7 @@ export class RechargeToolHandlers {
   async handleGetCollections(args) {
     try {
       const client = this.createClient(args);
-      const { api_key, ...params } = args;
+      const { api_key, ...params } = this.sanitizeArgs(args);
       const data = await client.getCollections(params);
       return this.formatResponse(data);
     } catch (error) {
@@ -895,7 +895,7 @@ export class RechargeToolHandlers {
   async handleGetSubscriptionAnalytics(args) {
     try {
       const client = this.createClient(args);
-      const { api_key, ...params } = args;
+      const { api_key, ...params } = this.sanitizeArgs(args);
       const data = await client.getSubscriptionAnalytics(params);
       return this.formatResponse(data);
     } catch (error) {
@@ -906,7 +906,7 @@ export class RechargeToolHandlers {
   async handleGetCustomerAnalytics(args) {
     try {
       const client = this.createClient(args);
-      const { api_key, ...params } = args;
+      const { api_key, ...params } = this.sanitizeArgs(args);
       const data = await client.getCustomerAnalytics(params);
       return this.formatResponse(data);
     } catch (error) {
@@ -919,7 +919,7 @@ export class RechargeToolHandlers {
     try {
       this.validateRequired(args, ['order_id']);
       const client = this.createClient(args);
-      const { api_key, order_id, ...orderData } = args;
+      const { api_key, order_id, ...orderData } = this.sanitizeArgs(args);
       const data = await client.updateOrder(order_id, orderData);
       return this.formatResponse(data);
     } catch (error) {
@@ -965,7 +965,7 @@ export class RechargeToolHandlers {
     try {
       this.validateRequired(args, ['customer_id']);
       const client = this.createClient(args);
-      const { api_key, customer_id, ...sessionData } = args;
+      const { api_key, customer_id, ...sessionData } = this.sanitizeArgs(args);
       const data = await client.createCustomerPortalSession(customer_id, sessionData);
       return this.formatResponse(data);
     } catch (error) {
@@ -977,7 +977,7 @@ export class RechargeToolHandlers {
   async handleGetBundleSelections(args) {
     try {
       const client = this.createClient(args);
-      const { api_key, ...params } = args;
+      const { api_key, ...params } = this.sanitizeArgs(args);
       const data = await client.getBundleSelections(params);
       return this.formatResponse(data);
     } catch (error) {
@@ -1000,7 +1000,7 @@ export class RechargeToolHandlers {
     try {
       this.validateRequired(args, ['subscription_id', 'external_product_id', 'external_variant_id', 'quantity']);
       const client = this.createClient(args);
-      const { api_key, ...bundleSelectionData } = args;
+      const { api_key, ...bundleSelectionData } = this.sanitizeArgs(args);
       const data = await client.createBundleSelection(bundleSelectionData);
       return this.formatResponse(data);
     } catch (error) {
@@ -1012,7 +1012,7 @@ export class RechargeToolHandlers {
     try {
       this.validateRequired(args, ['bundle_selection_id']);
       const client = this.createClient(args);
-      const { api_key, bundle_selection_id, ...bundleSelectionData } = args;
+      const { api_key, bundle_selection_id, ...bundleSelectionData } = this.sanitizeArgs(args);
       const data = await client.updateBundleSelection(bundle_selection_id, bundleSelectionData);
       return this.formatResponse(data);
     } catch (error) {
@@ -1035,7 +1035,7 @@ export class RechargeToolHandlers {
   async handleGetRetentionStrategies(args) {
     try {
       const client = this.createClient(args);
-      const { api_key, ...params } = args;
+      const { api_key, ...params } = this.sanitizeArgs(args);
       const data = await client.getRetentionStrategies(params);
       return this.formatResponse(data);
     } catch (error) {
@@ -1058,7 +1058,7 @@ export class RechargeToolHandlers {
   async handleGetAsyncBatches(args) {
     try {
       const client = this.createClient(args);
-      const { api_key, ...params } = args;
+      const { api_key, ...params } = this.sanitizeArgs(args);
       const data = await client.getAsyncBatches(params);
       return this.formatResponse(data);
     } catch (error) {
@@ -1081,7 +1081,7 @@ export class RechargeToolHandlers {
     try {
       this.validateRequired(args, ['batch_type', 'requests']);
       const client = this.createClient(args);
-      const { api_key, ...asyncBatchData } = args;
+      const { api_key, ...asyncBatchData } = this.sanitizeArgs(args);
       const data = await client.createAsyncBatch(asyncBatchData);
       return this.formatResponse(data);
     } catch (error) {
@@ -1093,7 +1093,7 @@ export class RechargeToolHandlers {
   async handleGetNotifications(args) {
     try {
       const client = this.createClient(args);
-      const { api_key, ...params } = args;
+      const { api_key, ...params } = this.sanitizeArgs(args);
       const data = await client.getNotifications(params);
       return this.formatResponse(data);
     } catch (error) {
@@ -1391,102 +1391,6 @@ export class RechargeToolHandlers {
       return this.formatResponse(data);
     } catch (error) {
       return this.formatError('removing charge discount', error);
-    }
-  }
-
-  // Nested resource tools - Customer relationships
-  async handleGetCustomerAddresses(args) {
-    try {
-      this.validateRequired(args, ['customer_id']);
-      const client = this.createClient(args);
-      const { api_key, customer_id, ...params } = this.sanitizeArgs(args);
-      const data = await client.getCustomerAddresses(customer_id, params);
-      return this.formatResponse(data);
-    } catch (error) {
-      return this.formatError('retrieving customer addresses', error);
-    }
-  }
-
-  async handleGetCustomerSubscriptions(args) {
-    try {
-      this.validateRequired(args, ['customer_id']);
-      const client = this.createClient(args);
-      const { api_key, customer_id, ...params } = this.sanitizeArgs(args);
-      const data = await client.getCustomerSubscriptions(customer_id, params);
-      return this.formatResponse(data);
-    } catch (error) {
-      return this.formatError('retrieving customer subscriptions', error);
-    }
-  }
-
-  async handleGetCustomerOrders(args) {
-    try {
-      this.validateRequired(args, ['customer_id']);
-      const client = this.createClient(args);
-      const { api_key, customer_id, ...params } = this.sanitizeArgs(args);
-      const data = await client.getCustomerOrders(customer_id, params);
-      return this.formatResponse(data);
-    } catch (error) {
-      return this.formatError('retrieving customer orders', error);
-    }
-  }
-
-  async handleGetCustomerCharges(args) {
-    try {
-      this.validateRequired(args, ['customer_id']);
-      const client = this.createClient(args);
-      const { api_key, customer_id, ...params } = this.sanitizeArgs(args);
-      const data = await client.getCustomerCharges(customer_id, params);
-      return this.formatResponse(data);
-    } catch (error) {
-      return this.formatError('retrieving customer charges', error);
-    }
-  }
-
-  async handleGetCustomerPaymentSources(args) {
-    try {
-      this.validateRequired(args, ['customer_id']);
-      const client = this.createClient(args);
-      const { api_key, customer_id, ...params } = this.sanitizeArgs(args);
-      const data = await client.getCustomerPaymentSources(customer_id, params);
-      return this.formatResponse(data);
-    } catch (error) {
-      return this.formatError('retrieving customer payment sources', error);
-    }
-  }
-
-  async handleCreateCustomerPaymentSource(args) {
-    try {
-      this.validateRequired(args, ['customer_id', 'payment_token', 'payment_type']);
-      const client = this.createClient(args);
-      const { api_key, customer_id, ...paymentSourceData } = this.sanitizeArgs(args);
-      const data = await client.createCustomerPaymentSource(customer_id, paymentSourceData);
-      return this.formatResponse(data);
-    } catch (error) {
-      return this.formatError('creating customer payment source', error);
-    }
-  }
-
-  async handleUpdateCustomerPaymentSource(args) {
-    try {
-      this.validateRequired(args, ['customer_id', 'payment_source_id']);
-      const client = this.createClient(args);
-      const { api_key, customer_id, payment_source_id, ...paymentSourceData } = this.sanitizeArgs(args);
-      const data = await client.updateCustomerPaymentSource(customer_id, payment_source_id, paymentSourceData);
-      return this.formatResponse(data);
-    } catch (error) {
-      return this.formatError('updating customer payment source', error);
-    }
-  }
-
-  async handleDeleteCustomerPaymentSource(args) {
-    try {
-      this.validateRequired(args, ['customer_id', 'payment_source_id']);
-      const client = this.createClient(args);
-      const data = await client.deleteCustomerPaymentSource(args.customer_id, args.payment_source_id);
-      return this.formatResponse(data);
-    } catch (error) {
-      return this.formatError('deleting customer payment source', error);
     }
   }
 }
