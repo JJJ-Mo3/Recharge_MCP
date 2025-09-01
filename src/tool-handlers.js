@@ -1227,4 +1227,170 @@ export class RechargeToolHandlers {
       return this.formatError('deleting subscription plan', error);
     }
   }
+
+  // Shipping rate handlers
+  async handleGetShippingRates(args) {
+    try {
+      const client = this.createClient(args);
+      const { api_key, ...params } = this.sanitizeArgs(args);
+      const data = await client.getShippingRates(params);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('retrieving shipping rates', error);
+    }
+  }
+
+  async handleGetShippingRate(args) {
+    try {
+      this.validateRequired(args, ['shipping_rate_id']);
+      const client = this.createClient(args);
+      const data = await client.getShippingRate(args.shipping_rate_id);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('retrieving shipping rate', error);
+    }
+  }
+
+  async handleCreateShippingRate(args) {
+    try {
+      this.validateRequired(args, ['name', 'price']);
+      const client = this.createClient(args);
+      const { api_key, ...shippingRateData } = this.sanitizeArgs(args);
+      const data = await client.createShippingRate(shippingRateData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('creating shipping rate', error);
+    }
+  }
+
+  async handleUpdateShippingRate(args) {
+    try {
+      this.validateRequired(args, ['shipping_rate_id']);
+      const client = this.createClient(args);
+      const { api_key, shipping_rate_id, ...shippingRateData } = this.sanitizeArgs(args);
+      const data = await client.updateShippingRate(shipping_rate_id, shippingRateData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('updating shipping rate', error);
+    }
+  }
+
+  async handleDeleteShippingRate(args) {
+    try {
+      this.validateRequired(args, ['shipping_rate_id']);
+      const client = this.createClient(args);
+      const data = await client.deleteShippingRate(args.shipping_rate_id);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('deleting shipping rate', error);
+    }
+  }
+
+  // Tax line handlers
+  async handleGetTaxLines(args) {
+    try {
+      const client = this.createClient(args);
+      const { api_key, ...params } = this.sanitizeArgs(args);
+      const data = await client.getTaxLines(params);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('retrieving tax lines', error);
+    }
+  }
+
+  async handleGetTaxLine(args) {
+    try {
+      this.validateRequired(args, ['tax_line_id']);
+      const client = this.createClient(args);
+      const data = await client.getTaxLine(args.tax_line_id);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('retrieving tax line', error);
+    }
+  }
+
+  // Subscription discount handlers
+  async handleGetSubscriptionDiscounts(args) {
+    try {
+      this.validateRequired(args, ['subscription_id']);
+      const client = this.createClient(args);
+      const { api_key, subscription_id, ...params } = this.sanitizeArgs(args);
+      const data = await client.getSubscriptionDiscounts(subscription_id, params);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('retrieving subscription discounts', error);
+    }
+  }
+
+  async handleApplySubscriptionDiscount(args) {
+    try {
+      this.validateRequired(args, ['subscription_id', 'discount_id']);
+      const client = this.createClient(args);
+      const { api_key, subscription_id, ...discountData } = this.sanitizeArgs(args);
+      const data = await client.applySubscriptionDiscount(subscription_id, discountData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('applying subscription discount', error);
+    }
+  }
+
+  async handleRemoveSubscriptionDiscount(args) {
+    try {
+      this.validateRequired(args, ['subscription_id', 'discount_id']);
+      const client = this.createClient(args);
+      const data = await client.removeSubscriptionDiscount(args.subscription_id, args.discount_id);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('removing subscription discount', error);
+    }
+  }
+
+  // Order discount handlers
+  async handleGetOrderDiscounts(args) {
+    try {
+      this.validateRequired(args, ['order_id']);
+      const client = this.createClient(args);
+      const { api_key, order_id, ...params } = this.sanitizeArgs(args);
+      const data = await client.getOrderDiscounts(order_id, params);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('retrieving order discounts', error);
+    }
+  }
+
+  // Charge discount handlers
+  async handleGetChargeDiscounts(args) {
+    try {
+      this.validateRequired(args, ['charge_id']);
+      const client = this.createClient(args);
+      const { api_key, charge_id, ...params } = this.sanitizeArgs(args);
+      const data = await client.getChargeDiscounts(charge_id, params);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('retrieving charge discounts', error);
+    }
+  }
+
+  async handleApplyChargeDiscount(args) {
+    try {
+      this.validateRequired(args, ['charge_id', 'discount_id']);
+      const client = this.createClient(args);
+      const { api_key, charge_id, ...discountData } = this.sanitizeArgs(args);
+      const data = await client.applyChargeDiscount(charge_id, discountData);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('applying charge discount', error);
+    }
+  }
+
+  async handleRemoveChargeDiscount(args) {
+    try {
+      this.validateRequired(args, ['charge_id', 'discount_id']);
+      const client = this.createClient(args);
+      const data = await client.removeChargeDiscount(args.charge_id, args.discount_id);
+      return this.formatResponse(data);
+    } catch (error) {
+      return this.formatError('removing charge discount', error);
+    }
+  }
 }

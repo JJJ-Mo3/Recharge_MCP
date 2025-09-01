@@ -205,6 +205,30 @@ class RechargeServer {
           tools.createSubscriptionPlanSchema,
           tools.updateSubscriptionPlanSchema,
           tools.deleteSubscriptionPlanSchema,
+
+          // Shipping rate tools
+          tools.getShippingRatesSchema,
+          tools.getShippingRateSchema,
+          tools.createShippingRateSchema,
+          tools.updateShippingRateSchema,
+          tools.deleteShippingRateSchema,
+
+          // Tax line tools
+          tools.getTaxLinesSchema,
+          tools.getTaxLineSchema,
+
+          // Subscription discount tools
+          tools.getSubscriptionDiscountsSchema,
+          tools.applySubscriptionDiscountSchema,
+          tools.removeSubscriptionDiscountSchema,
+
+          // Order discount tools
+          tools.getOrderDiscountsSchema,
+
+          // Charge discount tools
+          tools.getChargeDiscountsSchema,
+          tools.applyChargeDiscountSchema,
+          tools.removeChargeDiscountSchema,
         ],
       };
     });
@@ -465,6 +489,44 @@ class RechargeServer {
             return await this.toolHandlers.handleUpdateSubscriptionPlan(request.params.arguments);
           case 'recharge_delete_subscription_plan':
             return await this.toolHandlers.handleDeleteSubscriptionPlan(request.params.arguments);
+
+          // Shipping rate tools
+          case 'recharge_get_shipping_rates':
+            return await this.toolHandlers.handleGetShippingRates(request.params.arguments);
+          case 'recharge_get_shipping_rate':
+            return await this.toolHandlers.handleGetShippingRate(request.params.arguments);
+          case 'recharge_create_shipping_rate':
+            return await this.toolHandlers.handleCreateShippingRate(request.params.arguments);
+          case 'recharge_update_shipping_rate':
+            return await this.toolHandlers.handleUpdateShippingRate(request.params.arguments);
+          case 'recharge_delete_shipping_rate':
+            return await this.toolHandlers.handleDeleteShippingRate(request.params.arguments);
+
+          // Tax line tools
+          case 'recharge_get_tax_lines':
+            return await this.toolHandlers.handleGetTaxLines(request.params.arguments);
+          case 'recharge_get_tax_line':
+            return await this.toolHandlers.handleGetTaxLine(request.params.arguments);
+
+          // Subscription discount tools
+          case 'recharge_get_subscription_discounts':
+            return await this.toolHandlers.handleGetSubscriptionDiscounts(request.params.arguments);
+          case 'recharge_apply_subscription_discount':
+            return await this.toolHandlers.handleApplySubscriptionDiscount(request.params.arguments);
+          case 'recharge_remove_subscription_discount':
+            return await this.toolHandlers.handleRemoveSubscriptionDiscount(request.params.arguments);
+
+          // Order discount tools
+          case 'recharge_get_order_discounts':
+            return await this.toolHandlers.handleGetOrderDiscounts(request.params.arguments);
+
+          // Charge discount tools
+          case 'recharge_get_charge_discounts':
+            return await this.toolHandlers.handleGetChargeDiscounts(request.params.arguments);
+          case 'recharge_apply_charge_discount':
+            return await this.toolHandlers.handleApplyChargeDiscount(request.params.arguments);
+          case 'recharge_remove_charge_discount':
+            return await this.toolHandlers.handleRemoveChargeDiscount(request.params.arguments);
 
           default:
             throw new Error(`Unknown tool: ${name}`);

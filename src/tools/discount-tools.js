@@ -156,3 +156,173 @@ export const createDiscountSchema = {
     required: ['code', 'value', 'value_type']
   }
 };
+
+// Subscription discount tools
+export const getSubscriptionDiscountsSchema = {
+  name: 'recharge_get_subscription_discounts',
+  description: 'Retrieve discounts applied to a subscription',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      subscription_id: {
+        type: 'string',
+        description: 'The subscription ID'
+      },
+      limit: {
+        type: 'number',
+        description: 'Number of discounts to retrieve (max 250)',
+        minimum: 1,
+        maximum: 250
+      },
+      api_key: {
+        type: 'string',
+        description: 'Optional API key to override the default server API key'
+      }
+    },
+    required: ['subscription_id']
+  }
+};
+
+export const applySubscriptionDiscountSchema = {
+  name: 'recharge_apply_subscription_discount',
+  description: 'Apply a discount to a subscription',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      subscription_id: {
+        type: 'string',
+        description: 'The subscription ID'
+      },
+      discount_id: {
+        type: 'string',
+        description: 'The discount ID to apply'
+      },
+      api_key: {
+        type: 'string',
+        description: 'Optional API key to override the default server API key'
+      }
+    },
+    required: ['subscription_id', 'discount_id']
+  }
+};
+
+export const removeSubscriptionDiscountSchema = {
+  name: 'recharge_remove_subscription_discount',
+  description: 'Remove a discount from a subscription',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      subscription_id: {
+        type: 'string',
+        description: 'The subscription ID'
+      },
+      discount_id: {
+        type: 'string',
+        description: 'The discount ID to remove'
+      },
+      api_key: {
+        type: 'string',
+        description: 'Optional API key to override the default server API key'
+      }
+    },
+    required: ['subscription_id', 'discount_id']
+  }
+};
+
+// Order discount tools
+export const getOrderDiscountsSchema = {
+  name: 'recharge_get_order_discounts',
+  description: 'Retrieve discounts applied to an order',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      order_id: {
+        type: 'string',
+        description: 'The order ID'
+      },
+      limit: {
+        type: 'number',
+        description: 'Number of discounts to retrieve (max 250)',
+        minimum: 1,
+        maximum: 250
+      },
+      api_key: {
+        type: 'string',
+        description: 'Optional API key to override the default server API key'
+      }
+    },
+    required: ['order_id']
+  }
+};
+
+// Charge discount tools
+export const getChargeDiscountsSchema = {
+  name: 'recharge_get_charge_discounts',
+  description: 'Retrieve discounts applied to a charge',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      charge_id: {
+        type: 'string',
+        description: 'The charge ID'
+      },
+      limit: {
+        type: 'number',
+        description: 'Number of discounts to retrieve (max 250)',
+        minimum: 1,
+        maximum: 250
+      },
+      api_key: {
+        type: 'string',
+        description: 'Optional API key to override the default server API key'
+      }
+    },
+    required: ['charge_id']
+  }
+};
+
+export const applyChargeDiscountSchema = {
+  name: 'recharge_apply_charge_discount',
+  description: 'Apply a discount to a charge',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      charge_id: {
+        type: 'string',
+        description: 'The charge ID'
+      },
+      discount_id: {
+        type: 'string',
+        description: 'The discount ID to apply'
+      },
+      api_key: {
+        type: 'string',
+        description: 'Optional API key to override the default server API key'
+      }
+    },
+    required: ['charge_id', 'discount_id']
+  }
+};
+
+export const removeChargeDiscountSchema = {
+  name: 'recharge_remove_charge_discount',
+  description: 'Remove a discount from a charge',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      charge_id: {
+        type: 'string',
+        description: 'The charge ID'
+      },
+      discount_id: {
+        type: 'string',
+        description: 'The discount ID to remove'
+      },
+      api_key: {
+        type: 'string',
+        description: 'Optional API key to override the default server API key'
+      }
+    },
+    required: ['charge_id', 'discount_id']
+  }
+};

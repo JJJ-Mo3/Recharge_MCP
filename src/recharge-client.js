@@ -581,6 +581,46 @@ export class RechargeClient {
     return this.request(`/analytics/customers?${searchParams}`);
   }
 
+  // Shipping rate methods
+  async getShippingRates(params = {}) {
+    const searchParams = this.buildQueryParams(params);
+    return this.request(`/shipping_rates?${searchParams}`);
+  }
+
+  async getShippingRate(shippingRateId) {
+    return this.request(`/shipping_rates/${shippingRateId}`);
+  }
+
+  async createShippingRate(shippingRateData) {
+    return this.request('/shipping_rates', {
+      method: 'POST',
+      body: JSON.stringify(shippingRateData)
+    });
+  }
+
+  async updateShippingRate(shippingRateId, shippingRateData) {
+    return this.request(`/shipping_rates/${shippingRateId}`, {
+      method: 'PUT',
+      body: JSON.stringify(shippingRateData)
+    });
+  }
+
+  async deleteShippingRate(shippingRateId) {
+    return this.request(`/shipping_rates/${shippingRateId}`, {
+      method: 'DELETE'
+    });
+  }
+
+  // Tax line methods
+  async getTaxLines(params = {}) {
+    const searchParams = this.buildQueryParams(params);
+    return this.request(`/tax_lines?${searchParams}`);
+  }
+
+  async getTaxLine(taxLineId) {
+    return this.request(`/tax_lines/${taxLineId}`);
+  }
+
   // Store credit methods
   async getStoreCredits(params = {}) {
     const searchParams = this.buildQueryParams(params);
@@ -710,6 +750,50 @@ export class RechargeClient {
 
   async deleteSubscriptionPlan(subscriptionPlanId) {
     return this.request(`/subscription_plans/${subscriptionPlanId}`, {
+      method: 'DELETE'
+    });
+  }
+
+  // Subscription discount methods
+  async getSubscriptionDiscounts(subscriptionId, params = {}) {
+    const searchParams = this.buildQueryParams(params);
+    return this.request(`/subscriptions/${subscriptionId}/discounts?${searchParams}`);
+  }
+
+  async applySubscriptionDiscount(subscriptionId, discountData) {
+    return this.request(`/subscriptions/${subscriptionId}/discounts`, {
+      method: 'POST',
+      body: JSON.stringify(discountData)
+    });
+  }
+
+  async removeSubscriptionDiscount(subscriptionId, discountId) {
+    return this.request(`/subscriptions/${subscriptionId}/discounts/${discountId}`, {
+      method: 'DELETE'
+    });
+  }
+
+  // Order discount methods
+  async getOrderDiscounts(orderId, params = {}) {
+    const searchParams = this.buildQueryParams(params);
+    return this.request(`/orders/${orderId}/discounts?${searchParams}`);
+  }
+
+  // Charge discount methods
+  async getChargeDiscounts(chargeId, params = {}) {
+    const searchParams = this.buildQueryParams(params);
+    return this.request(`/charges/${chargeId}/discounts?${searchParams}`);
+  }
+
+  async applyChargeDiscount(chargeId, discountData) {
+    return this.request(`/charges/${chargeId}/discounts`, {
+      method: 'POST',
+      body: JSON.stringify(discountData)
+    });
+  }
+
+  async removeChargeDiscount(chargeId, discountId) {
+    return this.request(`/charges/${chargeId}/discounts/${discountId}`, {
       method: 'DELETE'
     });
   }

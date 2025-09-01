@@ -487,6 +487,30 @@ For other MCP-compatible clients, configure them to run this server as a local p
 - `recharge_update_subscription_plan` - Update subscription plan details
 - `recharge_delete_subscription_plan` - Delete a subscription plan
 
+### Shipping Rate Tools
+- `recharge_get_shipping_rates` - Retrieve shipping rates with filtering and pagination
+- `recharge_get_shipping_rate` - Get a specific shipping rate by ID
+- `recharge_create_shipping_rate` - Create a new shipping rate
+- `recharge_update_shipping_rate` - Update shipping rate details
+- `recharge_delete_shipping_rate` - Delete a shipping rate
+
+### Tax Line Tools
+- `recharge_get_tax_lines` - Retrieve tax lines with filtering and pagination
+- `recharge_get_tax_line` - Get a specific tax line by ID
+
+### Subscription Discount Tools
+- `recharge_get_subscription_discounts` - Retrieve discounts applied to a subscription
+- `recharge_apply_subscription_discount` - Apply a discount to a subscription
+- `recharge_remove_subscription_discount` - Remove a discount from a subscription
+
+### Order Discount Tools
+- `recharge_get_order_discounts` - Retrieve discounts applied to an order
+
+### Charge Discount Tools
+- `recharge_get_charge_discounts` - Retrieve discounts applied to a charge
+- `recharge_apply_charge_discount` - Apply a discount to a charge
+- `recharge_remove_charge_discount` - Remove a discount from a charge
+
 ## Sample Usage
 
 Below are examples of how to use each tool with sample parameters and expected responses.
@@ -704,6 +728,43 @@ Below are examples of how to use each tool with sample parameters and expected r
   "arguments": {
     "title": "Monthly Coffee Plan",
     "description": "Premium coffee delivered monthly"
+  }
+}
+```
+
+### Shipping Rate Management
+
+#### Create Shipping Rate
+```json
+{
+  "tool": "recharge_create_shipping_rate",
+  "arguments": {
+    "name": "Standard Shipping",
+    "price": "5.99"
+  }
+}
+```
+
+### Discount Application
+
+#### Apply Discount to Subscription
+```json
+{
+  "tool": "recharge_apply_subscription_discount",
+  "arguments": {
+    "subscription_id": "456789",
+    "discount_id": "discount_123"
+  }
+}
+```
+
+#### Apply Discount to Charge
+```json
+{
+  "tool": "recharge_apply_charge_discount",
+  "arguments": {
+    "charge_id": "333444",
+    "discount_id": "discount_123"
   }
 }
 ```
