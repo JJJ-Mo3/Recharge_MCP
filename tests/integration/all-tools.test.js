@@ -386,9 +386,17 @@ describe('Integration Tests - Recharge Subscription Flows', () => {
           address_id: addressId,
           next_charge_scheduled_at: '2024-02-01T00:00:00Z',
           order_interval_frequency: '30',
-          order_interval_unit: 'day',
+    const resumeDate = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(); // 14 days from now
+    const futureDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(); // 30 days from now
+    const pauseData = { 
+    const startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]; // 30 days ago
+    const endDate = new Date().toISOString().split('T')[0]; // today
+        { id: '123', quantity: 2, next_charge_scheduled_at: futureDate },
+        { id: '456', quantity: 3, next_charge_scheduled_at: futureDate }
+      end_date: endDate
+    };
           quantity: 1,
-          shopify_variant_id: '999'
+      .reply(200, { charge: { id: chargeId, status: 'queued', scheduled_at: futureScheduledDate } });
         })
         .reply(201, { 
           subscription: { 
@@ -400,9 +408,10 @@ describe('Integration Tests - Recharge Subscription Flows', () => {
 
       // Execute in proper order
       const customerResult = await handlers.handleGetCustomer({ customer_id: customerId });
+    const futureChargeDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(); // 30 days from now
       expect(customerResult.content[0].text).toContain(customerId);
 
-      const addressResult = await handlers.handleGetAddress({ address_id: addressId });
+      next_charge_scheduled_at: futureChargeDate,
       expect(addressResult.content[0].text).toContain(addressId);
 
       const subscriptionResult = await handlers.handleCreateSubscription({
@@ -410,10 +419,59 @@ describe('Integration Tests - Recharge Subscription Flows', () => {
         next_charge_scheduled_at: '2024-02-01T00:00:00Z',
         order_interval_frequency: '30',
         order_interval_unit: 'day',
+          next_charge_scheduled_at: futureChargeDate,
         quantity: 1,
         shopify_variant_id: '999'
       });
       expect(subscriptionResult.content[0].text).toContain('"status": "active"');
     });
+
+    // Step 5: Test charge delay to future date
+    const delayedChargeId = '789';
+    const futureChargeDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(); // 30 days from now
+    const delayDate = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(); // 14 days from now
+    
+    nock(baseUrl)
+      .post(`/charges/${delayedChargeId}/delay`, { date: delayDate })
+      next_charge_scheduled_at: futureChargeDate,
+
+    const delayResult = await handlers.handleDelayCharge({ 
+      charge_id: delayedChargeId, 
+      date: delayDate 
+    });
+        next_charge_scheduled_at: futureChargeDate,
+    expect(subscriptionResult.content[0].text).toContain(`"next_charge_scheduled_at": "${futureChargeDate}"`);
+  });
+
+  test('should handle subscription charge skipping with future dates', async () => {
+    const subscriptionId = '789';
+    const futureChargeDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(); // 30 days from now
+    
+    nock(baseUrl)
+      .post(`/subscriptions/${subscriptionId}/skip`, { date: futureChargeDate })
+      .reply(200, { subscription: { id: subscriptionId, status: 'active' } });
+
+    const result = await handlers.handleSkipSubscriptionCharge({ 
+      subscription_id: subscriptionId, 
+      charge_date: futureChargeDate 
+    });
+    
+    expect(result.content[0].text).toContain('"status": "active"');
+  });
+
+  test('should handle next charge date updates with future dates', async () => {
+    const subscriptionId = '789';
+    const newChargeDate = new Date(Date.now() + 45 * 24 * 60 * 60 * 1000).toISOString(); // 45 days from now
+    
+    nock(baseUrl)
+      .post(`/subscriptions/${subscriptionId}/set_next_charge_date`, { date: newChargeDate })
+      .reply(200, { subscription: { id: subscriptionId, next_charge_scheduled_at: newChargeDate } });
+
+    const result = await handlers.handleSetNextChargeDate({ 
+      subscription_id: subscriptionId, 
+      date: newChargeDate 
+    });
+    
+    expect(result.content[0].text).toContain(`"next_charge_scheduled_at": "${newChargeDate}"`);
   });
 });

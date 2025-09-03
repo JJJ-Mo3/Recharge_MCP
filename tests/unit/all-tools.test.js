@@ -205,7 +205,7 @@ describe('All Tools Unit Tests', () => {
       // Tax line methods
       getTaxLines: jest.fn(),
       getTaxLine: jest.fn(),
-
+      next_charge_scheduled_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
       // Bulk operation methods
       bulkUpdateSubscriptions: jest.fn(),
       bulkSkipCharges: jest.fn(),
@@ -426,6 +426,7 @@ describe('All Tools Unit Tests', () => {
       });
     });
 
+      resume_date: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString() // 14 days from now
     test('should handle network errors', async () => {
       const error = new Error('Network timeout');
       mockClient.getSubscription.mockRejectedValue(error);
@@ -448,6 +449,102 @@ describe('All Tools Unit Tests', () => {
     test('should fall back to default API key', () => {
       const apiKey = handlers.getApiKey({});
       expect(apiKey).toBe('test_api_key');
+    });
+  });
+
+  test('handleSetNextChargeDate should set future charge date', async () => {
+    const futureDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(); // 7 days from now
+    const mockData = { subscription: { id: '789', next_charge_scheduled_at: futureDate } };
+    mockClient.setNextChargeDate.mockResolvedValue(mockData);
+
+    const result = await handlers.handleSetNextChargeDate({ 
+      subscription_id: '789', 
+      date: futureDate 
+    });
+
+    expect(mockClient.setNextChargeDate).toHaveBeenCalledWith('789', { date: futureDate });
+    expect(result).toEqual({
+      content: [{ type: 'text', text: JSON.stringify(mockData, null, 2) }]
+    });
+  });
+
+  test('handleSkipSubscriptionCharge should skip future charge', async () => {
+    const futureChargeDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(); // 30 days from now
+    const mockData = { subscription: { id: '789', status: 'active' } };
+    mockClient.skipSubscriptionCharge.mockResolvedValue(mockData);
+
+    const result = await handlers.handleSkipSubscriptionCharge({ 
+      subscription_id: '789', 
+      charge_date: futureChargeDate 
+    });
+
+    expect(mockClient.skipSubscriptionCharge).toHaveBeenCalledWith('789', futureChargeDate);
+    expect(result).toEqual({
+      content: [{ type: 'text', text: JSON.stringify(mockData, null, 2) }]
+    });
+  });
+
+  test('handleDelayCharge should delay charge to future date', async () => {
+    const futureDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(); // 7 days from now
+    const mockData = { charge: { id: '123', scheduled_at: futureDate } };
+    mockClient.delayCharge.mockResolvedValue(mockData);
+
+    const startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]; // 30 days ago
+    const endDate = new Date().toISOString().split('T')[0]; // today
+    const result = await handlers.handleDelayCharge({ 
+      charge_id: '123', 
+      date: futureDate 
+    const result = await handlers.handleGetSubscriptionAnalytics({ 
+      start_date: startDate,
+      end_date: endDate 
+    });
+
+    expect(mockClient.getSubscriptionAnalytics).toHaveBeenCalledWith({ 
+      start_date: startDate,
+      end_date: endDate 
+    });
+    expect(result).toEqual({
+      content: [{ type: 'text', text: JSON.stringify(mockData, null, 2) }]
+    });
+  });
+
+  test('handleCreateCharge should create charge with future date', async () => {
+    const futureDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(); // 30 days from now
+    const futureDate = new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString(); // 1 day from now
+    const chargeData = {
+        { id: '123', quantity: 2, next_charge_scheduled_at: futureDate },
+        { id: '456', quantity: 3, next_charge_scheduled_at: futureDate }
+      scheduled_at: futureDate
+    };
+    const mockData = { charge: { id: '123', ...chargeData } };
+    mockClient.createCharge.mockResolvedValue(mockData);
+
+    const result = await handlers.handleCreateCharge(chargeData);
+
+    expect(mockClient.createCharge).toHaveBeenCalledWith(chargeData);
+    expect(result).toEqual({
+      content: [{ type: 'text', text: JSON.stringify(mockData, null, 2) }]
+    });
+  });
+
+  test('handleCreateOnetime should create onetime with future charge date', async () => {
+    const futureDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(); // 7 days from now
+    const onetimeData = {
+      address_id: '456',
+      next_charge_scheduled_at: futureDate,
+      product_title: 'One-time Product',
+      price: '29.99',
+      quantity: 1,
+      shopify_variant_id: '789'
+    };
+    const mockData = { onetime: { id: '123', ...onetimeData } };
+    mockClient.createOnetime.mockResolvedValue(mockData);
+
+    const result = await handlers.handleCreateOnetime(onetimeData);
+
+    expect(mockClient.createOnetime).toHaveBeenCalledWith(onetimeData);
+    expect(result).toEqual({
+      content: [{ type: 'text', text: JSON.stringify(mockData, null, 2) }]
     });
   });
 });
