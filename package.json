@@ -7,7 +7,11 @@
   "scripts": {
     "start": "node index.js",
     "dev": "node --watch index.js",
-    "test": "npm run validate",
+    "test": "npm run test:unit && npm run test:integration",
+    "test:unit": "jest --testPathPattern=tests/unit",
+    "test:integration": "jest --testPathPattern=tests/integration",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
     "validate": "node -c index.js && node -c src/recharge-client.js && node -c src/tool-handlers.js && node -c src/tools/index.js",
     "lint": "echo \"No linting configured - consider adding ESLint for production use\"", 
     "check": "npm run validate && echo \"✅ All validations passed\"",
@@ -40,7 +44,11 @@
     "@modelcontextprotocol/sdk": "latest",
     "dotenv": "latest"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nock": "^13.4.0",
+    "@types/jest": "^29.5.8"
+  },
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=8.0.0"
