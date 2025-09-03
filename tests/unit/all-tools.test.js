@@ -2,6 +2,7 @@ import { describe, test, expect, beforeEach, afterEach, jest } from '@jest/globa
 import { RechargeToolHandlers } from '../../src/tool-handlers.js';
 import { RechargeClient } from '../../src/recharge-client.js';
 import * as tools from '../../src/tools/index.js';
+import * as allTools from '../../src/tools/index.js';
 
 // Mock the RechargeClient
 jest.mock('../../src/recharge-client.js');
@@ -222,6 +223,22 @@ describe('All Tools Comprehensive Test Suite', () => {
   });
 
   describe('Tool Schema Validation', () => {
+    test('should have all 130+ tools exported', () => {
+      const toolCount = Object.keys(allTools).length;
+      expect(toolCount).toBeGreaterThanOrEqual(130);
+      console.log(`Total tools exported: ${toolCount}`);
+    });
+
+    test('all tool schemas should have required properties', () => {
+      Object.values(allTools).forEach(tool => {
+        expect(tool).toHaveProperty('name');
+        expect(tool).toHaveProperty('description');
+        expect(tool).toHaveProperty('inputSchema');
+        expect(tool.inputSchema).toHaveProperty('type', 'object');
+        expect(tool.inputSchema).toHaveProperty('properties');
+      });
+    });
+
     test('should have all required tool schemas exported', () => {
       const expectedTools = [
         // Customer tools
@@ -280,7 +297,23 @@ describe('All Tools Comprehensive Test Suite', () => {
       expect(toolSchemas.length).toBeGreaterThanOrEqual(130);
     });
   });
+
   describe('Customer Tools', () => {
+    beforeEach(() => {
+      mockClient.getCustomers = jest.fn();
+      mockClient.getCustomer = jest.fn();
+      mockClient.createCustomer = jest.fn();
+      mockClient.updateCustomer = jest.fn();
+      mockClient.getCustomerAddresses = jest.fn();
+      mockClient.getCustomerSubscriptions = jest.fn();
+      mockClient.getCustomerOrders = jest.fn();
+      mockClient.getCustomerCharges = jest.fn();
+      mockClient.getCustomerPaymentSources = jest.fn();
+      mockClient.createCustomerPaymentSource = jest.fn();
+      mockClient.updateCustomerPaymentSource = jest.fn();
+      mockClient.deleteCustomerPaymentSource = jest.fn();
+    });
+
     test('should handle customer retrieval with proper parameters', async () => {
       const mockData = { customers: [{ id: '123', email: 'test@example.com' }] };
       mockClient.getCustomers.mockResolvedValue(mockData);
@@ -418,9 +451,63 @@ describe('All Tools Comprehensive Test Suite', () => {
       expect(result.content[0].text).toContain('"success"');
       expect(result.isError).toBeUndefined();
     });
+
+    test('handleGetCustomerAddresses should work correctly', async () => {
+      const mockData = { addresses: [{ id: '456', customer_id: '123' }] };
+      mockClient.getCustomerAddresses.mockResolvedValue(mockData);
+
+      const result = await handlers.handleGetCustomerAddresses({ customer_id: '123' });
+
+      expect(mockClient.getCustomerAddresses).toHaveBeenCalledWith('123', {});
+      expect(result.content[0].text).toContain('"addresses"');
+    });
+
+    test('handleCreateCustomerPaymentSource should work correctly', async () => {
+      const paymentData = { payment_token: 'tok_123', payment_type: 'credit_card' };
+      const mockData = { payment_source: { id: '789', ...paymentData } };
+      mockClient.createCustomerPaymentSource.mockResolvedValue(mockData);
+
+      const result = await handlers.handleCreateCustomerPaymentSource({ 
+        customer_id: '123', 
+        ...paymentData 
+      });
+
+      expect(mockClient.createCustomerPaymentSource).toHaveBeenCalledWith('123', paymentData);
+      expect(result.content[0].text).toContain('payment_source');
+    });
   });
 
   describe('Subscription Tools', () => {
+    beforeEach(() => {
+      mockClient.getSubscriptions = jest.fn();
+      mockClient.createSubscription = jest.fn();
+      mockClient.getSubscription = jest.fn();
+      mockClient.updateSubscription = jest.fn();
+      mockClient.cancelSubscription = jest.fn();
+      mockClient.activateSubscription = jest.fn();
+      mockClient.skipSubscriptionCharge = jest.fn();
+      mockClient.unskipSubscriptionCharge = jest.fn();
+      mockClient.swapSubscription = jest.fn();
+      mockClient.setNextChargeDate = jest.fn();
+      mockClient.getSubscriptionCharges = jest.fn();
+      mockClient.createSubscriptionCharge = jest.fn();
+      mockClient.getSubscriptionLineItems = jest.fn();
+      mockClient.createSubscriptionLineItem = jest.fn();
+      mockClient.updateSubscriptionLineItem = jest.fn();
+      mockClient.deleteSubscriptionLineItem = jest.fn();
+      mockClient.getSubscriptionNotes = jest.fn();
+      mockClient.createSubscriptionNote = jest.fn();
+      mockClient.updateSubscriptionNote = jest.fn();
+      mockClient.deleteSubscriptionNote = jest.fn();
+      mockClient.getSubscriptionDeliverySchedule = jest.fn();
+      mockClient.updateSubscriptionDeliverySchedule = jest.fn();
+      mockClient.pauseSubscription = jest.fn();
+      mockClient.resumeSubscription = jest.fn();
+      mockClient.getSubscriptionDiscounts = jest.fn();
+      mockClient.applySubscriptionDiscount = jest.fn();
+      mockClient.removeSubscriptionDiscount = jest.fn();
+    });
+
     test('should get subscriptions with proper filtering', async () => {
       const mockData = { subscriptions: [{ id: '456', status: 'active' }] };
       mockClient.getSubscriptions.mockResolvedValue(mockData);
@@ -746,6 +833,47 @@ describe('All Tools Comprehensive Test Suite', () => {
       expect(result.content[0].text).toContain('"success"');
       expect(result.isError).toBeUndefined();
     });
+
+    test('handleSkipSubscriptionCharge should work correctly', async () => {
+      const mockData = { subscription: { id: '789', next_charge_scheduled_at: '2024-02-01' } };
+      mockClient.skipSubscriptionCharge.mockResolvedValue(mockData);
+
+      const result = await handlers.handleSkipSubscriptionCharge({ 
+        subscription_id: '789', 
+        charge_date: '2024-01-01' 
+      });
+
+      expect(mockClient.skipSubscriptionCharge).toHaveBeenCalledWith('789', '2024-01-01');
+      expect(result.content[0].text).toContain('subscription');
+    });
+
+    test('handleSwapSubscription should work correctly', async () => {
+      const swapData = { shopify_variant_id: '456' };
+      const mockData = { subscription: { id: '789', shopify_variant_id: '456' } };
+      mockClient.swapSubscription.mockResolvedValue(mockData);
+
+      const result = await handlers.handleSwapSubscription({ 
+        subscription_id: '789', 
+        ...swapData 
+      });
+
+      expect(mockClient.swapSubscription).toHaveBeenCalledWith('789', swapData);
+      expect(result.content[0].text).toContain('subscription');
+    });
+
+    test('handlePauseSubscription should work correctly', async () => {
+      const pauseData = { pause_reason: 'Vacation' };
+      const mockData = { subscription: { id: '789', status: 'paused' } };
+      mockClient.pauseSubscription.mockResolvedValue(mockData);
+
+      const result = await handlers.handlePauseSubscription({ 
+        subscription_id: '789', 
+        ...pauseData 
+      });
+
+      expect(mockClient.pauseSubscription).toHaveBeenCalledWith('789', pauseData);
+      expect(result.content[0].text).toContain('paused');
+    });
   });
 
   describe('Missing Tool Categories', () => {
@@ -878,6 +1006,36 @@ describe('All Tools Comprehensive Test Suite', () => {
   });
 
   describe('Order Tools', () => {
+    beforeEach(() => {
+      mockClient.getOrders = jest.fn();
+      mockClient.getOrder = jest.fn();
+      mockClient.updateOrder = jest.fn();
+      mockClient.deleteOrder = jest.fn();
+      mockClient.cloneOrder = jest.fn();
+      mockClient.getOrderLineItems = jest.fn();
+      mockClient.getOrderDiscounts = jest.fn();
+    });
+
+    test('handleGetOrders should work correctly', async () => {
+      const mockData = { orders: [{ id: '123', status: 'processed' }] };
+      mockClient.getOrders.mockResolvedValue(mockData);
+
+      const result = await handlers.handleGetOrders({ limit: 10 });
+
+      expect(mockClient.getOrders).toHaveBeenCalledWith({ limit: 10 });
+      expect(result.content[0].text).toContain('orders');
+    });
+
+    test('handleCloneOrder should work correctly', async () => {
+      const mockData = { order: { id: '456', cloned_from: '123' } };
+      mockClient.cloneOrder.mockResolvedValue(mockData);
+
+      const result = await handlers.handleCloneOrder({ order_id: '123' });
+
+      expect(mockClient.cloneOrder).toHaveBeenCalledWith('123');
+      expect(result.content[0].text).toContain('order');
+    });
+
     test('handleGetOrders should work correctly', async () => {
       const mockData = { orders: [{ id: '101', customer_id: '123' }] };
       mockClient.getOrders.mockResolvedValue(mockData);
@@ -951,6 +1109,49 @@ describe('All Tools Comprehensive Test Suite', () => {
   });
 
   describe('Charge Tools', () => {
+    beforeEach(() => {
+      mockClient.getCharges = jest.fn();
+      mockClient.getCharge = jest.fn();
+      mockClient.createCharge = jest.fn();
+      mockClient.updateCharge = jest.fn();
+      mockClient.deleteCharge = jest.fn();
+      mockClient.skipCharge = jest.fn();
+      mockClient.processCharge = jest.fn();
+      mockClient.unskipCharge = jest.fn();
+      mockClient.delayCharge = jest.fn();
+      mockClient.refundCharge = jest.fn();
+      mockClient.getChargeLineItems = jest.fn();
+      mockClient.updateChargeLineItem = jest.fn();
+      mockClient.getChargeAttempts = jest.fn();
+      mockClient.getChargeDiscounts = jest.fn();
+      mockClient.applyChargeDiscount = jest.fn();
+      mockClient.removeChargeDiscount = jest.fn();
+    });
+
+    test('handleProcessCharge should work correctly', async () => {
+      const mockData = { charge: { id: '123', status: 'success' } };
+      mockClient.processCharge.mockResolvedValue(mockData);
+
+      const result = await handlers.handleProcessCharge({ charge_id: '123' });
+
+      expect(mockClient.processCharge).toHaveBeenCalledWith('123');
+      expect(result.content[0].text).toContain('success');
+    });
+
+    test('handleRefundCharge should work correctly', async () => {
+      const refundData = { amount: '10.00', reason: 'Customer request' };
+      const mockData = { charge: { id: '123', status: 'refunded' } };
+      mockClient.refundCharge.mockResolvedValue(mockData);
+
+      const result = await handlers.handleRefundCharge({ 
+        charge_id: '123', 
+        ...refundData 
+      });
+
+      expect(mockClient.refundCharge).toHaveBeenCalledWith('123', refundData);
+      expect(result.content[0].text).toContain('refunded');
+    });
+
     test('handleGetCharges should work correctly', async () => {
       const mockData = { charges: [{ id: '303', customer_id: '123' }] };
       mockClient.getCharges.mockResolvedValue(mockData);
@@ -1133,6 +1334,54 @@ describe('All Tools Comprehensive Test Suite', () => {
   });
 
   describe('Address Tools', () => {
+    beforeEach(() => {
+      mockClient.getAddresses = jest.fn();
+      mockClient.getAddress = jest.fn();
+      mockClient.updateAddress = jest.fn();
+      mockClient.createAddress = jest.fn();
+      mockClient.deleteAddress = jest.fn();
+      mockClient.validateAddress = jest.fn();
+      mockClient.getAddressSubscriptions = jest.fn();
+      mockClient.getAddressCharges = jest.fn();
+    });
+
+    test('handleCreateAddress should work correctly', async () => {
+      const addressData = { 
+        customer_id: '123',
+        first_name: 'John',
+        last_name: 'Doe',
+        address1: '123 Main St',
+        city: 'New York',
+        province: 'NY',
+        country_code: 'US',
+        zip: '10001'
+      };
+      const mockData = { address: { id: '456', ...addressData } };
+      mockClient.createAddress.mockResolvedValue(mockData);
+
+      const result = await handlers.handleCreateAddress(addressData);
+
+      expect(mockClient.createAddress).toHaveBeenCalledWith(addressData);
+      expect(result.content[0].text).toContain('address');
+    });
+
+    test('handleValidateAddress should work correctly', async () => {
+      const addressData = { 
+        address1: '123 Main St',
+        city: 'New York',
+        province: 'NY',
+        country_code: 'US',
+        zip: '10001'
+      };
+      const mockData = { address: { ...addressData, valid: true } };
+      mockClient.validateAddress.mockResolvedValue(mockData);
+
+      const result = await handlers.handleValidateAddress(addressData);
+
+      expect(mockClient.validateAddress).toHaveBeenCalledWith(addressData);
+      expect(result.content[0].text).toContain('valid');
+    });
+
     test('should get addresses with proper filtering', async () => {
       const mockData = { addresses: [{ id: '789', customer_id: '123' }] };
       mockClient.getAddresses.mockResolvedValue(mockData);
@@ -1233,6 +1482,48 @@ describe('All Tools Comprehensive Test Suite', () => {
   });
 
   describe('Discount Tools', () => {
+    beforeEach(() => {
+      mockClient.getDiscounts = jest.fn();
+      mockClient.getDiscount = jest.fn();
+      mockClient.updateDiscount = jest.fn();
+      mockClient.deleteDiscount = jest.fn();
+      mockClient.createDiscount = jest.fn();
+      mockClient.getSubscriptionDiscounts = jest.fn();
+      mockClient.applySubscriptionDiscount = jest.fn();
+      mockClient.removeSubscriptionDiscount = jest.fn();
+      mockClient.getChargeDiscounts = jest.fn();
+      mockClient.applyChargeDiscount = jest.fn();
+      mockClient.removeChargeDiscount = jest.fn();
+    });
+
+    test('handleCreateDiscount should work correctly', async () => {
+      const discountData = { 
+        code: 'SAVE10',
+        value: 10,
+        value_type: 'percentage'
+      };
+      const mockData = { discount: { id: '123', ...discountData } };
+      mockClient.createDiscount.mockResolvedValue(mockData);
+
+      const result = await handlers.handleCreateDiscount(discountData);
+
+      expect(mockClient.createDiscount).toHaveBeenCalledWith(discountData);
+      expect(result.content[0].text).toContain('SAVE10');
+    });
+
+    test('handleApplySubscriptionDiscount should work correctly', async () => {
+      const mockData = { discount_application: { id: '456', discount_id: '123' } };
+      mockClient.applySubscriptionDiscount.mockResolvedValue(mockData);
+
+      const result = await handlers.handleApplySubscriptionDiscount({ 
+        subscription_id: '789', 
+        discount_id: '123' 
+      });
+
+      expect(mockClient.applySubscriptionDiscount).toHaveBeenCalledWith('789', { discount_id: '123' });
+      expect(result.content[0].text).toContain('discount_application');
+    });
+
     test('should get discounts with filtering', async () => {
       const mockData = { discounts: [{ id: 'disc_123', code: 'SAVE20' }] };
       mockClient.getDiscounts.mockResolvedValue(mockData);
@@ -1291,6 +1582,206 @@ describe('All Tools Comprehensive Test Suite', () => {
   });
 
   describe('Advanced Tools', () => {
+    beforeEach(() => {
+      // Metafield tools
+      mockClient.getMetafields = jest.fn();
+      mockClient.getMetafield = jest.fn();
+      mockClient.updateMetafield = jest.fn();
+      mockClient.deleteMetafield = jest.fn();
+      mockClient.createMetafield = jest.fn();
+      
+      // Webhook tools
+      mockClient.getWebhooks = jest.fn();
+      mockClient.getWebhook = jest.fn();
+      mockClient.updateWebhook = jest.fn();
+      mockClient.deleteWebhook = jest.fn();
+      mockClient.createWebhook = jest.fn();
+      
+      // Payment method tools
+      mockClient.getPaymentMethods = jest.fn();
+      mockClient.getPaymentMethod = jest.fn();
+      mockClient.updatePaymentMethod = jest.fn();
+      
+      // Checkout tools
+      mockClient.getCheckouts = jest.fn();
+      mockClient.getCheckout = jest.fn();
+      mockClient.updateCheckout = jest.fn();
+      mockClient.processCheckout = jest.fn();
+      mockClient.createCheckout = jest.fn();
+      
+      // One-time product tools
+      mockClient.getOnetimes = jest.fn();
+      mockClient.getOnetime = jest.fn();
+      mockClient.updateOnetime = jest.fn();
+      mockClient.deleteOnetime = jest.fn();
+      mockClient.createOnetime = jest.fn();
+      
+      // Store credit tools
+      mockClient.getStoreCredits = jest.fn();
+      mockClient.getStoreCredit = jest.fn();
+      mockClient.updateStoreCredit = jest.fn();
+      mockClient.createStoreCredit = jest.fn();
+      
+      // Shop tools
+      mockClient.getShop = jest.fn();
+      mockClient.updateShop = jest.fn();
+      
+      // Collection tools
+      mockClient.getCollections = jest.fn();
+      mockClient.getCollection = jest.fn();
+      mockClient.createCollection = jest.fn();
+      mockClient.updateCollection = jest.fn();
+      mockClient.deleteCollection = jest.fn();
+      
+      // Analytics tools
+      mockClient.getSubscriptionAnalytics = jest.fn();
+      mockClient.getCustomerAnalytics = jest.fn();
+      
+      // Customer portal tools
+      mockClient.getCustomerPortalSession = jest.fn();
+      mockClient.createCustomerPortalSession = jest.fn();
+      
+      // Bundle selection tools
+      mockClient.getBundleSelections = jest.fn();
+      mockClient.getBundleSelection = jest.fn();
+      mockClient.createBundleSelection = jest.fn();
+      mockClient.updateBundleSelection = jest.fn();
+      mockClient.deleteBundleSelection = jest.fn();
+      
+      // Retention strategy tools
+      mockClient.getRetentionStrategies = jest.fn();
+      mockClient.getRetentionStrategy = jest.fn();
+      
+      // Async batch tools
+      mockClient.getAsyncBatches = jest.fn();
+      mockClient.getAsyncBatch = jest.fn();
+      mockClient.createAsyncBatch = jest.fn();
+      
+      // Notification tools
+      mockClient.getNotifications = jest.fn();
+      mockClient.getNotification = jest.fn();
+      
+      // Plan tools
+      mockClient.getPlans = jest.fn();
+      mockClient.getPlan = jest.fn();
+      mockClient.createPlan = jest.fn();
+      mockClient.updatePlan = jest.fn();
+      mockClient.deletePlan = jest.fn();
+      
+      // Subscription plan tools
+      mockClient.getSubscriptionPlans = jest.fn();
+      mockClient.getSubscriptionPlan = jest.fn();
+      mockClient.createSubscriptionPlan = jest.fn();
+      mockClient.updateSubscriptionPlan = jest.fn();
+      mockClient.deleteSubscriptionPlan = jest.fn();
+      
+      // Shipping rate tools
+      mockClient.getShippingRates = jest.fn();
+      mockClient.getShippingRate = jest.fn();
+      mockClient.createShippingRate = jest.fn();
+      mockClient.updateShippingRate = jest.fn();
+      mockClient.deleteShippingRate = jest.fn();
+      
+      // Tax line tools
+      mockClient.getTaxLines = jest.fn();
+      mockClient.getTaxLine = jest.fn();
+      
+      // Bulk operation tools
+      mockClient.bulkUpdateSubscriptions = jest.fn();
+      mockClient.bulkSkipCharges = jest.fn();
+      mockClient.bulkUnskipCharges = jest.fn();
+    });
+
+    test('handleCreateMetafield should work correctly', async () => {
+      const metafieldData = { 
+        namespace: 'custom',
+        key: 'notes',
+        value: 'Important customer',
+        value_type: 'string',
+        owner_resource: 'customer',
+        owner_id: '123'
+      };
+      const mockData = { metafield: { id: '456', ...metafieldData } };
+      mockClient.createMetafield.mockResolvedValue(mockData);
+
+      const result = await handlers.handleCreateMetafield(metafieldData);
+
+      expect(mockClient.createMetafield).toHaveBeenCalledWith(metafieldData);
+      expect(result.content[0].text).toContain('metafield');
+    });
+
+    test('handleCreateWebhook should work correctly', async () => {
+      const webhookData = { 
+        address: 'https://example.com/webhook',
+        topic: 'subscription/created'
+      };
+      const mockData = { webhook: { id: '789', ...webhookData } };
+      mockClient.createWebhook.mockResolvedValue(mockData);
+
+      const result = await handlers.handleCreateWebhook(webhookData);
+
+      expect(mockClient.createWebhook).toHaveBeenCalledWith(webhookData);
+      expect(result.content[0].text).toContain('webhook');
+    });
+
+    test('handleCreateCheckout should work correctly', async () => {
+      const checkoutData = { 
+        line_items: [{ variant_id: '123', quantity: 1 }]
+      };
+      const mockData = { checkout: { token: 'abc123', ...checkoutData } };
+      mockClient.createCheckout.mockResolvedValue(mockData);
+
+      const result = await handlers.handleCreateCheckout(checkoutData);
+
+      expect(mockClient.createCheckout).toHaveBeenCalledWith(checkoutData);
+      expect(result.content[0].text).toContain('checkout');
+    });
+
+    test('handleCreateOnetime should work correctly', async () => {
+      const onetimeData = { 
+        address_id: '123',
+        next_charge_scheduled_at: '2024-01-01',
+        product_title: 'One-time Product',
+        price: '19.99',
+        quantity: 1,
+        shopify_variant_id: '456'
+      };
+      const mockData = { onetime: { id: '789', ...onetimeData } };
+      mockClient.createOnetime.mockResolvedValue(mockData);
+
+      const result = await handlers.handleCreateOnetime(onetimeData);
+
+      expect(mockClient.createOnetime).toHaveBeenCalledWith(onetimeData);
+      expect(result.content[0].text).toContain('onetime');
+    });
+
+    test('handleGetSubscriptionAnalytics should work correctly', async () => {
+      const params = { start_date: '2024-01-01', end_date: '2024-01-31' };
+      const mockData = { analytics: { total_subscriptions: 100, revenue: '5000.00' } };
+      mockClient.getSubscriptionAnalytics.mockResolvedValue(mockData);
+
+      const result = await handlers.handleGetSubscriptionAnalytics(params);
+
+      expect(mockClient.getSubscriptionAnalytics).toHaveBeenCalledWith(params);
+      expect(result.content[0].text).toContain('analytics');
+    });
+
+    test('handleBulkUpdateSubscriptions should work correctly', async () => {
+      const subscriptionsData = { 
+        subscriptions: [
+          { id: '123', quantity: 2 },
+          { id: '456', quantity: 3 }
+        ]
+      };
+      const mockData = { async_batch: { id: '789', status: 'processing' } };
+      mockClient.bulkUpdateSubscriptions.mockResolvedValue(mockData);
+
+      const result = await handlers.handleBulkUpdateSubscriptions(subscriptionsData);
+
+      expect(mockClient.bulkUpdateSubscriptions).toHaveBeenCalledWith(subscriptionsData);
+      expect(result.content[0].text).toContain('async_batch');
+    });
+
     test('should handle metafield operations', async () => {
       const mockData = { metafields: [{ id: 'meta_123', key: 'custom_field' }] };
       mockClient.getMetafields.mockResolvedValue(mockData);
@@ -1409,6 +1900,42 @@ describe('All Tools Comprehensive Test Suite', () => {
         isError: true
       });
     });
+
+    test('should handle client errors gracefully', async () => {
+      const error = new Error('Test error');
+      mockClient.getCustomers.mockRejectedValue(error);
+
+      const result = await handlers.handleGetCustomers({ limit: 10 });
+
+      expect(result).toEqual({
+        content: [{ type: 'text', text: 'Error: Test error' }],
+        isError: true
+      });
+    });
+
+    test('should handle network errors', async () => {
+      const error = new Error('Network error');
+      mockClient.getCustomers.mockRejectedValue(error);
+
+      const result = await handlers.handleGetCustomers({ limit: 10 });
+
+      expect(result).toEqual({
+        content: [{ type: 'text', text: 'Error: Network error' }],
+        isError: true
+      });
+    });
+
+    test('should handle API validation errors', async () => {
+      const error = new Error('Validation failed');
+      mockClient.createCustomer.mockRejectedValue(error);
+
+      const result = await handlers.handleCreateCustomer({ email: 'invalid' });
+
+      expect(result).toEqual({
+        content: [{ type: 'text', text: 'Error: Validation failed' }],
+        isError: true
+      });
+    });
   });
 
   describe('API Key Handling', () => {
@@ -1464,6 +1991,44 @@ describe('All Tools Comprehensive Test Suite', () => {
       expect(result.content[0]).toHaveProperty('type', 'text');
       expect(result.content[0].text).toMatch(/^Error:/);
       expect(result).toHaveProperty('isError', true);
+    });
+  });
+
+  describe('Response Formatting', () => {
+    test('should format successful responses correctly', () => {
+      const data = { customer: { id: '123', email: 'test@example.com' } };
+      const result = handlers.formatResponse(data);
+
+      expect(result).toEqual({
+        content: [{ type: 'text', text: JSON.stringify(data, null, 2) }]
+      });
+    });
+
+    test('should format error responses with isError flag', () => {
+      const error = new Error('Test error');
+      const result = handlers.handleError(error);
+
+      expect(result).toEqual({
+        content: [{ type: 'text', text: 'Error: Test error' }],
+        isError: true
+      });
+    });
+
+    test('should handle complex nested data', () => {
+      const complexData = {
+        customer: {
+          id: '123',
+          subscriptions: [
+            { id: '456', status: 'active' },
+            { id: '789', status: 'paused' }
+          ]
+        }
+      };
+      const result = handlers.formatResponse(complexData);
+
+      expect(result.content[0].text).toContain('customer');
+      expect(result.content[0].text).toContain('subscriptions');
+      expect(result.content[0].text).toContain('active');
     });
   });
 });

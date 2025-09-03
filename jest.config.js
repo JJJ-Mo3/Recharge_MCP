@@ -1,14 +1,23 @@
 module.exports = {
   testEnvironment: 'node',
+  preset: null,
   extensionsToTreatAsEsm: ['.js'],
-  globals: {
-    'jest': {
-      useESM: true
-    }
-  },
   moduleNameMapping: {
     '^(\\.{1,2}/.*)\\.js$': '$1'
   },
+  transform: {
+    '^.+\\.js$': ['babel-jest', { 
+      presets: [
+        ['@babel/preset-env', { 
+          targets: { node: 'current' },
+          modules: false
+        }]
+      ]
+    }]
+  },
+  transformIgnorePatterns: [
+    'node_modules/(?!(.*\\.mjs$))'
+  ],
   collectCoverageFrom: [
     'src/**/*.js',
     'index.js',
@@ -25,26 +34,18 @@ module.exports = {
   setupFilesAfterEnv: ['<rootDir>/tests/setup.js'],
   testTimeout: 60000,
   verbose: true,
-  collectCoverage: false, // Enable with --coverage flag
+  collectCoverage: false,
   coverageThreshold: {
     global: {
-      branches: 75,
+      branches: 80,
       functions: 85,
-      lines: 85,
-      statements: 85
+      lines: 90,
+      statements: 90
     }
   },
-  moduleFileExtensions: ['js', 'json'],
-  transform: {
-    '^.+\\.js$': ['babel-jest', { 
-      presets: [['@babel/preset-env', { 
-        targets: { node: 'current' },
-        modules: false
-      }]] 
-    }]
-  },
-  transformIgnorePatterns: [
-    'node_modules/(?!(.*\\.mjs$))'
-  ],
-  testEnvironment: 'node'
+  moduleFileExtensions: ['js', 'json', 'mjs'],
+  maxWorkers: '50%',
+  clearMocks: true,
+  restoreMocks: true,
+  resetMocks: true
 };

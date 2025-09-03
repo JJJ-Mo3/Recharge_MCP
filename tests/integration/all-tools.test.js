@@ -1,8 +1,9 @@
 import { describe, test, expect, beforeEach, afterEach, jest } from '@jest/globals';
 import nock from 'nock';
 import { RechargeToolHandlers } from '../../src/tool-handlers.js';
+import * as allTools from '../../src/tools/index.js';
 
-describe('All Tools Integration Tests', () => {
+describe('Integration Tests - Complete Workflows', () => {
   let handlers;
   const baseUrl = 'https://api.rechargeapps.com';
   const apiKey = 'test_api_key_integration';
@@ -20,6 +21,403 @@ describe('All Tools Integration Tests', () => {
   afterEach(() => {
     nock.cleanAll();
     nock.restore();
+  });
+
+  describe('Tool Registration Validation', () => {
+    test('should have all required tool categories', () => {
+      const toolNames = Object.keys(allTools);
+      
+      // Customer tools (12)
+      expect(toolNames.filter(name => name.includes('Customer'))).toHaveLength(12);
+      
+      // Subscription tools (29)
+      expect(toolNames.filter(name => name.includes('Subscription'))).toHaveLength(29);
+      
+      // Charge tools (15)
+      expect(toolNames.filter(name => name.includes('Charge'))).toHaveLength(15);
+      
+      // Address tools (8)
+      expect(toolNames.filter(name => name.includes('Address'))).toHaveLength(8);
+      
+      // Discount tools (12)
+      expect(toolNames.filter(name => name.includes('Discount'))).toHaveLength(12);
+      
+      // Product tools (2)
+      expect(toolNames.filter(name => name.includes('Product'))).toHaveLength(2);
+      
+      // Order tools (7)
+      expect(toolNames.filter(name => name.includes('Order'))).toHaveLength(7);
+    });
+
+    test('should have all advanced tool categories', () => {
+      const toolNames = Object.keys(allTools);
+      
+      // Metafield tools (5)
+      expect(toolNames.filter(name => name.includes('Metafield'))).toHaveLength(5);
+      
+      // Webhook tools (5)
+      expect(toolNames.filter(name => name.includes('Webhook'))).toHaveLength(5);
+      
+      // Payment method tools (3)
+      expect(toolNames.filter(name => name.includes('PaymentMethod'))).toHaveLength(3);
+      
+      // Checkout tools (5)
+      expect(toolNames.filter(name => name.includes('Checkout'))).toHaveLength(5);
+      
+      // One-time product tools (5)
+      expect(toolNames.filter(name => name.includes('Onetime'))).toHaveLength(5);
+      
+      // Store credit tools (4)
+      expect(toolNames.filter(name => name.includes('StoreCredit'))).toHaveLength(4);
+      
+      // Shop tools (2)
+      expect(toolNames.filter(name => name.includes('Shop'))).toHaveLength(2);
+      
+      // Collection tools (5)
+      expect(toolNames.filter(name => name.includes('Collection'))).toHaveLength(5);
+      
+      // Analytics tools (2)
+      expect(toolNames.filter(name => name.includes('Analytics'))).toHaveLength(2);
+      
+      // Plan tools (10)
+      expect(toolNames.filter(name => name.includes('Plan'))).toHaveLength(10);
+      
+      // Shipping rate tools (5)
+      expect(toolNames.filter(name => name.includes('ShippingRate'))).toHaveLength(5);
+      
+      // Tax line tools (2)
+      expect(toolNames.filter(name => name.includes('TaxLine'))).toHaveLength(2);
+      
+      // Bulk operation tools (3)
+      expect(toolNames.filter(name => name.includes('Bulk'))).toHaveLength(3);
+    });
+  });
+
+  describe('Complete Customer Onboarding Workflow', () => {
+    test('should handle full customer lifecycle', async () => {
+      // Step 1: Create customer
+      const customerData = { email: 'integration@test.com', first_name: 'Integration', last_name: 'Test' };
+      const createdCustomer = { customer: { id: '12345', ...customerData } };
+      
+      nock(baseUrl)
+        .post('/customers', customerData)
+        .reply(201, createdCustomer);
+
+      const createResult = await handlers.handleCreateCustomer(customerData);
+      expect(JSON.parse(createResult.content[0].text)).toHaveProperty('customer');
+
+      // Step 2: Create address for customer
+      const addressData = {
+        customer_id: '12345',
+        first_name: 'Integration',
+        last_name: 'Test',
+        address1: '123 Main St',
+        city: 'New York',
+        province: 'NY',
+        country_code: 'US',
+        zip: '10001'
+      };
+      const createdAddress = { address: { id: '67890', ...addressData } };
+      
+      nock(baseUrl)
+        .post('/addresses', addressData)
+        .reply(201, createdAddress);
+
+      const addressResult = await handlers.handleCreateAddress(addressData);
+      expect(JSON.parse(addressResult.content[0].text)).toHaveProperty('address');
+
+      // Step 3: Create subscription
+      const subscriptionData = {
+        address_id: '67890',
+        next_charge_scheduled_at: '2024-02-01T00:00:00Z',
+        order_interval_frequency: '1',
+        order_interval_unit: 'month',
+        quantity: 2,
+        shopify_variant_id: '345678'
+      };
+      const createdSubscription = { subscription: { id: '11111', customer_id: '12345', ...subscriptionData } };
+      
+      nock(baseUrl)
+        .post('/subscriptions', subscriptionData)
+        .reply(201, createdSubscription);
+
+      const subscriptionResult = await handlers.handleCreateSubscription(subscriptionData);
+      expect(JSON.parse(subscriptionResult.content[0].text)).toHaveProperty('subscription');
+    });
+  });
+
+  describe('Advanced Feature Workflows', () => {
+    test('should handle metafield management workflow', async () => {
+      // Create metafield
+      nock(baseUrl)
+        .post('/metafields')
+        .reply(201, { 
+          metafield: { 
+            id: '123', 
+            namespace: 'custom', 
+            key: 'notes',
+            value: 'VIP customer',
+            owner_resource: 'customer',
+            owner_id: '456'
+          } 
+        });
+
+      const createResult = await handlers.handleCreateMetafield({
+        namespace: 'custom',
+        key: 'notes',
+        value: 'VIP customer',
+        value_type: 'string',
+        owner_resource: 'customer',
+        owner_id: '456'
+      });
+
+      expect(createResult.content[0].text).toContain('metafield');
+
+      // Update metafield
+      nock(baseUrl)
+        .put('/metafields/123')
+        .reply(200, { 
+          metafield: { 
+            id: '123', 
+            value: 'Premium VIP customer' 
+          } 
+        });
+
+      const updateResult = await handlers.handleUpdateMetafield({
+        metafield_id: '123',
+        value: 'Premium VIP customer'
+      });
+
+      expect(updateResult.content[0].text).toContain('Premium VIP customer');
+    });
+
+    test('should handle webhook management workflow', async () => {
+      // Create webhook
+      nock(baseUrl)
+        .post('/webhooks')
+        .reply(201, { 
+          webhook: { 
+            id: '789', 
+            address: 'https://example.com/webhook',
+            topic: 'subscription/created'
+          } 
+        });
+
+      const createResult = await handlers.handleCreateWebhook({
+        address: 'https://example.com/webhook',
+        topic: 'subscription/created'
+      });
+
+      expect(createResult.content[0].text).toContain('webhook');
+
+      // Update webhook
+      nock(baseUrl)
+        .put('/webhooks/789')
+        .reply(200, { 
+          webhook: { 
+            id: '789', 
+            address: 'https://newdomain.com/webhook'
+          } 
+        });
+
+      const updateResult = await handlers.handleUpdateWebhook({
+        webhook_id: '789',
+        address: 'https://newdomain.com/webhook'
+      });
+
+      expect(updateResult.content[0].text).toContain('newdomain.com');
+    });
+
+    test('should handle checkout workflow', async () => {
+      // Create checkout
+      nock(baseUrl)
+        .post('/checkouts')
+        .reply(201, { 
+          checkout: { 
+            token: 'abc123',
+            line_items: [{ variant_id: '456', quantity: 1 }]
+          } 
+        });
+
+      const createResult = await handlers.handleCreateCheckout({
+        line_items: [{ variant_id: '456', quantity: 1 }]
+      });
+
+      expect(createResult.content[0].text).toContain('checkout');
+
+      // Process checkout
+      nock(baseUrl)
+        .post('/checkouts/abc123/process')
+        .reply(200, { 
+          checkout: { 
+            token: 'abc123', 
+            status: 'processed'
+          } 
+        });
+
+      const processResult = await handlers.handleProcessCheckout({
+        checkout_token: 'abc123'
+      });
+
+      expect(processResult.content[0].text).toContain('processed');
+    });
+
+    test('should handle analytics workflow', async () => {
+      // Get subscription analytics
+      nock(baseUrl)
+        .get('/analytics/subscriptions')
+        .query({ start_date: '2024-01-01', end_date: '2024-01-31' })
+        .reply(200, { 
+          analytics: { 
+            total_subscriptions: 150,
+            active_subscriptions: 120,
+            revenue: '15000.00'
+          } 
+        });
+
+      const subscriptionAnalytics = await handlers.handleGetSubscriptionAnalytics({
+        start_date: '2024-01-01',
+        end_date: '2024-01-31'
+      });
+
+      expect(subscriptionAnalytics.content[0].text).toContain('analytics');
+      expect(subscriptionAnalytics.content[0].text).toContain('15000.00');
+
+      // Get customer analytics
+      nock(baseUrl)
+        .get('/analytics/customers')
+        .query({ start_date: '2024-01-01', end_date: '2024-01-31' })
+        .reply(200, { 
+          analytics: { 
+            total_customers: 75,
+            new_customers: 25,
+            churn_rate: '5.2'
+          } 
+        });
+
+      const customerAnalytics = await handlers.handleGetCustomerAnalytics({
+        start_date: '2024-01-01',
+        end_date: '2024-01-31'
+      });
+
+      expect(customerAnalytics.content[0].text).toContain('analytics');
+      expect(customerAnalytics.content[0].text).toContain('churn_rate');
+    });
+
+    test('should handle bulk operations workflow', async () => {
+      // Bulk update subscriptions
+      nock(baseUrl)
+        .post('/async_batches')
+        .reply(201, { 
+          async_batch: { 
+            id: '999', 
+            status: 'processing',
+            batch_type: 'subscriptions_bulk_update'
+          } 
+        });
+
+      const bulkUpdateResult = await handlers.handleBulkUpdateSubscriptions({
+        subscriptions: [
+          { id: '123', quantity: 2 },
+          { id: '456', quantity: 3 }
+        ]
+      });
+
+      expect(bulkUpdateResult.content[0].text).toContain('async_batch');
+      expect(bulkUpdateResult.content[0].text).toContain('processing');
+
+      // Bulk skip charges
+      nock(baseUrl)
+        .post('/async_batches')
+        .reply(201, { 
+          async_batch: { 
+            id: '888', 
+            status: 'processing',
+            batch_type: 'charges_bulk_skip'
+          } 
+        });
+
+      const bulkSkipResult = await handlers.handleBulkSkipCharges({
+        charge_ids: ['789', '101112']
+      });
+
+      expect(bulkSkipResult.content[0].text).toContain('async_batch');
+      expect(bulkSkipResult.content[0].text).toContain('charges_bulk_skip');
+    });
+  });
+
+  describe('Error Handling Scenarios', () => {
+    test('should handle 404 errors gracefully', async () => {
+      nock(baseUrl)
+        .get('/customers/nonexistent')
+        .reply(404, { errors: ['Customer not found'] });
+
+      const result = await handlers.handleGetCustomer({ customer_id: 'nonexistent' });
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain('Customer not found');
+    });
+
+    test('should handle 422 validation errors', async () => {
+      nock(baseUrl)
+        .post('/customers')
+        .reply(422, { errors: ['Email is required', 'Email format is invalid'] });
+
+      const result = await handlers.handleCreateCustomer({ first_name: 'John' });
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain('Email is required');
+    });
+
+    test('should handle 429 rate limit errors', async () => {
+      nock(baseUrl)
+        .get('/customers/123')
+        .reply(429, { error: 'Rate limit exceeded' });
+
+      const result = await handlers.handleGetCustomer({ customer_id: '123' });
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain('Rate limit exceeded');
+    });
+
+    test('should handle network timeout errors', async () => {
+      nock(baseUrl)
+        .get('/customers/123')
+        .delay(6000) // Longer than timeout
+        .reply(200, {});
+
+      const result = await handlers.handleGetCustomer({ customer_id: '123' });
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain('timeout');
+    });
+
+    test('should handle malformed JSON responses', async () => {
+      nock(baseUrl)
+        .get('/customers/123')
+        .reply(200, 'invalid json response');
+
+      const result = await handlers.handleGetCustomer({ customer_id: '123' });
+
+      expect(result.isError).toBe(true);
+    });
+
+    test('should handle server errors with retry logic', async () => {
+      // First request fails with 500
+      nock(baseUrl)
+        .get('/customers/123')
+        .reply(500, 'Internal Server Error');
+
+      // Second request succeeds
+      nock(baseUrl)
+        .get('/customers/123')
+        .reply(200, { customer: { id: '123', email: 'test@example.com' } });
+
+      const result = await handlers.handleGetCustomer({ customer_id: '123' });
+
+      expect(result.isError).toBeFalsy();
+      expect(result.content[0].text).toContain('test@example.com');
+    });
   });
 
   describe('Network and HTTP Error Handling', () => {
