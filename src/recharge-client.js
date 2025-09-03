@@ -979,7 +979,7 @@ export class RechargeClient {
 
   async resumeSubscription(subscriptionId) {
     return this.request(`/subscriptions/${subscriptionId}`, {
-      method: 'POST'
+      method: 'POST',
       body: JSON.stringify({ status: 'active' })
     });
   }
