@@ -10,12 +10,49 @@ describe('All Tools Integration Tests', () => {
   beforeEach(() => {
     handlers = new RechargeToolHandlers(apiKey);
     nock.cleanAll();
+    
+    // Ensure clean state
+    if (!nock.isActive()) {
+      nock.activate();
+    }
   });
 
   afterEach(() => {
     nock.cleanAll();
+    nock.restore();
   });
 
+  describe('Network and HTTP Error Handling', () => {
+    test('should handle network connection errors', async () => {
+      nock(baseUrl)
+        .get('/customers/123')
+        .replyWithError('ECONNREFUSED');
+
+      const result = await handlers.handleGetCustomer({ customer_id: '123' });
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain('Error:');
+    });
+
+    test('should handle DNS resolution errors', async () => {
+      nock(baseUrl)
+        .get('/customers/123')
+        .replyWithError('ENOTFOUND');
+
+      const result = await handlers.handleGetCustomer({ customer_id: '123' });
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain('Error:');
+    });
+
+    test('should handle malformed JSON responses', async () => {
+      nock(baseUrl)
+        .get('/customers/123')
+        .reply(200, 'invalid json{');
+
+      const result = await handlers.handleGetCustomer({ customer_id: '123' });
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain('Error:');
+    });
+  });
   describe('Customer Tools Integration', () => {
     test('should handle complete customer workflow in correct order', async () => {
       // Step 1: Create customer first
@@ -30,6 +67,7 @@ describe('All Tools Integration Tests', () => {
       const createResult = await handlers.handleCreateCustomer(customerData);
       expect(createResult.content[0].text).toContain('"customer"');
       expect(createResult.content[0].text).toContain('12345');
+      expect(createResult.isError).toBeUndefined();
 
       // Step 2: Retrieve customer to verify creation
       nock(baseUrl)
@@ -39,6 +77,7 @@ describe('All Tools Integration Tests', () => {
       const getResult = await handlers.handleGetCustomer({ customer_id: '12345' });
       expect(getResult.content[0].text).toContain('"customer"');
       expect(getResult.content[0].text).toContain('integration@test.com');
+      expect(getResult.isError).toBeUndefined();
 
       // Step 3: Update customer information
       const updateData = { first_name: 'Updated' };
@@ -51,6 +90,7 @@ describe('All Tools Integration Tests', () => {
       const updateResult = await handlers.handleUpdateCustomer({ customer_id: '12345', ...updateData });
       expect(updateResult.content[0].text).toContain('"customer"');
       expect(updateResult.content[0].text).toContain('Updated');
+      expect(updateResult.isError).toBeUndefined();
     });
 
     test('should handle customer → address → subscription → charge workflow', async () => {
@@ -712,9 +752,239 @@ describe('All Tools Integration Tests', () => {
       });
       
       expect(applyResult.content[0].text).toContain('"discount_application"');
+      expect(applyResult.isError).toBeUndefined();
     });
   });
 
+  describe('Comprehensive Tool Coverage Integration', () => {
+    test('should handle all payment method operations', async () => {
+      // Get payment methods
+      const paymentMethodsResponse = { payment_methods: [{ id: 'pm_123', customer_id: '123' }] };
+      nock(baseUrl)
+        .get('/payment_methods')
+        .query({ customer_id: '123' })
+        .reply(200, paymentMethodsResponse);
+
+      const getResult = await handlers.handleGetPaymentMethods({ customer_id: '123' });
+      expect(getResult.content[0].text).toContain('"payment_methods"');
+      expect(getResult.isError).toBeUndefined();
+
+      // Get single payment method
+      const paymentMethodResponse = { payment_method: { id: 'pm_123', customer_id: '123' } };
+      nock(baseUrl)
+        .get('/payment_methods/pm_123')
+        .reply(200, paymentMethodResponse);
+
+      const getSingleResult = await handlers.handleGetPaymentMethod({ payment_method_id: 'pm_123' });
+      expect(getSingleResult.content[0].text).toContain('"payment_method"');
+      expect(getSingleResult.isError).toBeUndefined();
+
+      // Update payment method
+      const updateData = { billing_address: { city: 'New York' } };
+      const updatedPaymentMethod = { payment_method: { id: 'pm_123', ...updateData } };
+      nock(baseUrl)
+        .put('/payment_methods/pm_123', updateData)
+        .reply(200, updatedPaymentMethod);
+
+      const updateResult = await handlers.handleUpdatePaymentMethod({ payment_method_id: 'pm_123', ...updateData });
+      expect(updateResult.content[0].text).toContain('"payment_method"');
+      expect(updateResult.isError).toBeUndefined();
+    });
+
+    test('should handle all plan operations', async () => {
+      // Get plans
+      const plansResponse = { plans: [{ id: 'plan_123', title: 'Basic Plan' }] };
+      nock(baseUrl)
+        .get('/plans')
+        .query({ limit: 25 })
+        .reply(200, plansResponse);
+
+      const getResult = await handlers.handleGetPlans({ limit: 25 });
+      expect(getResult.content[0].text).toContain('"plans"');
+      expect(getResult.isError).toBeUndefined();
+
+      // Create plan
+      const planData = { title: 'Premium Plan', description: 'Premium subscription plan' };
+      const createdPlan = { plan: { id: 'plan_456', ...planData } };
+      nock(baseUrl)
+        .post('/plans', planData)
+        .reply(201, createdPlan);
+
+      const createResult = await handlers.handleCreatePlan(planData);
+      expect(createResult.content[0].text).toContain('"plan"');
+      expect(createResult.content[0].text).toContain('plan_456');
+      expect(createResult.isError).toBeUndefined();
+
+      // Update plan
+      const updateData = { description: 'Updated description' };
+      const updatedPlan = { plan: { id: 'plan_456', ...updateData } };
+      nock(baseUrl)
+        .put('/plans/plan_456', updateData)
+        .reply(200, updatedPlan);
+
+      const updateResult = await handlers.handleUpdatePlan({ plan_id: 'plan_456', ...updateData });
+      expect(updateResult.content[0].text).toContain('"plan"');
+      expect(updateResult.isError).toBeUndefined();
+
+      // Delete plan
+      nock(baseUrl)
+        .delete('/plans/plan_456')
+        .reply(200, { success: true });
+
+      const deleteResult = await handlers.handleDeletePlan({ plan_id: 'plan_456' });
+      expect(deleteResult.content[0].text).toContain('"success"');
+      expect(deleteResult.isError).toBeUndefined();
+    });
+
+    test('should handle all shipping rate operations', async () => {
+      // Get shipping rates
+      const shippingRatesResponse = { shipping_rates: [{ id: 'rate_123', name: 'Standard' }] };
+      nock(baseUrl)
+        .get('/shipping_rates')
+        .query({ limit: 25 })
+        .reply(200, shippingRatesResponse);
+
+      const getResult = await handlers.handleGetShippingRates({ limit: 25 });
+      expect(getResult.content[0].text).toContain('"shipping_rates"');
+      expect(getResult.isError).toBeUndefined();
+
+      // Create shipping rate
+      const rateData = { name: 'Express', price: '9.99' };
+      const createdRate = { shipping_rate: { id: 'rate_456', ...rateData } };
+      nock(baseUrl)
+        .post('/shipping_rates', rateData)
+        .reply(201, createdRate);
+
+      const createResult = await handlers.handleCreateShippingRate(rateData);
+      expect(createResult.content[0].text).toContain('"shipping_rate"');
+      expect(createResult.isError).toBeUndefined();
+    });
+
+    test('should handle all tax line operations', async () => {
+      // Get tax lines
+      const taxLinesResponse = { tax_lines: [{ id: 'tax_123', rate: '0.08' }] };
+      nock(baseUrl)
+        .get('/tax_lines')
+        .query({ limit: 25 })
+        .reply(200, taxLinesResponse);
+
+      const getResult = await handlers.handleGetTaxLines({ limit: 25 });
+      expect(getResult.content[0].text).toContain('"tax_lines"');
+      expect(getResult.isError).toBeUndefined();
+
+      // Get single tax line
+      const taxLineResponse = { tax_line: { id: 'tax_123', rate: '0.08' } };
+      nock(baseUrl)
+        .get('/tax_lines/tax_123')
+        .reply(200, taxLineResponse);
+
+      const getSingleResult = await handlers.handleGetTaxLine({ tax_line_id: 'tax_123' });
+      expect(getSingleResult.content[0].text).toContain('"tax_line"');
+      expect(getSingleResult.isError).toBeUndefined();
+    });
+
+    test('should handle all bundle selection operations', async () => {
+      // Get bundle selections
+      const bundleSelectionsResponse = { bundle_selections: [{ id: 'bundle_123', subscription_id: 'sub_001' }] };
+      nock(baseUrl)
+        .get('/bundle_selections')
+        .query({ subscription_id: 'sub_001' })
+        .reply(200, bundleSelectionsResponse);
+
+      const getResult = await handlers.handleGetBundleSelections({ subscription_id: 'sub_001' });
+      expect(getResult.content[0].text).toContain('"bundle_selections"');
+      expect(getResult.isError).toBeUndefined();
+
+      // Create bundle selection
+      const bundleData = {
+        subscription_id: 'sub_001',
+        external_product_id: 'prod_123',
+        external_variant_id: 'var_123',
+        quantity: 2
+      };
+      const createdBundle = { bundle_selection: { id: 'bundle_456', ...bundleData } };
+      nock(baseUrl)
+        .post('/bundle_selections', bundleData)
+        .reply(201, createdBundle);
+
+      const createResult = await handlers.handleCreateBundleSelection(bundleData);
+      expect(createResult.content[0].text).toContain('"bundle_selection"');
+      expect(createResult.isError).toBeUndefined();
+    });
+
+    test('should handle all retention strategy operations', async () => {
+      // Get retention strategies
+      const retentionStrategiesResponse = { retention_strategies: [{ id: 'retention_123', name: 'Win-back' }] };
+      nock(baseUrl)
+        .get('/retention_strategies')
+        .query({ limit: 25 })
+        .reply(200, retentionStrategiesResponse);
+
+      const getResult = await handlers.handleGetRetentionStrategies({ limit: 25 });
+      expect(getResult.content[0].text).toContain('"retention_strategies"');
+      expect(getResult.isError).toBeUndefined();
+
+      // Get single retention strategy
+      const retentionStrategyResponse = { retention_strategy: { id: 'retention_123', name: 'Win-back' } };
+      nock(baseUrl)
+        .get('/retention_strategies/retention_123')
+        .reply(200, retentionStrategyResponse);
+
+      const getSingleResult = await handlers.handleGetRetentionStrategy({ retention_strategy_id: 'retention_123' });
+      expect(getSingleResult.content[0].text).toContain('"retention_strategy"');
+      expect(getSingleResult.isError).toBeUndefined();
+    });
+
+    test('should handle all async batch operations', async () => {
+      // Get async batches
+      const asyncBatchesResponse = { async_batches: [{ id: 'batch_123', status: 'completed' }] };
+      nock(baseUrl)
+        .get('/async_batches')
+        .query({ limit: 25 })
+        .reply(200, asyncBatchesResponse);
+
+      const getResult = await handlers.handleGetAsyncBatches({ limit: 25 });
+      expect(getResult.content[0].text).toContain('"async_batches"');
+      expect(getResult.isError).toBeUndefined();
+
+      // Create async batch
+      const batchData = {
+        batch_type: 'subscriptions_bulk_update',
+        requests: [{ id: 'sub_001', quantity: 2 }]
+      };
+      const createdBatch = { async_batch: { id: 'batch_456', ...batchData } };
+      nock(baseUrl)
+        .post('/async_batches', batchData)
+        .reply(201, createdBatch);
+
+      const createResult = await handlers.handleCreateAsyncBatch(batchData);
+      expect(createResult.content[0].text).toContain('"async_batch"');
+      expect(createResult.isError).toBeUndefined();
+    });
+
+    test('should handle all notification operations', async () => {
+      // Get notifications
+      const notificationsResponse = { notifications: [{ id: 'notif_123', customer_id: 'cust_001' }] };
+      nock(baseUrl)
+        .get('/notifications')
+        .query({ customer_id: 'cust_001' })
+        .reply(200, notificationsResponse);
+
+      const getResult = await handlers.handleGetNotifications({ customer_id: 'cust_001' });
+      expect(getResult.content[0].text).toContain('"notifications"');
+      expect(getResult.isError).toBeUndefined();
+
+      // Get single notification
+      const notificationResponse = { notification: { id: 'notif_123', customer_id: 'cust_001' } };
+      nock(baseUrl)
+        .get('/notifications/notif_123')
+        .reply(200, notificationResponse);
+
+      const getSingleResult = await handlers.handleGetNotification({ notification_id: 'notif_123' });
+      expect(getSingleResult.content[0].text).toContain('"notification"');
+      expect(getSingleResult.isError).toBeUndefined();
+    });
+  });
   describe('Missing Tool Categories Integration', () => {
     test('should handle metafield workflow', async () => {
       // Create metafield for customer
@@ -735,6 +1005,7 @@ describe('All Tools Integration Tests', () => {
       const createResult = await handlers.handleCreateMetafield(metafieldData);
       expect(createResult.content[0].text).toContain('"metafield"');
       expect(createResult.content[0].text).toContain('meta_001');
+      expect(createResult.isError).toBeUndefined();
 
       // Get metafields for customer
       const metafieldsResponse = { metafields: [{ id: 'meta_001', owner_id: 'cust_001' }] };
@@ -748,6 +1019,7 @@ describe('All Tools Integration Tests', () => {
         owner_id: 'cust_001' 
       });
       expect(getResult.content[0].text).toContain('"metafields"');
+      expect(getResult.isError).toBeUndefined();
     });
 
     test('should handle webhook workflow', async () => {
@@ -1026,6 +1298,40 @@ describe('All Tools Integration Tests', () => {
       const result = await handlers.handleGetCustomer({ customer_id: '123' });
       expect(result.isError).toBe(true);
       expect(result.content[0].text).toContain('timeout');
+    });
+
+    test('should handle 500 server errors with retry', async () => {
+      nock(baseUrl)
+        .get('/customers/123')
+        .reply(500, 'Internal Server Error')
+        .get('/customers/123')
+        .reply(200, { customer: { id: '123', email: 'test@example.com' } });
+
+      const result = await handlers.handleGetCustomer({ customer_id: '123' });
+      expect(result.isError).toBeFalsy();
+      expect(result.content[0].text).toContain('"customer"');
+    });
+
+    test('should handle 503 service unavailable with retry', async () => {
+      nock(baseUrl)
+        .get('/customers/123')
+        .reply(503, 'Service Unavailable')
+        .get('/customers/123')
+        .reply(200, { customer: { id: '123', email: 'test@example.com' } });
+
+      const result = await handlers.handleGetCustomer({ customer_id: '123' });
+      expect(result.isError).toBeFalsy();
+      expect(result.content[0].text).toContain('"customer"');
+    });
+
+    test('should handle empty response bodies', async () => {
+      nock(baseUrl)
+        .get('/customers/123')
+        .reply(200, '');
+
+      const result = await handlers.handleGetCustomer({ customer_id: '123' });
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain('Error:');
     });
   });
 });

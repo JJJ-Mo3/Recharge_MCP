@@ -1,9 +1,8 @@
 module.exports = {
   testEnvironment: 'node',
-  preset: 'es-modules',
   extensionsToTreatAsEsm: ['.js'],
   globals: {
-    'ts-jest': {
+    'jest': {
       useESM: true
     }
   },
@@ -37,13 +36,15 @@ module.exports = {
   },
   moduleFileExtensions: ['js', 'json'],
   transform: {
-    '^.+\\.js$': ['babel-jest', { presets: [['@babel/preset-env', { targets: { node: 'current' } }]] }]
+    '^.+\\.js$': ['babel-jest', { 
+      presets: [['@babel/preset-env', { 
+        targets: { node: 'current' },
+        modules: false
+      }]] 
+    }]
   },
-  testEnvironmentOptions: {
-    node: {
-      experimental: {
-        modules: true
-      }
-    }
-  }
+  transformIgnorePatterns: [
+    'node_modules/(?!(.*\\.mjs$))'
+  ],
+  testEnvironment: 'node'
 };

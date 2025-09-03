@@ -1,6 +1,7 @@
 import { describe, test, expect, beforeEach, afterEach, jest } from '@jest/globals';
 import { RechargeToolHandlers } from '../../src/tool-handlers.js';
 import { RechargeClient } from '../../src/recharge-client.js';
+import * as tools from '../../src/tools/index.js';
 
 // Mock the RechargeClient
 jest.mock('../../src/recharge-client.js');
@@ -220,6 +221,65 @@ describe('All Tools Comprehensive Test Suite', () => {
     jest.clearAllMocks();
   });
 
+  describe('Tool Schema Validation', () => {
+    test('should have all required tool schemas exported', () => {
+      const expectedTools = [
+        // Customer tools
+        'getCustomersSchema', 'getCustomerSchema', 'createCustomerSchema', 'updateCustomerSchema',
+        'getCustomerAddressesSchema', 'getCustomerSubscriptionsSchema', 'getCustomerOrdersSchema',
+        'getCustomerChargesSchema', 'getCustomerPaymentSourcesSchema', 'createCustomerPaymentSourceSchema',
+        'updateCustomerPaymentSourceSchema', 'deleteCustomerPaymentSourceSchema',
+        
+        // Subscription tools
+        'getSubscriptionsSchema', 'createSubscriptionSchema', 'getSubscriptionSchema', 'updateSubscriptionSchema',
+        'cancelSubscriptionSchema', 'activateSubscriptionSchema', 'skipSubscriptionChargeSchema',
+        'unskipSubscriptionChargeSchema', 'swapSubscriptionSchema', 'setNextChargeDateSchema',
+        'getSubscriptionChargesSchema', 'createSubscriptionChargeSchema', 'getSubscriptionLineItemsSchema',
+        'createSubscriptionLineItemSchema', 'updateSubscriptionLineItemSchema', 'deleteSubscriptionLineItemSchema',
+        'getSubscriptionNotesSchema', 'createSubscriptionNoteSchema', 'updateSubscriptionNoteSchema',
+        'deleteSubscriptionNoteSchema', 'getSubscriptionDeliveryScheduleSchema', 'updateSubscriptionDeliveryScheduleSchema',
+        'pauseSubscriptionSchema', 'resumeSubscriptionSchema', 'getSubscriptionDiscountsSchema',
+        'applySubscriptionDiscountSchema', 'removeSubscriptionDiscountSchema',
+        
+        // Product tools
+        'getProductsSchema', 'getProductSchema',
+        
+        // Order tools
+        'getOrdersSchema', 'getOrderSchema', 'updateOrderSchema', 'deleteOrderSchema', 'cloneOrderSchema',
+        'getOrderLineItemsSchema', 'getOrderDiscountsSchema',
+        
+        // Charge tools
+        'getChargesSchema', 'getChargeSchema', 'createChargeSchema', 'updateChargeSchema', 'deleteChargeSchema',
+        'skipChargeSchema', 'processChargeSchema', 'unskipChargeSchema', 'delayChargeSchema', 'refundChargeSchema',
+        'getChargeLineItemsSchema', 'updateChargeLineItemSchema', 'getChargeAttemptsSchema',
+        'getChargeDiscountsSchema', 'applyChargeDiscountSchema', 'removeChargeDiscountSchema',
+        
+        // Address tools
+        'getAddressesSchema', 'getAddressSchema', 'updateAddressSchema', 'createAddressSchema',
+        'deleteAddressSchema', 'validateAddressSchema', 'getAddressSubscriptionsSchema', 'getAddressChargesSchema',
+        
+        // Discount tools
+        'getDiscountsSchema', 'getDiscountSchema', 'updateDiscountSchema', 'deleteDiscountSchema',
+        'createDiscountSchema', 'getSubscriptionDiscountsSchema', 'applySubscriptionDiscountSchema',
+        'removeSubscriptionDiscountSchema', 'getOrderDiscountsSchema', 'getChargeDiscountsSchema',
+        'applyChargeDiscountSchema', 'removeChargeDiscountSchema',
+        
+        // And many more...
+      ];
+      
+      expectedTools.forEach(toolName => {
+        expect(tools[toolName]).toBeDefined();
+        expect(tools[toolName]).toHaveProperty('name');
+        expect(tools[toolName]).toHaveProperty('description');
+        expect(tools[toolName]).toHaveProperty('inputSchema');
+      });
+    });
+
+    test('should have correct tool count', () => {
+      const toolSchemas = Object.keys(tools).filter(key => key.endsWith('Schema'));
+      expect(toolSchemas.length).toBeGreaterThanOrEqual(130);
+    });
+  });
   describe('Customer Tools', () => {
     test('should handle customer retrieval with proper parameters', async () => {
       const mockData = { customers: [{ id: '123', email: 'test@example.com' }] };
@@ -229,6 +289,8 @@ describe('All Tools Comprehensive Test Suite', () => {
 
       expect(mockClient.getCustomers).toHaveBeenCalledWith({ limit: 10, email: 'test@example.com' });
       expect(result.content[0].text).toContain('"customers"');
+      expect(result.content[0].text).toContain('123');
+      expect(result.isError).toBeUndefined();
     });
 
     test('should handle single customer retrieval with valid ID', async () => {
@@ -239,6 +301,8 @@ describe('All Tools Comprehensive Test Suite', () => {
 
       expect(mockClient.getCustomer).toHaveBeenCalledWith('123');
       expect(result.content[0].text).toContain('"customer"');
+      expect(result.content[0].text).toContain('integration@test.com');
+      expect(result.isError).toBeUndefined();
     });
 
     test('should create customer with required fields first', async () => {
@@ -250,6 +314,8 @@ describe('All Tools Comprehensive Test Suite', () => {
 
       expect(mockClient.createCustomer).toHaveBeenCalledWith(customerData);
       expect(result.content[0].text).toContain('"customer"');
+      expect(result.content[0].text).toContain('456');
+      expect(result.isError).toBeUndefined();
     });
 
     test('should update customer only after creation', async () => {
@@ -350,6 +416,7 @@ describe('All Tools Comprehensive Test Suite', () => {
 
       expect(mockClient.deleteCustomerPaymentSource).toHaveBeenCalledWith('123', '303');
       expect(result.content[0].text).toContain('"success"');
+      expect(result.isError).toBeUndefined();
     });
   });
 
@@ -362,6 +429,8 @@ describe('All Tools Comprehensive Test Suite', () => {
 
       expect(mockClient.getSubscriptions).toHaveBeenCalledWith({ customer_id: '123', status: 'active' });
       expect(result.content[0].text).toContain('"subscriptions"');
+      expect(result.content[0].text).toContain('456');
+      expect(result.isError).toBeUndefined();
     });
 
     test('should create subscription only with valid address', async () => {
@@ -675,9 +744,115 @@ describe('All Tools Comprehensive Test Suite', () => {
 
       expect(mockClient.removeSubscriptionDiscount).toHaveBeenCalledWith('456', 'discount_123');
       expect(result.content[0].text).toContain('"success"');
+      expect(result.isError).toBeUndefined();
     });
   });
 
+  describe('Missing Tool Categories', () => {
+    test('should handle all metafield operations', async () => {
+      // Get metafields
+      const metafieldsData = { metafields: [{ id: 'meta_123', key: 'custom_field' }] };
+      mockClient.getMetafields.mockResolvedValue(metafieldsData);
+
+      const getResult = await handlers.handleGetMetafields({ owner_resource: 'customer', owner_id: '123' });
+      expect(mockClient.getMetafields).toHaveBeenCalledWith({ owner_resource: 'customer', owner_id: '123' });
+      expect(getResult.content[0].text).toContain('"metafields"');
+
+      // Get single metafield
+      const metafieldData = { metafield: { id: 'meta_123', key: 'custom_field' } };
+      mockClient.getMetafield.mockResolvedValue(metafieldData);
+
+      const getSingleResult = await handlers.handleGetMetafield({ metafield_id: 'meta_123' });
+      expect(mockClient.getMetafield).toHaveBeenCalledWith('meta_123');
+      expect(getSingleResult.content[0].text).toContain('"metafield"');
+
+      // Create metafield
+      const createData = { namespace: 'custom', key: 'test', value: 'value', value_type: 'string', owner_resource: 'customer', owner_id: '123' };
+      const createdData = { metafield: { id: 'meta_456', ...createData } };
+      mockClient.createMetafield.mockResolvedValue(createdData);
+
+      const createResult = await handlers.handleCreateMetafield(createData);
+      expect(mockClient.createMetafield).toHaveBeenCalledWith(createData);
+      expect(createResult.content[0].text).toContain('"metafield"');
+
+      // Update metafield
+      const updateData = { value: 'new_value' };
+      const updatedData = { metafield: { id: 'meta_123', ...updateData } };
+      mockClient.updateMetafield.mockResolvedValue(updatedData);
+
+      const updateResult = await handlers.handleUpdateMetafield({ metafield_id: 'meta_123', ...updateData });
+      expect(mockClient.updateMetafield).toHaveBeenCalledWith('meta_123', updateData);
+      expect(updateResult.content[0].text).toContain('"metafield"');
+
+      // Delete metafield
+      mockClient.deleteMetafield.mockResolvedValue({ success: true });
+
+      const deleteResult = await handlers.handleDeleteMetafield({ metafield_id: 'meta_123' });
+      expect(mockClient.deleteMetafield).toHaveBeenCalledWith('meta_123');
+      expect(deleteResult.content[0].text).toContain('"success"');
+    });
+
+    test('should handle all webhook operations', async () => {
+      // Get webhooks
+      const webhooksData = { webhooks: [{ id: 'hook_123', topic: 'subscription/created' }] };
+      mockClient.getWebhooks.mockResolvedValue(webhooksData);
+
+      const getResult = await handlers.handleGetWebhooks({ limit: 25 });
+      expect(mockClient.getWebhooks).toHaveBeenCalledWith({ limit: 25 });
+      expect(getResult.content[0].text).toContain('"webhooks"');
+
+      // Create webhook
+      const createData = { address: 'https://example.com/webhook', topic: 'subscription/created' };
+      const createdData = { webhook: { id: 'hook_456', ...createData } };
+      mockClient.createWebhook.mockResolvedValue(createdData);
+
+      const createResult = await handlers.handleCreateWebhook(createData);
+      expect(mockClient.createWebhook).toHaveBeenCalledWith(createData);
+      expect(createResult.content[0].text).toContain('"webhook"');
+    });
+
+    test('should handle all advanced tool categories', async () => {
+      // One-time products
+      const onetimeData = { onetimes: [{ id: 'onetime_123' }] };
+      mockClient.getOnetimes.mockResolvedValue(onetimeData);
+
+      const onetimeResult = await handlers.handleGetOnetimes({ limit: 25 });
+      expect(mockClient.getOnetimes).toHaveBeenCalledWith({ limit: 25 });
+      expect(onetimeResult.content[0].text).toContain('"onetimes"');
+
+      // Store credits
+      const creditData = { store_credits: [{ id: 'credit_123' }] };
+      mockClient.getStoreCredits.mockResolvedValue(creditData);
+
+      const creditResult = await handlers.handleGetStoreCredits({ customer_id: '123' });
+      expect(mockClient.getStoreCredits).toHaveBeenCalledWith({ customer_id: '123' });
+      expect(creditResult.content[0].text).toContain('"store_credits"');
+
+      // Shop
+      const shopData = { shop: { id: 'shop_123', name: 'Test Shop' } };
+      mockClient.getShop.mockResolvedValue(shopData);
+
+      const shopResult = await handlers.handleGetShop({});
+      expect(mockClient.getShop).toHaveBeenCalledWith();
+      expect(shopResult.content[0].text).toContain('"shop"');
+
+      // Collections
+      const collectionData = { collections: [{ id: 'coll_123' }] };
+      mockClient.getCollections.mockResolvedValue(collectionData);
+
+      const collectionResult = await handlers.handleGetCollections({ limit: 25 });
+      expect(mockClient.getCollections).toHaveBeenCalledWith({ limit: 25 });
+      expect(collectionResult.content[0].text).toContain('"collections"');
+
+      // Analytics
+      const analyticsData = { analytics: { total_subscriptions: 100 } };
+      mockClient.getSubscriptionAnalytics.mockResolvedValue(analyticsData);
+
+      const analyticsResult = await handlers.handleGetSubscriptionAnalytics({ start_date: '2024-01-01' });
+      expect(mockClient.getSubscriptionAnalytics).toHaveBeenCalledWith({ start_date: '2024-01-01' });
+      expect(analyticsResult.content[0].text).toContain('"analytics"');
+    });
+  });
   describe('Product Tools', () => {
     test('handleGetProducts should work correctly', async () => {
       const mockData = { products: [{ id: '789', title: 'Test Product' }] };
@@ -687,6 +862,7 @@ describe('All Tools Comprehensive Test Suite', () => {
 
       expect(mockClient.getProducts).toHaveBeenCalledWith({ limit: 25, title: 'Test' });
       expect(result.content[0].text).toContain('"products"');
+      expect(result.isError).toBeUndefined();
     });
 
     test('handleGetProduct should work correctly', async () => {
@@ -697,6 +873,7 @@ describe('All Tools Comprehensive Test Suite', () => {
 
       expect(mockClient.getProduct).toHaveBeenCalledWith('789');
       expect(result.content[0].text).toContain('"product"');
+      expect(result.isError).toBeUndefined();
     });
   });
 
@@ -1208,6 +1385,30 @@ describe('All Tools Comprehensive Test Suite', () => {
         isError: true
       });
     });
+
+    test('should handle timeout errors gracefully', async () => {
+      const error = new Error('Request timeout after 30000ms');
+      mockClient.getCustomers.mockRejectedValue(error);
+
+      const result = await handlers.handleGetCustomers({ limit: 10 });
+
+      expect(result).toEqual({
+        content: [{ type: 'text', text: 'Error: Request timeout after 30000ms' }],
+        isError: true
+      });
+    });
+
+    test('should handle rate limit errors gracefully', async () => {
+      const error = new Error('Recharge API error 429: Rate limit exceeded');
+      mockClient.getCustomers.mockRejectedValue(error);
+
+      const result = await handlers.handleGetCustomers({ limit: 10 });
+
+      expect(result).toEqual({
+        content: [{ type: 'text', text: 'Error: Recharge API error 429: Rate limit exceeded' }],
+        isError: true
+      });
+    });
   });
 
   describe('API Key Handling', () => {
@@ -1224,6 +1425,45 @@ describe('All Tools Comprehensive Test Suite', () => {
     test('should create client with correct API key', () => {
       handlers.createClient({ api_key: 'custom_key' });
       expect(RechargeClient).toHaveBeenCalledWith('custom_key');
+    });
+
+    test('should handle missing API key gracefully', () => {
+      const handlersWithoutKey = new RechargeToolHandlers(null);
+      const apiKey = handlersWithoutKey.getApiKey({});
+      expect(apiKey).toBeNull();
+    });
+  });
+
+  describe('Response Format Validation', () => {
+    test('should format successful responses correctly', async () => {
+      const mockData = { customers: [{ id: '123' }] };
+      mockClient.getCustomers.mockResolvedValue(mockData);
+
+      const result = await handlers.handleGetCustomers({ limit: 10 });
+
+      expect(result).toHaveProperty('content');
+      expect(Array.isArray(result.content)).toBe(true);
+      expect(result.content.length).toBe(1);
+      expect(result.content[0]).toHaveProperty('type', 'text');
+      expect(result.content[0]).toHaveProperty('text');
+      expect(result.isError).toBeUndefined();
+      
+      // Validate JSON format
+      expect(() => JSON.parse(result.content[0].text)).not.toThrow();
+    });
+
+    test('should format error responses correctly', async () => {
+      const error = new Error('Test error');
+      mockClient.getCustomers.mockRejectedValue(error);
+
+      const result = await handlers.handleGetCustomers({ limit: 10 });
+
+      expect(result).toHaveProperty('content');
+      expect(Array.isArray(result.content)).toBe(true);
+      expect(result.content.length).toBe(1);
+      expect(result.content[0]).toHaveProperty('type', 'text');
+      expect(result.content[0].text).toMatch(/^Error:/);
+      expect(result).toHaveProperty('isError', true);
     });
   });
 });
