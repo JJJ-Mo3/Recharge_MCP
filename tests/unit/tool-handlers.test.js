@@ -1,5 +1,5 @@
-const { RechargeToolHandlers } = require('../../src/tool-handlers.js');
-const { RechargeClient } = require('../../src/recharge-client.js');
+import { RechargeToolHandlers } from '../../src/tool-handlers.js';
+import { RechargeClient } from '../../src/recharge-client.js';
 
 // Mock the RechargeClient
 jest.mock('../../src/recharge-client.js');

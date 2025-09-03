@@ -7,15 +7,18 @@
   "scripts": {
     "start": "node index.js",
     "dev": "node --watch index.js",
-    "test": "npm run test:unit && npm run test:integration",
+    "test": "jest",
     "test:unit": "jest --testPathPattern=tests/unit",
     "test:integration": "jest --testPathPattern=tests/integration",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
+    "test:ci": "jest --ci --coverage --watchAll=false",
     "validate": "node -c index.js && node -c src/recharge-client.js && node -c src/tool-handlers.js && node -c src/tools/index.js",
-    "lint": "echo \"No linting configured - consider adding ESLint for production use\"", 
+    "lint": "echo \"✅ Linting placeholder - consider adding ESLint for production use\"", 
     "check": "npm run validate && echo \"✅ All validations passed\"",
-    "audit": "npm audit --audit-level=moderate"
+    "audit": "npm audit --audit-level=moderate",
+    "test:tools": "jest --testPathPattern=tests/unit/all-tools.test.js",
+    "test:integration:full": "jest --testPathPattern=tests/integration/all-tools.test.js"
   },
   "keywords": [
     "mcp", 
@@ -47,7 +50,10 @@
   "devDependencies": {
     "jest": "^29.7.0",
     "nock": "^13.4.0",
-    "@types/jest": "^29.5.8"
+    "@types/jest": "^29.5.8",
+    "@babel/core": "^7.23.0",
+    "@babel/preset-env": "^7.23.0",
+    "babel-jest": "^29.7.0"
   },
   "engines": {
     "node": ">=18.0.0",

@@ -22,9 +22,9 @@ describe('All Tools Comprehensive Test Suite', () => {
       getCustomerOrders: jest.fn(),
       getCustomerCharges: jest.fn(),
       getCustomerPaymentSources: jest.fn(),
-      createPaymentMethod: jest.fn(),
-      updatePaymentMethod: jest.fn(),
-      deletePaymentMethod: jest.fn(),
+      createCustomerPaymentSource: jest.fn(),
+      updateCustomerPaymentSource: jest.fn(),
+      deleteCustomerPaymentSource: jest.fn(),
 
       // Subscription methods
       getSubscriptions: jest.fn(),
@@ -52,8 +52,8 @@ describe('All Tools Comprehensive Test Suite', () => {
       pauseSubscription: jest.fn(),
       resumeSubscription: jest.fn(),
       getSubscriptionDiscounts: jest.fn(),
-      applyDiscount: jest.fn(),
-      removeDiscount: jest.fn(),
+      applySubscriptionDiscount: jest.fn(),
+      removeSubscriptionDiscount: jest.fn(),
 
       // Product methods
       getProducts: jest.fn(),
@@ -83,6 +83,8 @@ describe('All Tools Comprehensive Test Suite', () => {
       updateChargeLineItem: jest.fn(),
       getChargeAttempts: jest.fn(),
       getChargeDiscounts: jest.fn(),
+      applyChargeDiscount: jest.fn(),
+      removeChargeDiscount: jest.fn(),
 
       // Address methods
       getAddresses: jest.fn(),
@@ -118,6 +120,7 @@ describe('All Tools Comprehensive Test Suite', () => {
       // Payment method methods
       getPaymentMethods: jest.fn(),
       getPaymentMethod: jest.fn(),
+      updatePaymentMethod: jest.fn(),
 
       // Checkout methods
       getCheckouts: jest.fn(),
@@ -313,18 +316,18 @@ describe('All Tools Comprehensive Test Suite', () => {
     test('should create payment source only for existing customer', async () => {
       const paymentData = { payment_token: 'tok_123', payment_type: 'credit_card' };
       const mockData = { payment_method: { id: '303', ...paymentData } };
-      mockClient.createPaymentMethod.mockResolvedValue(mockData);
+      mockClient.createCustomerPaymentSource.mockResolvedValue(mockData);
 
       const result = await handlers.handleCreateCustomerPaymentSource({ customer_id: '123', ...paymentData });
 
-      expect(mockClient.createPaymentMethod).toHaveBeenCalledWith('123', paymentData);
+      expect(mockClient.createCustomerPaymentSource).toHaveBeenCalledWith('123', paymentData);
       expect(result.content[0].text).toContain('"payment_method"');
     });
 
     test('should update payment source only after creation', async () => {
       const updateData = { billing_address: { city: 'New York' } };
       const mockData = { payment_method: { id: '303', ...updateData } };
-      mockClient.updatePaymentMethod.mockResolvedValue(mockData);
+      mockClient.updateCustomerPaymentSource.mockResolvedValue(mockData);
 
       const result = await handlers.handleUpdateCustomerPaymentSource({ 
         customer_id: '123', 
@@ -332,20 +335,20 @@ describe('All Tools Comprehensive Test Suite', () => {
         ...updateData 
       });
 
-      expect(mockClient.updatePaymentMethod).toHaveBeenCalledWith('123', '303', updateData);
+      expect(mockClient.updateCustomerPaymentSource).toHaveBeenCalledWith('123', '303', updateData);
       expect(result.content[0].text).toContain('"payment_method"');
     });
 
     test('should delete payment source only if not in use', async () => {
       const mockData = { success: true };
-      mockClient.deletePaymentMethod.mockResolvedValue(mockData);
+      mockClient.deleteCustomerPaymentSource.mockResolvedValue(mockData);
 
       const result = await handlers.handleDeleteCustomerPaymentSource({ 
         customer_id: '123', 
         payment_source_id: '303' 
       });
 
-      expect(mockClient.deletePaymentMethod).toHaveBeenCalledWith('123', '303');
+      expect(mockClient.deleteCustomerPaymentSource).toHaveBeenCalledWith('123', '303');
       expect(result.content[0].text).toContain('"success"');
     });
   });
@@ -650,27 +653,27 @@ describe('All Tools Comprehensive Test Suite', () => {
 
     test('should apply discount to existing subscription', async () => {
       const mockData = { discount_application: { id: '606', discount_id: 'discount_123' } };
-      mockClient.applyDiscount.mockResolvedValue(mockData);
+      mockClient.applySubscriptionDiscount.mockResolvedValue(mockData);
 
       const result = await handlers.handleApplySubscriptionDiscount({ 
         subscription_id: '456', 
         discount_id: 'discount_123' 
       });
 
-      expect(mockClient.applyDiscount).toHaveBeenCalledWith('456', { discount_id: 'discount_123' });
+      expect(mockClient.applySubscriptionDiscount).toHaveBeenCalledWith('456', { discount_id: 'discount_123' });
       expect(result.content[0].text).toContain('"discount_application"');
     });
 
     test('should remove discount only after application', async () => {
       const mockData = { success: true };
-      mockClient.removeDiscount.mockResolvedValue(mockData);
+      mockClient.removeSubscriptionDiscount.mockResolvedValue(mockData);
 
       const result = await handlers.handleRemoveSubscriptionDiscount({ 
         subscription_id: '456', 
         discount_id: 'discount_123' 
       });
 
-      expect(mockClient.removeDiscount).toHaveBeenCalledWith('456', 'discount_123');
+      expect(mockClient.removeSubscriptionDiscount).toHaveBeenCalledWith('456', 'discount_123');
       expect(result.content[0].text).toContain('"success"');
     });
   });
@@ -927,28 +930,245 @@ describe('All Tools Comprehensive Test Suite', () => {
 
     test('handleApplyChargeDiscount should work correctly', async () => {
       const mockData = { discount_application: { id: '707', discount_id: 'discount_123' } };
-      mockClient.applyDiscount.mockResolvedValue(mockData);
+      mockClient.applyChargeDiscount.mockResolvedValue(mockData);
 
       const result = await handlers.handleApplyChargeDiscount({ 
         charge_id: '303', 
         discount_id: 'discount_123' 
       });
 
-      expect(mockClient.applyDiscount).toHaveBeenCalledWith('303', { discount_id: 'discount_123' });
+      expect(mockClient.applyChargeDiscount).toHaveBeenCalledWith('303', { discount_id: 'discount_123' });
       expect(result.content[0].text).toContain('"discount_application"');
     });
 
     test('handleRemoveChargeDiscount should work correctly', async () => {
       const mockData = { success: true };
-      mockClient.removeDiscount.mockResolvedValue(mockData);
+      mockClient.removeChargeDiscount.mockResolvedValue(mockData);
 
       const result = await handlers.handleRemoveChargeDiscount({ 
         charge_id: '303', 
         discount_id: 'discount_123' 
       });
 
-      expect(mockClient.removeDiscount).toHaveBeenCalledWith('303', 'discount_123');
+      expect(mockClient.removeChargeDiscount).toHaveBeenCalledWith('303', 'discount_123');
       expect(result.content[0].text).toContain('"success"');
+    });
+  });
+
+  describe('Address Tools', () => {
+    test('should get addresses with proper filtering', async () => {
+      const mockData = { addresses: [{ id: '789', customer_id: '123' }] };
+      mockClient.getAddresses.mockResolvedValue(mockData);
+
+      const result = await handlers.handleGetAddresses({ customer_id: '123', limit: 25 });
+
+      expect(mockClient.getAddresses).toHaveBeenCalledWith({ customer_id: '123', limit: 25 });
+      expect(result.content[0].text).toContain('"addresses"');
+    });
+
+    test('should get single address by ID', async () => {
+      const mockData = { address: { id: '789', customer_id: '123' } };
+      mockClient.getAddress.mockResolvedValue(mockData);
+
+      const result = await handlers.handleGetAddress({ address_id: '789' });
+
+      expect(mockClient.getAddress).toHaveBeenCalledWith('789');
+      expect(result.content[0].text).toContain('"address"');
+    });
+
+    test('should create address for existing customer', async () => {
+      const addressData = {
+        customer_id: '123',
+        first_name: 'John',
+        last_name: 'Doe',
+        address1: '123 Main St',
+        city: 'New York',
+        province: 'NY',
+        country_code: 'US',
+        zip: '10001'
+      };
+      const mockData = { address: { id: '789', ...addressData } };
+      mockClient.createAddress.mockResolvedValue(mockData);
+
+      const result = await handlers.handleCreateAddress(addressData);
+
+      expect(mockClient.createAddress).toHaveBeenCalledWith(addressData);
+      expect(result.content[0].text).toContain('"address"');
+    });
+
+    test('should update address after creation', async () => {
+      const updateData = { address1: '456 Oak Ave' };
+      const mockData = { address: { id: '789', address1: '456 Oak Ave' } };
+      mockClient.updateAddress.mockResolvedValue(mockData);
+
+      const result = await handlers.handleUpdateAddress({ address_id: '789', ...updateData });
+
+      expect(mockClient.updateAddress).toHaveBeenCalledWith('789', updateData);
+      expect(result.content[0].text).toContain('"address"');
+    });
+
+    test('should delete address if no active subscriptions', async () => {
+      const mockData = { success: true };
+      mockClient.deleteAddress.mockResolvedValue(mockData);
+
+      const result = await handlers.handleDeleteAddress({ address_id: '789' });
+
+      expect(mockClient.deleteAddress).toHaveBeenCalledWith('789');
+      expect(result.content[0].text).toContain('"success"');
+    });
+
+    test('should validate address data', async () => {
+      const addressData = {
+        address1: '123 Main St',
+        city: 'New York',
+        province: 'NY',
+        country_code: 'US',
+        zip: '10001'
+      };
+      const mockData = { address: { ...addressData, valid: true } };
+      mockClient.validateAddress.mockResolvedValue(mockData);
+
+      const result = await handlers.handleValidateAddress(addressData);
+
+      expect(mockClient.validateAddress).toHaveBeenCalledWith(addressData);
+      expect(result.content[0].text).toContain('"address"');
+    });
+
+    test('should get subscriptions for address', async () => {
+      const mockData = { subscriptions: [{ id: '456', address_id: '789' }] };
+      mockClient.getAddressSubscriptions.mockResolvedValue(mockData);
+
+      const result = await handlers.handleGetAddressSubscriptions({ address_id: '789', status: 'active' });
+
+      expect(mockClient.getAddressSubscriptions).toHaveBeenCalledWith('789', { status: 'active' });
+      expect(result.content[0].text).toContain('"subscriptions"');
+    });
+
+    test('should get charges for address', async () => {
+      const mockData = { charges: [{ id: '303', address_id: '789' }] };
+      mockClient.getAddressCharges.mockResolvedValue(mockData);
+
+      const result = await handlers.handleGetAddressCharges({ address_id: '789', status: 'success' });
+
+      expect(mockClient.getAddressCharges).toHaveBeenCalledWith('789', { status: 'success' });
+      expect(result.content[0].text).toContain('"charges"');
+    });
+  });
+
+  describe('Discount Tools', () => {
+    test('should get discounts with filtering', async () => {
+      const mockData = { discounts: [{ id: 'disc_123', code: 'SAVE20' }] };
+      mockClient.getDiscounts.mockResolvedValue(mockData);
+
+      const result = await handlers.handleGetDiscounts({ status: 'enabled', limit: 25 });
+
+      expect(mockClient.getDiscounts).toHaveBeenCalledWith({ status: 'enabled', limit: 25 });
+      expect(result.content[0].text).toContain('"discounts"');
+    });
+
+    test('should get single discount by ID', async () => {
+      const mockData = { discount: { id: 'disc_123', code: 'SAVE20' } };
+      mockClient.getDiscount.mockResolvedValue(mockData);
+
+      const result = await handlers.handleGetDiscount({ discount_id: 'disc_123' });
+
+      expect(mockClient.getDiscount).toHaveBeenCalledWith('disc_123');
+      expect(result.content[0].text).toContain('"discount"');
+    });
+
+    test('should create discount with required fields', async () => {
+      const discountData = {
+        code: 'SAVE20',
+        value: 20,
+        value_type: 'percentage'
+      };
+      const mockData = { discount: { id: 'disc_123', ...discountData } };
+      mockClient.createDiscount.mockResolvedValue(mockData);
+
+      const result = await handlers.handleCreateDiscount(discountData);
+
+      expect(mockClient.createDiscount).toHaveBeenCalledWith(discountData);
+      expect(result.content[0].text).toContain('"discount"');
+    });
+
+    test('should update discount after creation', async () => {
+      const updateData = { status: 'disabled' };
+      const mockData = { discount: { id: 'disc_123', status: 'disabled' } };
+      mockClient.updateDiscount.mockResolvedValue(mockData);
+
+      const result = await handlers.handleUpdateDiscount({ discount_id: 'disc_123', ...updateData });
+
+      expect(mockClient.updateDiscount).toHaveBeenCalledWith('disc_123', updateData);
+      expect(result.content[0].text).toContain('"discount"');
+    });
+
+    test('should delete discount if not in use', async () => {
+      const mockData = { success: true };
+      mockClient.deleteDiscount.mockResolvedValue(mockData);
+
+      const result = await handlers.handleDeleteDiscount({ discount_id: 'disc_123' });
+
+      expect(mockClient.deleteDiscount).toHaveBeenCalledWith('disc_123');
+      expect(result.content[0].text).toContain('"success"');
+    });
+  });
+
+  describe('Advanced Tools', () => {
+    test('should handle metafield operations', async () => {
+      const mockData = { metafields: [{ id: 'meta_123', key: 'custom_field' }] };
+      mockClient.getMetafields.mockResolvedValue(mockData);
+
+      const result = await handlers.handleGetMetafields({ owner_resource: 'customer', owner_id: '123' });
+
+      expect(mockClient.getMetafields).toHaveBeenCalledWith({ owner_resource: 'customer', owner_id: '123' });
+      expect(result.content[0].text).toContain('"metafields"');
+    });
+
+    test('should handle webhook operations', async () => {
+      const mockData = { webhooks: [{ id: 'hook_123', topic: 'subscription/created' }] };
+      mockClient.getWebhooks.mockResolvedValue(mockData);
+
+      const result = await handlers.handleGetWebhooks({ limit: 25 });
+
+      expect(mockClient.getWebhooks).toHaveBeenCalledWith({ limit: 25 });
+      expect(result.content[0].text).toContain('"webhooks"');
+    });
+
+    test('should handle analytics operations', async () => {
+      const mockData = { analytics: { total_subscriptions: 100 } };
+      mockClient.getSubscriptionAnalytics.mockResolvedValue(mockData);
+
+      const result = await handlers.handleGetSubscriptionAnalytics({ 
+        start_date: '2024-01-01', 
+        end_date: '2024-01-31' 
+      });
+
+      expect(mockClient.getSubscriptionAnalytics).toHaveBeenCalledWith({ 
+        start_date: '2024-01-01', 
+        end_date: '2024-01-31' 
+      });
+      expect(result.content[0].text).toContain('"analytics"');
+    });
+
+    test('should handle bulk operations', async () => {
+      const subscriptionsData = {
+        subscriptions: [
+          { id: '456', quantity: 2 },
+          { id: '789', quantity: 3 }
+        ]
+      };
+      const mockData = { 
+        async_batch: { 
+          id: 'batch_123', 
+          status: 'processing' 
+        } 
+      };
+      mockClient.bulkUpdateSubscriptions.mockResolvedValue(mockData);
+
+      const result = await handlers.handleBulkUpdateSubscriptions(subscriptionsData);
+
+      expect(mockClient.bulkUpdateSubscriptions).toHaveBeenCalledWith(subscriptionsData);
+      expect(result.content[0].text).toContain('"async_batch"');
     });
   });
 

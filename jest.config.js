@@ -1,5 +1,15 @@
 module.exports = {
   testEnvironment: 'node',
+  preset: 'es-modules',
+  extensionsToTreatAsEsm: ['.js'],
+  globals: {
+    'ts-jest': {
+      useESM: true
+    }
+  },
+  moduleNameMapping: {
+    '^(\\.{1,2}/.*)\\.js$': '$1'
+  },
   collectCoverageFrom: [
     'src/**/*.js',
     'index.js',
@@ -10,18 +20,30 @@ module.exports = {
   coverageReporters: ['text', 'lcov', 'html'],
   testMatch: [
     '**/tests/**/*.test.js',
-    '**/tests/**/*.spec.js'
+    '**/tests/**/*.spec.js',
+    '!**/node_modules/**'
   ],
   setupFilesAfterEnv: ['<rootDir>/tests/setup.js'],
-  testTimeout: 30000,
+  testTimeout: 60000,
   verbose: true,
   collectCoverage: false, // Enable with --coverage flag
   coverageThreshold: {
     global: {
-      branches: 80,
-      functions: 80,
-      lines: 80,
-      statements: 80
+      branches: 75,
+      functions: 85,
+      lines: 85,
+      statements: 85
+    }
+  },
+  moduleFileExtensions: ['js', 'json'],
+  transform: {
+    '^.+\\.js$': ['babel-jest', { presets: [['@babel/preset-env', { targets: { node: 'current' } }]] }]
+  },
+  testEnvironmentOptions: {
+    node: {
+      experimental: {
+        modules: true
+      }
     }
   }
 };

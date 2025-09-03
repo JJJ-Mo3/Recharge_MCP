@@ -1,5 +1,5 @@
-const { RechargeServer } = require('../../index.js');
-const { Server } = require('@modelcontextprotocol/sdk/server/index.js');
+import { RechargeServer } from '../../index.js';
+import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 
 // Mock the MCP SDK
 jest.mock('@modelcontextprotocol/sdk/server/index.js');

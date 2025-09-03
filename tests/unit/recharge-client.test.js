@@ -1,5 +1,6 @@
 const nock = require('nock');
-const { RechargeClient } = require('../../src/recharge-client.js');
+import { RechargeClient } from '../../src/recharge-client.js';
+import nock from 'nock';
 
 describe('RechargeClient', () => {
   let client;

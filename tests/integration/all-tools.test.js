@@ -715,6 +715,273 @@ describe('All Tools Integration Tests', () => {
     });
   });
 
+  describe('Missing Tool Categories Integration', () => {
+    test('should handle metafield workflow', async () => {
+      // Create metafield for customer
+      const metafieldData = {
+        namespace: 'custom',
+        key: 'loyalty_tier',
+        value: 'gold',
+        value_type: 'string',
+        owner_resource: 'customer',
+        owner_id: 'cust_001'
+      };
+      const createdMetafield = { metafield: { id: 'meta_001', ...metafieldData } };
+      
+      nock(baseUrl)
+        .post('/metafields', metafieldData)
+        .reply(201, createdMetafield);
+
+      const createResult = await handlers.handleCreateMetafield(metafieldData);
+      expect(createResult.content[0].text).toContain('"metafield"');
+      expect(createResult.content[0].text).toContain('meta_001');
+
+      // Get metafields for customer
+      const metafieldsResponse = { metafields: [{ id: 'meta_001', owner_id: 'cust_001' }] };
+      nock(baseUrl)
+        .get('/metafields')
+        .query({ owner_resource: 'customer', owner_id: 'cust_001' })
+        .reply(200, metafieldsResponse);
+
+      const getResult = await handlers.handleGetMetafields({ 
+        owner_resource: 'customer', 
+        owner_id: 'cust_001' 
+      });
+      expect(getResult.content[0].text).toContain('"metafields"');
+    });
+
+    test('should handle webhook workflow', async () => {
+      // Create webhook
+      const webhookData = {
+        address: 'https://example.com/webhook',
+        topic: 'subscription/created'
+      };
+      const createdWebhook = { webhook: { id: 'hook_001', ...webhookData } };
+      
+      nock(baseUrl)
+        .post('/webhooks', webhookData)
+        .reply(201, createdWebhook);
+
+      const createResult = await handlers.handleCreateWebhook(webhookData);
+      expect(createResult.content[0].text).toContain('"webhook"');
+      expect(createResult.content[0].text).toContain('hook_001');
+
+      // Update webhook
+      const updateData = { topic: 'subscription/updated' };
+      const updatedWebhook = { webhook: { id: 'hook_001', ...updateData } };
+      
+      nock(baseUrl)
+        .put('/webhooks/hook_001', updateData)
+        .reply(200, updatedWebhook);
+
+      const updateResult = await handlers.handleUpdateWebhook({ webhook_id: 'hook_001', ...updateData });
+      expect(updateResult.content[0].text).toContain('"webhook"');
+    });
+
+    test('should handle checkout workflow', async () => {
+      // Create checkout
+      const checkoutData = {
+        line_items: [{ variant_id: 'var_001', quantity: 1 }],
+        email: 'checkout@test.com'
+      };
+      const createdCheckout = { checkout: { token: 'checkout_001', ...checkoutData } };
+      
+      nock(baseUrl)
+        .post('/checkouts', checkoutData)
+        .reply(201, createdCheckout);
+
+      const createResult = await handlers.handleCreateCheckout(checkoutData);
+      expect(createResult.content[0].text).toContain('"checkout"');
+      expect(createResult.content[0].text).toContain('checkout_001');
+
+      // Process checkout
+      const processedCheckout = { checkout: { token: 'checkout_001', status: 'processed' } };
+      
+      nock(baseUrl)
+        .post('/checkouts/checkout_001/process')
+        .reply(200, processedCheckout);
+
+      const processResult = await handlers.handleProcessCheckout({ checkout_token: 'checkout_001' });
+      expect(processResult.content[0].text).toContain('"checkout"');
+    });
+
+    test('should handle one-time product workflow', async () => {
+      // Create one-time product
+      const onetimeData = {
+        address_id: 'addr_001',
+        next_charge_scheduled_at: '2024-02-01T00:00:00Z',
+        product_title: 'One-time Product',
+        price: '19.99',
+        quantity: 1,
+        shopify_variant_id: 'var_onetime'
+      };
+      const createdOnetime = { onetime: { id: 'onetime_001', ...onetimeData } };
+      
+      nock(baseUrl)
+        .post('/onetimes', onetimeData)
+        .reply(201, createdOnetime);
+
+      const createResult = await handlers.handleCreateOnetime(onetimeData);
+      expect(createResult.content[0].text).toContain('"onetime"');
+      expect(createResult.content[0].text).toContain('onetime_001');
+
+      // Update one-time product
+      const updateData = { quantity: 2 };
+      const updatedOnetime = { onetime: { id: 'onetime_001', quantity: 2 } };
+      
+      nock(baseUrl)
+        .put('/onetimes/onetime_001', updateData)
+        .reply(200, updatedOnetime);
+
+      const updateResult = await handlers.handleUpdateOnetime({ onetime_id: 'onetime_001', ...updateData });
+      expect(updateResult.content[0].text).toContain('"onetime"');
+    });
+
+    test('should handle store credit workflow', async () => {
+      // Create store credit
+      const storeCreditData = {
+        amount: '50.00',
+        customer_id: 'cust_001',
+        note: 'Refund for defective product'
+      };
+      const createdStoreCredit = { store_credit: { id: 'credit_001', ...storeCreditData } };
+      
+      nock(baseUrl)
+        .post('/store_credits', storeCreditData)
+        .reply(201, createdStoreCredit);
+
+      const createResult = await handlers.handleCreateStoreCredit(storeCreditData);
+      expect(createResult.content[0].text).toContain('"store_credit"');
+      expect(createResult.content[0].text).toContain('credit_001');
+
+      // Get store credits for customer
+      const creditsResponse = { store_credits: [{ id: 'credit_001', customer_id: 'cust_001' }] };
+      nock(baseUrl)
+        .get('/store_credits')
+        .query({ customer_id: 'cust_001' })
+        .reply(200, creditsResponse);
+
+      const getResult = await handlers.handleGetStoreCredits({ customer_id: 'cust_001' });
+      expect(getResult.content[0].text).toContain('"store_credits"');
+    });
+
+    test('should handle shop configuration', async () => {
+      // Get shop info
+      const shopResponse = { shop: { id: 'shop_001', name: 'Test Shop' } };
+      
+      nock(baseUrl)
+        .get('/shop')
+        .reply(200, shopResponse);
+
+      const getResult = await handlers.handleGetShop({});
+      expect(getResult.content[0].text).toContain('"shop"');
+
+      // Update shop
+      const updateData = { name: 'Updated Shop Name' };
+      const updatedShop = { shop: { id: 'shop_001', name: 'Updated Shop Name' } };
+      
+      nock(baseUrl)
+        .put('/shop', updateData)
+        .reply(200, updatedShop);
+
+      const updateResult = await handlers.handleUpdateShop(updateData);
+      expect(updateResult.content[0].text).toContain('"shop"');
+    });
+
+    test('should handle collection management', async () => {
+      // Create collection
+      const collectionData = {
+        name: 'Premium Products',
+        description: 'High-end subscription products'
+      };
+      const createdCollection = { collection: { id: 'coll_001', ...collectionData } };
+      
+      nock(baseUrl)
+        .post('/collections', collectionData)
+        .reply(201, createdCollection);
+
+      const createResult = await handlers.handleCreateCollection(collectionData);
+      expect(createResult.content[0].text).toContain('"collection"');
+      expect(createResult.content[0].text).toContain('coll_001');
+
+      // Get collections
+      const collectionsResponse = { collections: [{ id: 'coll_001', name: 'Premium Products' }] };
+      nock(baseUrl)
+        .get('/collections')
+        .query({ limit: 25 })
+        .reply(200, collectionsResponse);
+
+      const getResult = await handlers.handleGetCollections({ limit: 25 });
+      expect(getResult.content[0].text).toContain('"collections"');
+    });
+
+    test('should handle analytics queries', async () => {
+      // Get subscription analytics
+      const subscriptionAnalytics = { 
+        analytics: { 
+          total_subscriptions: 150,
+          active_subscriptions: 120,
+          cancelled_subscriptions: 30
+        } 
+      };
+      
+      nock(baseUrl)
+        .get('/analytics/subscriptions')
+        .query({ start_date: '2024-01-01', end_date: '2024-01-31' })
+        .reply(200, subscriptionAnalytics);
+
+      const subscriptionResult = await handlers.handleGetSubscriptionAnalytics({ 
+        start_date: '2024-01-01', 
+        end_date: '2024-01-31' 
+      });
+      expect(subscriptionResult.content[0].text).toContain('"analytics"');
+      expect(subscriptionResult.content[0].text).toContain('150');
+
+      // Get customer analytics
+      const customerAnalytics = { 
+        analytics: { 
+          total_customers: 100,
+          new_customers: 25,
+          returning_customers: 75
+        } 
+      };
+      
+      nock(baseUrl)
+        .get('/analytics/customers')
+        .query({ start_date: '2024-01-01', end_date: '2024-01-31' })
+        .reply(200, customerAnalytics);
+
+      const customerResult = await handlers.handleGetCustomerAnalytics({ 
+        start_date: '2024-01-01', 
+        end_date: '2024-01-31' 
+      });
+      expect(customerResult.content[0].text).toContain('"analytics"');
+      expect(customerResult.content[0].text).toContain('100');
+    });
+
+    test('should handle customer portal sessions', async () => {
+      // Create customer portal session
+      const sessionData = {
+        customer_id: 'cust_001',
+        return_url: 'https://example.com/return'
+      };
+      const createdSession = { 
+        customer_portal_session: { 
+          id: 'session_001', 
+          url: 'https://portal.rechargeapps.com/session_001' 
+        } 
+      };
+      
+      nock(baseUrl)
+        .post('/customer_portal', sessionData)
+        .reply(201, createdSession);
+
+      const createResult = await handlers.handleCreateCustomerPortalSession(sessionData);
+      expect(createResult.content[0].text).toContain('"customer_portal_session"');
+      expect(createResult.content[0].text).toContain('session_001');
+    });
+  });
+
   describe('Error Handling Integration', () => {
     test('should handle 404 errors correctly', async () => {
       nock(baseUrl)
