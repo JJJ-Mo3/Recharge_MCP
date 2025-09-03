@@ -819,17 +819,17 @@ export class RechargeClient {
 
   async getCustomerSubscriptions(customerId, params = {}) {
     const searchParams = this.buildQueryParams(params);
-    return this.request(`/customers/${customerId}/subscriptions?${searchParams}`);
+    return this.request(`/subscriptions?customer_id=${customerId}&${searchParams}`);
   }
 
   async getCustomerOrders(customerId, params = {}) {
     const searchParams = this.buildQueryParams(params);
-    return this.request(`/customers/${customerId}/orders?${searchParams}`);
+    return this.request(`/orders?customer_id=${customerId}&${searchParams}`);
   }
 
   async getCustomerCharges(customerId, params = {}) {
     const searchParams = this.buildQueryParams(params);
-    return this.request(`/customers/${customerId}/charges?${searchParams}`);
+    return this.request(`/charges?customer_id=${customerId}&${searchParams}`);
   }
 
   // Nested resource methods - Subscription relationships
