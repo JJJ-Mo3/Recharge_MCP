@@ -1,6 +1,53 @@
 # Recharge MCP Server
 
-A comprehensive Model Context Protocol (MCP) server for the Recharge API v2021-11. This server provides **130+ production-ready tools** for managing subscriptions, customers, orders, charges, and more through AI assistants like Claude.
+A comprehensive Model Context Protocol (MCP) server for the Recharge API v2021-11. This production-ready server provides 130+ tools for managing subscriptions, customers, orders, charges, and all other Recharge operations with robust error handling, retry logic, and comprehensive test coverage.
+
+**Compatible with any local MCP client including:**
+- 🖥️ **Claude Desktop** - Direct integration for AI-powered subscription management
+- 📝 **Cursor** - AI code editor with Recharge API capabilities
+- 💻 **VSCode with GitHub Copilot** - Enhanced development workflow
+- 🔧 **Any MCP-compatible client** - Standard Model Context Protocol support
+
+## Table of Contents
+
+- [Features](#features)
+- [Installation](#installation)
+- [Configuration](#configuration)
+  - [Environment Variables](#environment-variables)
+  - [API Key Setup](#api-key-setup)
+- [Usage](#usage)
+  - [MCP Client Configuration](#mcp-client-configuration)
+  - [Claude Desktop Setup](#claude-desktop-setup)
+  - [Cursor Setup](#cursor-setup)
+  - [VSCode with Copilot Setup](#vscode-with-copilot-setup)
+- [Available Tools](#available-tools)
+  - [Customer Management](#customer-management)
+  - [Subscription Management](#subscription-management)
+  - [Charge Management](#charge-management)
+  - [Address Management](#address-management)
+  - [Product Management](#product-management)
+  - [Order Management](#order-management)
+  - [Discount Management](#discount-management)
+  - [Analytics & Reporting](#analytics--reporting)
+  - [Advanced Features](#advanced-features)
+- [Testing](#testing)
+  - [Running Tests](#running-tests)
+  - [Test Coverage](#test-coverage)
+  - [Business Flow Validation](#business-flow-validation)
+- [Development](#development)
+  - [Project Structure](#project-structure)
+  - [Adding New Tools](#adding-new-tools)
+  - [Contributing](#contributing)
+- [API Reference](#api-reference)
+  - [Tool Schemas](#tool-schemas)
+  - [Error Handling](#error-handling)
+  - [Rate Limiting](#rate-limiting)
+- [Troubleshooting](#troubleshooting)
+  - [Common Issues](#common-issues)
+  - [API Connectivity](#api-connectivity)
+  - [Performance Optimization](#performance-optimization)
+- [License](#license)
+- [Support](#support)
 
 ## Table of Contents
 
