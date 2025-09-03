@@ -73,12 +73,36 @@ export class RechargeClient {
           try {
             errorData = await response.json();
           } catch {
-            errorData = await response.text();
+            try {
+              errorData = await response.text();
+            } catch {
+              errorData = `HTTP ${response.status} ${response.statusText}`;
+            }
           }
           
-          const errorMessage = typeof errorData === 'object' && errorData.errors 
-            ? JSON.stringify(errorData.errors)
-            : errorData || `HTTP ${response.status}`;
+          let errorMessage;
+          if (typeof errorData === 'object' && errorData !== null) {
+            if (errorData.errors) {
+              // Handle Recharge API errors array
+              errorMessage = Array.isArray(errorData.errors) 
+                ? errorData.errors.join(', ')
+                : JSON.stringify(errorData.errors);
+            } else if (errorData.error) {
+              // Handle single error object
+              errorMessage = typeof errorData.error === 'string' 
+                ? errorData.error 
+                : JSON.stringify(errorData.error);
+            } else if (errorData.message) {
+              // Handle message field
+              errorMessage = errorData.message;
+            } else {
+              // Fallback for other object structures
+              errorMessage = JSON.stringify(errorData);
+            }
+          } else {
+            // Handle string or other primitive types
+            errorMessage = errorData || `HTTP ${response.status} ${response.statusText}`;
+          }
           
           // Don't retry on client errors (4xx)
           if (response.status >= 400 && response.status < 500) {
