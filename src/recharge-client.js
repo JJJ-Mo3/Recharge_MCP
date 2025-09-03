@@ -953,13 +953,13 @@ export class RechargeClient {
 
   // Subscription delivery schedules
   async getSubscriptionDeliverySchedule(subscriptionId) {
-    return this.request(`/delivery_schedules?subscription_id=${subscriptionId}`);
+    return this.request(`/subscriptions/${subscriptionId}/delivery_schedule`);
   }
 
   async updateSubscriptionDeliverySchedule(subscriptionId, scheduleData) {
-    return this.request('/delivery_schedules', {
-      method: 'PUT',
-      body: JSON.stringify({ ...scheduleData, subscription_id: subscriptionId })
+    return this.request(`/subscriptions/${subscriptionId}/delivery_schedule`, {
+      method: 'PUT', 
+      body: JSON.stringify(scheduleData)
     });
   }
 
@@ -971,16 +971,15 @@ export class RechargeClient {
 
   // Subscription pause/resume
   async pauseSubscription(subscriptionId, pauseData) {
-    return this.request(`/subscriptions/${subscriptionId}`, {
+    return this.request(`/subscriptions/${subscriptionId}/pause`, {
       method: 'POST',
-      body: JSON.stringify({ status: 'paused', ...pauseData })
+      body: JSON.stringify(pauseData)
     });
   }
 
   async resumeSubscription(subscriptionId) {
-    return this.request(`/subscriptions/${subscriptionId}`, {
-      method: 'PUT',
-      body: JSON.stringify({ status: 'active' })
+    return this.request(`/subscriptions/${subscriptionId}/resume`, {
+      method: 'POST'
     });
   }
   // Order discount methods
