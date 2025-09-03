@@ -1224,6 +1224,151 @@ Test your setup with:
 npm run validate
 ```
 
+## Testing
+
+The Recharge MCP Server includes a comprehensive test suite covering all 130+ tools and business workflows.
+
+### Test Suite Overview
+
+**Complete Coverage:**
+- ✅ **Unit Tests**: Every tool handler with mocked API responses
+- ✅ **Integration Tests**: End-to-end workflows with realistic business scenarios
+- ✅ **Error Handling**: All error conditions (404, 422, 429, timeouts, network failures)
+- ✅ **API Key Handling**: Client-provided vs default API key scenarios
+- ✅ **Business Workflows**: Complete customer onboarding, subscription lifecycle, charge processing
+- ✅ **Dependency Validation**: Proper order of operations for related resources
+
+### Running Tests
+
+**Basic Test Commands:**
+```bash
+# Run all tests
+npm test
+
+# Run with coverage report
+npm run test:coverage
+
+# Run in watch mode (for development)
+npm run test:watch
+```
+
+**Specific Test Suites:**
+```bash
+# Unit tests only (fast, mocked)
+npm run test:unit
+
+# Integration tests only (slower, realistic workflows)
+npm run test:integration
+
+# Test all tools comprehensively
+npm run test:tools
+
+# Full integration workflow tests
+npm run test:integration:full
+```
+
+**CI/CD Commands:**
+```bash
+# Run tests in CI mode (no watch, with coverage)
+npm run test:ci
+
+# Validate code syntax and structure
+npm run validate
+
+# Check for security vulnerabilities
+npm run audit
+```
+
+### Test Structure
+
+**Unit Tests (`tests/unit/`):**
+- **Tool Handlers**: Every tool handler with comprehensive parameter validation
+- **API Client**: HTTP client with retry logic, error handling, timeout management
+- **Response Formatting**: Proper MCP response structure validation
+- **Error Scenarios**: Network failures, API errors, validation failures
+
+**Integration Tests (`tests/integration/`):**
+- **Complete Workflows**: Customer → Address → Subscription → Charge flows
+- **Business Logic**: Realistic dependency chains and order of operations
+- **HTTP Mocking**: Real API simulation using nock for accurate testing
+- **Error Recovery**: Rate limiting, retry logic, timeout handling
+
+### Test Coverage Targets
+
+- **Branches**: 75% minimum
+- **Functions**: 85% minimum  
+- **Lines**: 85% minimum
+- **Statements**: 85% minimum
+
+### GitHub Actions Integration
+
+**Automated Testing:**
+- ✅ **Multi-Node.js versions**: Tests on Node.js 18.x, 20.x, 22.x
+- ✅ **Pull Request validation**: All PRs must pass full test suite
+- ✅ **Release testing**: Comprehensive validation before releases
+- ✅ **Security auditing**: Automated dependency vulnerability scanning
+- ✅ **Coverage reporting**: Integrated with Codecov for coverage tracking
+
+**Test Workflow Triggers:**
+- Push to `main` or `develop` branches
+- All pull requests
+- Release tags (`v*`)
+- Manual workflow dispatch
+
+### Writing New Tests
+
+**For New Tools:**
+```javascript
+test('should handle new tool correctly', async () => {
+  const mockData = { resource: { id: '123', name: 'test' } };
+  mockClient.newMethod.mockResolvedValue(mockData);
+
+  const result = await handlers.handleNewTool({ param: 'value' });
+
+  expect(mockClient.newMethod).toHaveBeenCalledWith('value');
+  expect(result.content[0].text).toContain('"resource"');
+});
+```
+
+**For Business Workflows:**
+```javascript
+test('should handle complete business workflow', async () => {
+  // Step 1: Prerequisites (customer, address)
+  // Step 2: Main action (create subscription)
+  // Step 3: Verification (check relationships)
+  // Step 4: Cleanup (if needed)
+});
+```
+
+### Test Utilities
+
+**Global Test Helpers:**
+```javascript
+// Available in all tests
+global.testUtils.createMockResponse(data)
+global.testUtils.createErrorResponse(message)
+global.testUtils.expectValidResponse(result)
+global.testUtils.expectErrorResponse(result)
+```
+
+### Debugging Tests
+
+**Verbose Output:**
+```bash
+npm test -- --verbose
+```
+
+**Debug Specific Test:**
+```bash
+npm test -- --testNamePattern="customer workflow"
+```
+
+**Coverage Report:**
+```bash
+npm run test:coverage
+# Open coverage/lcov-report/index.html in browser
+```
+
 ## API Coverage
 
 This MCP server provides **100% coverage** of the Recharge API v2021-11:
