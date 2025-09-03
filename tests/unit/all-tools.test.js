@@ -494,6 +494,8 @@ describe('All Tools Unit Tests', () => {
     const result = await handlers.handleDelayCharge({ 
       charge_id: '123', 
       date: futureDate 
+    }
+    )
     const result = await handlers.handleGetSubscriptionAnalytics({ 
       start_date: startDate,
       end_date: endDate 
