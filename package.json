@@ -54,8 +54,7 @@
     "@babel/core": "^7.23.0",
     "@babel/preset-env": "^7.23.0",
     "babel-jest": "^29.7.0",
-    "jest-environment-node": "^29.7.0",
-    "supertest": "^6.3.4"
+    "jest-environment-node": "^29.7.0"
   },
   "engines": {
     "node": ">=18.0.0",
