@@ -1,0 +1,764 @@
+import { describe, test, expect, beforeEach, afterEach, jest } from '@jest/globals';
+import nock from 'nock';
+import { RechargeToolHandlers } from '../../src/tool-handlers.js';
+
+describe('All Tools Integration Tests', () => {
+  let handlers;
+  const baseUrl = 'https://api.rechargeapps.com';
+  const apiKey = 'test_api_key_integration';
+
+  beforeEach(() => {
+    handlers = new RechargeToolHandlers(apiKey);
+    nock.cleanAll();
+  });
+
+  afterEach(() => {
+    nock.cleanAll();
+  });
+
+  describe('Customer Tools Integration', () => {
+    test('should handle complete customer workflow in correct order', async () => {
+      // Step 1: Create customer first
+      // Mock customer creation
+      const customerData = { email: 'integration@test.com', first_name: 'Integration', last_name: 'Test' };
+      const createdCustomer = { customer: { id: '12345', ...customerData } };
+      
+      nock(baseUrl)
+        .post('/customers', customerData)
+        .reply(201, createdCustomer);
+
+      const createResult = await handlers.handleCreateCustomer(customerData);
+      expect(createResult.content[0].text).toContain('"customer"');
+      expect(createResult.content[0].text).toContain('12345');
+
+      // Step 2: Retrieve customer to verify creation
+      nock(baseUrl)
+        .get('/customers/12345')
+        .reply(200, createdCustomer);
+
+      const getResult = await handlers.handleGetCustomer({ customer_id: '12345' });
+      expect(getResult.content[0].text).toContain('"customer"');
+      expect(getResult.content[0].text).toContain('integration@test.com');
+
+      // Step 3: Update customer information
+      const updateData = { first_name: 'Updated' };
+      const updatedCustomer = { customer: { id: '12345', ...customerData, ...updateData } };
+      
+      nock(baseUrl)
+        .put('/customers/12345', updateData)
+        .reply(200, updatedCustomer);
+
+      const updateResult = await handlers.handleUpdateCustomer({ customer_id: '12345', ...updateData });
+      expect(updateResult.content[0].text).toContain('"customer"');
+      expect(updateResult.content[0].text).toContain('Updated');
+    });
+
+    test('should handle customer → address → subscription → charge workflow', async () => {
+      const customerId = '12345';
+      
+      // Step 1: Customer must exist first (assume created in previous test)
+      // Step 2: Create address for customer
+      const addressData = {
+        customer_id: customerId,
+        first_name: 'John',
+        last_name: 'Doe',
+        address1: '123 Main St',
+        city: 'New York',
+        province: 'NY',
+        country_code: 'US',
+        zip: '10001'
+      };
+      const createdAddress = { address: { id: '67890', ...addressData } };
+      
+      nock(baseUrl)
+        .post('/addresses', addressData)
+        .reply(201, createdAddress);
+
+      const addressResult = await handlers.handleCreateAddress(addressData);
+      expect(addressResult.content[0].text).toContain('"address"');
+      expect(addressResult.content[0].text).toContain('67890');
+
+      // Step 3: Get customer addresses (should include the one we just created)
+      const addressesResponse = { addresses: [{ id: '67890', customer_id: customerId }] };
+      nock(baseUrl)
+        .get('/addresses')
+        .query({ customer_id: customerId })
+        .reply(200, addressesResponse);
+
+      const addressesResult = await handlers.handleGetCustomerAddresses({ customer_id: customerId });
+      expect(addressesResult.content[0].text).toContain('"addresses"');
+      expect(addressesResult.content[0].text).toContain('67890');
+
+      // Step 4: Create subscription using the address
+      const subscriptionData = {
+        address_id: '67890',
+        next_charge_scheduled_at: '2024-02-01T00:00:00Z',
+        order_interval_frequency: '1',
+        order_interval_unit: 'month',
+        quantity: 2,
+        shopify_variant_id: '345678'
+      };
+      const createdSubscription = { subscription: { id: '11111', customer_id: customerId, ...subscriptionData } };
+      
+      nock(baseUrl)
+        .post('/subscriptions', subscriptionData)
+        .reply(201, createdSubscription);
+
+      const subscriptionResult = await handlers.handleCreateSubscription(subscriptionData);
+      expect(subscriptionResult.content[0].text).toContain('"subscription"');
+      expect(subscriptionResult.content[0].text).toContain('11111');
+
+      // Step 5: Get customer subscriptions (should include the one we just created)
+      const subscriptionsResponse = { subscriptions: [{ id: '11111', customer_id: customerId }] };
+      nock(baseUrl)
+        .get('/subscriptions')
+        .query({ customer_id: customerId, status: 'active' })
+        .reply(200, subscriptionsResponse);
+
+      const subscriptionsResult = await handlers.handleGetCustomerSubscriptions({ 
+        customer_id: customerId, 
+        status: 'active' 
+      });
+      expect(subscriptionsResult.content[0].text).toContain('"subscriptions"');
+      expect(subscriptionsResult.content[0].text).toContain('11111');
+
+      // Step 6: Create charge for the subscription
+      const chargeData = {
+        address_id: '67890',
+        line_items: [{ variant_id: '345678', quantity: 2 }]
+      };
+      const createdCharge = { charge: { id: '33333', customer_id: customerId, subscription_id: '11111', ...chargeData } };
+      
+      nock(baseUrl)
+        .post('/charges', chargeData)
+        .reply(201, createdCharge);
+
+      const chargeResult = await handlers.handleCreateCharge(chargeData);
+      expect(chargeResult.content[0].text).toContain('"charge"');
+      expect(chargeResult.content[0].text).toContain('33333');
+
+      // Step 7: Get customer orders (generated from charges)
+      const ordersResponse = { orders: [{ id: '22222', customer_id: customerId }] };
+      nock(baseUrl)
+        .get('/orders')
+        .query({ customer_id: customerId })
+        .reply(200, ordersResponse);
+
+      const ordersResult = await handlers.handleGetCustomerOrders({ customer_id: customerId });
+      expect(ordersResult.content[0].text).toContain('"orders"');
+
+      // Step 8: Get customer charges (should include the one we created)
+      const chargesResponse = { charges: [{ id: '33333', customer_id: customerId }] };
+      nock(baseUrl)
+        .get('/charges')
+        .query({ customer_id: customerId })
+        .reply(200, chargesResponse);
+
+      const chargesResult = await handlers.handleGetCustomerCharges({ customer_id: customerId });
+      expect(chargesResult.content[0].text).toContain('"charges"');
+      expect(chargesResult.content[0].text).toContain('33333');
+    });
+  });
+
+  describe('Subscription Tools Integration', () => {
+    test('should handle subscription lifecycle in correct dependency order', async () => {
+      // Prerequisites: Customer (12345) and Address (67890) must exist
+      
+      // Step 1: Create subscription
+      const subscriptionData = {
+        address_id: '67890',
+        next_charge_scheduled_at: '2024-02-01T00:00:00Z',
+        order_interval_frequency: '1',
+        order_interval_unit: 'month',
+        quantity: 2,
+        shopify_variant_id: '345678'
+      };
+
+      const createdSubscription = { subscription: { id: '11111', ...subscriptionData } };
+      nock(baseUrl)
+        .post('/subscriptions', subscriptionData)
+        .reply(201, createdSubscription);
+
+      const createResult = await handlers.handleCreateSubscription(subscriptionData);
+      expect(createResult.content[0].text).toContain('"subscription"');
+      expect(createResult.content[0].text).toContain('11111');
+
+      // Step 2: Update subscription (only after creation)
+      const updateData = { quantity: 3 };
+      const updatedSubscription = { subscription: { id: '11111', ...subscriptionData, ...updateData } };
+      nock(baseUrl)
+        .put('/subscriptions/11111', updateData)
+        .reply(200, updatedSubscription);
+
+      const updateResult = await handlers.handleUpdateSubscription({ subscription_id: '11111', ...updateData });
+      expect(updateResult.content[0].text).toContain('"subscription"');
+      expect(updateResult.content[0].text).toContain('"quantity": 3');
+
+      // Step 3: Pause subscription (only active subscriptions can be paused)
+      const pauseData = { pause_reason: 'Customer vacation' };
+      const pausedSubscription = { subscription: { id: '11111', status: 'paused' } };
+      nock(baseUrl)
+        .post('/subscriptions/11111/pause', pauseData)
+        .reply(200, pausedSubscription);
+
+      const pauseResult = await handlers.handlePauseSubscription({ subscription_id: '11111', ...pauseData });
+      expect(pauseResult.content[0].text).toContain('"subscription"');
+      expect(pauseResult.content[0].text).toContain('paused');
+
+      // Step 4: Resume subscription (only paused subscriptions can be resumed)
+      const resumedSubscription = { subscription: { id: '11111', status: 'active' } };
+      nock(baseUrl)
+        .post('/subscriptions/11111/resume')
+        .reply(200, resumedSubscription);
+
+      const resumeResult = await handlers.handleResumeSubscription({ subscription_id: '11111' });
+      expect(resumeResult.content[0].text).toContain('"subscription"');
+      expect(resumeResult.content[0].text).toContain('active');
+
+      // Step 5: Cancel subscription (final action - cannot be undone)
+      const cancelledSubscription = { subscription: { id: '11111', status: 'cancelled' } };
+      nock(baseUrl)
+        .post('/subscriptions/11111/cancel', { cancellation_reason: 'Customer request' })
+        .reply(200, cancelledSubscription);
+
+      const cancelResult = await handlers.handleCancelSubscription({ 
+        subscription_id: '11111', 
+        cancellation_reason: 'Customer request' 
+      });
+      expect(cancelResult.content[0].text).toContain('"subscription"');
+      expect(cancelResult.content[0].text).toContain('cancelled');
+    });
+
+    test('should handle subscription line items in correct order', async () => {
+      const subscriptionId = '11111';
+      // Prerequisites: Subscription must exist and be active
+
+      // Step 1: Get existing line items (subscription starts with base line items)
+      const lineItemsResponse = { line_items: [{ id: '44444', subscription_id: subscriptionId }] };
+      nock(baseUrl)
+        .get('/line_items')
+        .query({ subscription_id: subscriptionId })
+        .reply(200, lineItemsResponse);
+
+      const getResult = await handlers.handleGetSubscriptionLineItems({ subscription_id: subscriptionId });
+      expect(getResult.content[0].text).toContain('"line_items"');
+
+      // Step 2: Add new line item to subscription
+      const lineItemData = { shopify_variant_id: '987654', quantity: 1 };
+      const createdLineItem = { line_item: { id: '55555', ...lineItemData } };
+      nock(baseUrl)
+        .post('/line_items', { ...lineItemData, subscription_id: subscriptionId })
+        .reply(201, createdLineItem);
+
+      const createResult = await handlers.handleCreateSubscriptionLineItem({ 
+        subscription_id: subscriptionId, 
+        ...lineItemData 
+      });
+      expect(createResult.content[0].text).toContain('"line_item"');
+      expect(createResult.content[0].text).toContain('55555');
+
+      // Step 3: Update line item (only after creation)
+      const updateData = { quantity: 2 };
+      const updatedLineItem = { line_item: { id: '55555', quantity: 2 } };
+      nock(baseUrl)
+        .put('/line_items/55555', updateData)
+        .reply(200, updatedLineItem);
+
+      const updateResult = await handlers.handleUpdateSubscriptionLineItem({ 
+        subscription_id: subscriptionId, 
+        line_item_id: '55555', 
+        ...updateData 
+      });
+      expect(updateResult.content[0].text).toContain('"line_item"');
+      expect(updateResult.content[0].text).toContain('"quantity": 2');
+
+      // Step 4: Delete line item (final action)
+      nock(baseUrl)
+        .delete('/line_items/55555')
+        .reply(200, { success: true });
+
+      const deleteResult = await handlers.handleDeleteSubscriptionLineItem({ 
+        subscription_id: subscriptionId, 
+        line_item_id: '55555' 
+      });
+      expect(deleteResult.content[0].text).toContain('"success": true');
+    });
+
+    test('should handle subscription notes in chronological order', async () => {
+      const subscriptionId = '11111';
+      // Prerequisites: Subscription must exist
+
+      // Step 1: Get existing notes (may be empty initially)
+      const notesResponse = { notes: [{ id: '66666', subscription_id: subscriptionId }] };
+      nock(baseUrl)
+        .get('/notes')
+        .query({ subscription_id: subscriptionId })
+        .reply(200, notesResponse);
+
+      const getResult = await handlers.handleGetSubscriptionNotes({ subscription_id: subscriptionId });
+      expect(getResult.content[0].text).toContain('"notes"');
+
+      // Step 2: Add first note
+      const noteData = { body: 'Customer prefers weekend delivery' };
+      const createdNote = { note: { id: '77777', ...noteData } };
+      nock(baseUrl)
+        .post('/notes', { ...noteData, subscription_id: subscriptionId })
+        .reply(201, createdNote);
+
+      const createResult = await handlers.handleCreateSubscriptionNote({ 
+        subscription_id: subscriptionId, 
+        ...noteData 
+      });
+      expect(createResult.content[0].text).toContain('"note"');
+      expect(createResult.content[0].text).toContain('77777');
+
+      // Step 3: Update note (only after creation)
+      const updateData = { body: 'Updated note content' };
+      const updatedNote = { note: { id: '77777', ...updateData } };
+      nock(baseUrl)
+        .put('/notes/77777', updateData)
+        .reply(200, updatedNote);
+
+      const updateResult = await handlers.handleUpdateSubscriptionNote({ 
+        subscription_id: subscriptionId, 
+        note_id: '77777', 
+        ...updateData 
+      });
+      expect(updateResult.content[0].text).toContain('"note"');
+      expect(updateResult.content[0].text).toContain('Updated note content');
+
+      // Step 4: Delete note (final action)
+      nock(baseUrl)
+        .delete('/notes/77777')
+        .reply(200, { success: true });
+
+      const deleteResult = await handlers.handleDeleteSubscriptionNote({ 
+        subscription_id: subscriptionId, 
+        note_id: '77777' 
+      });
+      expect(deleteResult.content[0].text).toContain('"success": true');
+    });
+  });
+
+  describe('Charge Tools Integration', () => {
+    test('should handle charge workflow in correct business order', async () => {
+      // Prerequisites: Customer, Address, and Subscription must exist
+      
+      // Step 1: Create charge (typically auto-generated, but can be manual)
+      const chargeData = {
+        address_id: '67890',
+        line_items: [{ variant_id: '345678', quantity: 2 }]
+      };
+
+      const createdCharge = { charge: { id: '88888', ...chargeData } };
+      nock(baseUrl)
+        .post('/charges', chargeData)
+        .reply(201, createdCharge);
+
+      const createResult = await handlers.handleCreateCharge(chargeData);
+      expect(createResult.content[0].text).toContain('"charge"');
+      expect(createResult.content[0].text).toContain('88888');
+
+      // Step 2: Skip charge (before processing - common customer service action)
+      const skippedCharge = { charge: { id: '88888', status: 'skipped' } };
+      nock(baseUrl)
+        .post('/charges/88888/skip')
+        .reply(200, skippedCharge);
+
+      const skipResult = await handlers.handleSkipCharge({ charge_id: '88888' });
+      expect(skipResult.content[0].text).toContain('"charge"');
+      expect(skipResult.content[0].text).toContain('skipped');
+
+      // Step 3: Unskip charge (customer changed mind)
+      const unskippedCharge = { charge: { id: '88888', status: 'queued' } };
+      nock(baseUrl)
+        .post('/charges/88888/unskip')
+        .reply(200, unskippedCharge);
+
+      const unskipResult = await handlers.handleUnskipCharge({ charge_id: '88888' });
+      expect(unskipResult.content[0].text).toContain('"charge"');
+      expect(unskipResult.content[0].text).toContain('queued');
+
+      // Step 4: Process charge (attempt payment)
+      const processedCharge = { charge: { id: '88888', status: 'success' } };
+      nock(baseUrl)
+        .post('/charges/88888/process')
+        .reply(200, processedCharge);
+
+      const processResult = await handlers.handleProcessCharge({ charge_id: '88888' });
+      expect(processResult.content[0].text).toContain('"charge"');
+      expect(processResult.content[0].text).toContain('success');
+
+      // Step 5: Refund charge (only after successful processing)
+      const refundData = { amount: '25.99', reason: 'Product defect' };
+      const refundResponse = { refund: { id: '99999', ...refundData } };
+      nock(baseUrl)
+        .post('/charges/88888/refund', refundData)
+        .reply(200, refundResponse);
+
+      const refundResult = await handlers.handleRefundCharge({ charge_id: '88888', ...refundData });
+      expect(refundResult.content[0].text).toContain('"refund"');
+      expect(refundResult.content[0].text).toContain('99999');
+    });
+
+    test('should handle charge attempts after processing attempts', async () => {
+      const chargeId = '88888';
+      // Prerequisites: Charge must exist and have processing attempts
+      
+      const attemptsResponse = { charge_attempts: [{ id: '10101', charge_id: chargeId }] };
+      
+      nock(baseUrl)
+        .get('/charge_attempts')
+        .query({ charge_id: chargeId })
+        .reply(200, attemptsResponse);
+
+      const result = await handlers.handleGetChargeAttempts({ charge_id: chargeId });
+      expect(result.content[0].text).toContain('"charge_attempts"');
+      expect(result.content[0].text).toContain('10101');
+    });
+  });
+
+  describe('Address Tools Integration', () => {
+    test('should handle address workflow with proper customer dependency', async () => {
+      // Prerequisites: Customer must exist first
+      
+      // Step 1: Create address for existing customer
+      const addressData = {
+        customer_id: '12345',
+        first_name: 'John',
+        last_name: 'Doe',
+        address1: '123 Main St',
+        city: 'New York',
+        province: 'NY',
+        country_code: 'US',
+        zip: '10001'
+      };
+
+      const createdAddress = { address: { id: '67890', ...addressData } };
+      nock(baseUrl)
+        .post('/addresses', addressData)
+        .reply(201, createdAddress);
+
+      const createResult = await handlers.handleCreateAddress(addressData);
+      expect(createResult.content[0].text).toContain('"address"');
+      expect(createResult.content[0].text).toContain('67890');
+
+      // Step 2: Validate address (can be done before or after creation)
+      const validationData = {
+        address1: '123 Main St',
+        city: 'New York',
+        province: 'NY',
+        country_code: 'US',
+        zip: '10001'
+      };
+      const validationResponse = { address: { ...validationData, valid: true } };
+      nock(baseUrl)
+        .post('/addresses/validate', validationData)
+        .reply(200, validationResponse);
+
+      const validateResult = await handlers.handleValidateAddress(validationData);
+      expect(validateResult.content[0].text).toContain('"address"');
+      expect(validateResult.content[0].text).toContain('true');
+
+      // Step 3: Update address (only after creation)
+      const updateData = { address1: '456 Oak Ave' };
+      const updatedAddress = { address: { id: '67890', ...addressData, ...updateData } };
+      nock(baseUrl)
+        .put('/addresses/67890', updateData)
+        .reply(200, updatedAddress);
+
+      const updateResult = await handlers.handleUpdateAddress({ address_id: '67890', ...updateData });
+      expect(updateResult.content[0].text).toContain('"address"');
+      expect(updateResult.content[0].text).toContain('456 Oak Ave');
+
+      // Step 4: Delete address (only if no active subscriptions use it)
+      nock(baseUrl)
+        .delete('/addresses/67890')
+        .reply(200, { success: true });
+
+      const deleteResult = await handlers.handleDeleteAddress({ address_id: '67890' });
+      expect(deleteResult.content[0].text).toContain('"success": true');
+    });
+
+    test('should handle address nested resources after address creation', async () => {
+      const addressId = '67890';
+      // Prerequisites: Address must exist and have associated resources
+
+      // Step 1: Get subscriptions using this address
+      const subscriptionsResponse = { subscriptions: [{ id: '11111', address_id: addressId }] };
+      nock(baseUrl)
+        .get('/subscriptions')
+        .query({ address_id: addressId })
+        .reply(200, subscriptionsResponse);
+
+      const subscriptionsResult = await handlers.handleGetAddressSubscriptions({ address_id: addressId });
+      expect(subscriptionsResult.content[0].text).toContain('"subscriptions"');
+
+      // Step 2: Get charges for this address
+      const chargesResponse = { charges: [{ id: '88888', address_id: addressId }] };
+      nock(baseUrl)
+        .get('/charges')
+        .query({ address_id: addressId })
+        .reply(200, chargesResponse);
+
+      const chargesResult = await handlers.handleGetAddressCharges({ address_id: addressId });
+      expect(chargesResult.content[0].text).toContain('"charges"');
+    });
+  });
+
+  describe('Discount Tools Integration', () => {
+    test('should handle discount workflow in business logic order', async () => {
+      // Step 1: Create discount first
+      const discountData = {
+        code: 'SAVE20',
+        value: 20,
+        value_type: 'percentage',
+        status: 'enabled',
+        usage_limit: 100,
+        applies_to: 'checkout'
+      };
+
+      const createdDiscount = { discount: { id: 'discount_123', ...discountData } };
+      nock(baseUrl)
+        .post('/discounts', discountData)
+        .reply(201, createdDiscount);
+
+      const createResult = await handlers.handleCreateDiscount(discountData);
+      expect(createResult.content[0].text).toContain('"discount"');
+      expect(createResult.content[0].text).toContain('discount_123');
+
+      // Step 2: Apply discount to subscription (only after discount exists)
+      // Prerequisites: Subscription must exist
+      const applicationResponse = { discount_application: { id: 'app_456', discount_id: 'discount_123' } };
+      nock(baseUrl)
+        .post('/discount_applications', { discount_id: 'discount_123', subscription_id: '11111' })
+        .reply(201, applicationResponse);
+
+      const applyResult = await handlers.handleApplySubscriptionDiscount({ 
+        subscription_id: '11111', 
+        discount_id: 'discount_123' 
+      });
+      expect(applyResult.content[0].text).toContain('"discount_application"');
+      expect(applyResult.content[0].text).toContain('app_456');
+
+      // Step 3: Remove discount (only after application)
+      nock(baseUrl)
+        .delete('/discount_applications/app_456')
+        .reply(200, { success: true });
+
+      const removeResult = await handlers.handleRemoveSubscriptionDiscount({ 
+        subscription_id: '11111', 
+        discount_id: 'discount_123' 
+      });
+      expect(removeResult.content[0].text).toContain('"success": true');
+    });
+  });
+
+  describe('Bulk Operations Integration', () => {
+    test('should handle bulk operations with proper prerequisites', async () => {
+      // Prerequisites: All subscriptions must exist before bulk operations
+      
+      const subscriptionsData = {
+        subscriptions: [
+          { id: '11111', quantity: 2 },
+          { id: '22222', quantity: 3 }
+        ]
+      };
+
+      const batchResponse = { 
+        async_batch: { 
+          id: 'batch_123', 
+          batch_type: 'subscriptions_bulk_update',
+          status: 'processing' 
+        } 
+      };
+
+      nock(baseUrl)
+        .post('/async_batches', {
+          batch_type: 'subscriptions_bulk_update',
+          requests: subscriptionsData.subscriptions
+        })
+        .reply(201, batchResponse);
+
+      const result = await handlers.handleBulkUpdateSubscriptions(subscriptionsData);
+      expect(result.content[0].text).toContain('"async_batch"');
+      expect(result.content[0].text).toContain('batch_123');
+    });
+
+    test('should handle bulk charge operations with existing charges', async () => {
+      // Prerequisites: All charges must exist before bulk operations
+      const chargeIds = ['88888', '99999', '10101'];
+
+      // Step 1: Bulk skip charges
+      const skipBatchResponse = { 
+        async_batch: { 
+          id: 'batch_456', 
+          batch_type: 'charges_bulk_skip',
+          status: 'processing' 
+        } 
+      };
+
+      nock(baseUrl)
+        .post('/async_batches', {
+          batch_type: 'charges_bulk_skip',
+          requests: chargeIds.map(id => ({ charge_id: id }))
+        })
+        .reply(201, skipBatchResponse);
+
+      const skipResult = await handlers.handleBulkSkipCharges({ charge_ids: chargeIds });
+      expect(skipResult.content[0].text).toContain('"async_batch"');
+      expect(skipResult.content[0].text).toContain('batch_456');
+
+      // Step 2: Bulk unskip charges (only after they were skipped)
+      const unskipBatchResponse = { 
+        async_batch: { 
+          id: 'batch_789', 
+          batch_type: 'charges_bulk_unskip',
+          status: 'processing' 
+        } 
+      };
+
+      nock(baseUrl)
+        .post('/async_batches', {
+          batch_type: 'charges_bulk_unskip',
+          requests: chargeIds.map(id => ({ charge_id: id }))
+        })
+        .reply(201, unskipBatchResponse);
+
+      const unskipResult = await handlers.handleBulkUnskipCharges({ charge_ids: chargeIds });
+      expect(unskipResult.content[0].text).toContain('"async_batch"');
+      expect(unskipResult.content[0].text).toContain('batch_789');
+    });
+  });
+
+  describe('Complete Business Workflow Integration', () => {
+    test('should handle end-to-end customer onboarding workflow', async () => {
+      // Complete realistic business workflow
+      
+      // Step 1: Create customer
+      const customerData = { email: 'workflow@test.com', first_name: 'Workflow', last_name: 'Test' };
+      const createdCustomer = { customer: { id: 'cust_001', ...customerData } };
+      
+      nock(baseUrl)
+        .post('/customers', customerData)
+        .reply(201, createdCustomer);
+
+      await handlers.handleCreateCustomer(customerData);
+
+      // Step 2: Create address for customer
+      const addressData = {
+        customer_id: 'cust_001',
+        first_name: 'Workflow',
+        last_name: 'Test',
+        address1: '789 Business St',
+        city: 'Commerce City',
+        province: 'CA',
+        country_code: 'US',
+        zip: '90210'
+      };
+      const createdAddress = { address: { id: 'addr_001', ...addressData } };
+      
+      nock(baseUrl)
+        .post('/addresses', addressData)
+        .reply(201, createdAddress);
+
+      await handlers.handleCreateAddress(addressData);
+
+      // Step 3: Create subscription
+      const subscriptionData = {
+        address_id: 'addr_001',
+        next_charge_scheduled_at: '2024-02-01T00:00:00Z',
+        order_interval_frequency: '1',
+        order_interval_unit: 'month',
+        quantity: 1,
+        shopify_variant_id: 'var_001'
+      };
+      const createdSubscription = { subscription: { id: 'sub_001', ...subscriptionData } };
+      
+      nock(baseUrl)
+        .post('/subscriptions', subscriptionData)
+        .reply(201, createdSubscription);
+
+      await handlers.handleCreateSubscription(subscriptionData);
+
+      // Step 4: Add line item to subscription
+      const lineItemData = { shopify_variant_id: 'var_002', quantity: 1 };
+      const createdLineItem = { line_item: { id: 'line_001', ...lineItemData } };
+      
+      nock(baseUrl)
+        .post('/line_items', { ...lineItemData, subscription_id: 'sub_001' })
+        .reply(201, createdLineItem);
+
+      await handlers.handleCreateSubscriptionLineItem({ subscription_id: 'sub_001', ...lineItemData });
+
+      // Step 5: Create discount and apply to subscription
+      const discountData = { code: 'WELCOME10', value: 10, value_type: 'percentage' };
+      const createdDiscount = { discount: { id: 'disc_001', ...discountData } };
+      
+      nock(baseUrl)
+        .post('/discounts', discountData)
+        .reply(201, createdDiscount);
+
+      await handlers.handleCreateDiscount(discountData);
+
+      const applicationResponse = { discount_application: { id: 'app_001', discount_id: 'disc_001' } };
+      nock(baseUrl)
+        .post('/discount_applications', { discount_id: 'disc_001', subscription_id: 'sub_001' })
+        .reply(201, applicationResponse);
+
+      const applyResult = await handlers.handleApplySubscriptionDiscount({ 
+        subscription_id: 'sub_001', 
+        discount_id: 'disc_001' 
+      });
+      
+      expect(applyResult.content[0].text).toContain('"discount_application"');
+    });
+  });
+
+  describe('Error Handling Integration', () => {
+    test('should handle 404 errors correctly', async () => {
+      nock(baseUrl)
+        .get('/customers/nonexistent')
+        .reply(404, { errors: ['Customer not found'] });
+
+      const result = await handlers.handleGetCustomer({ customer_id: 'nonexistent' });
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain('404');
+      expect(result.content[0].text).toContain('Customer not found');
+    });
+
+    test('should handle 422 validation errors correctly', async () => {
+      nock(baseUrl)
+        .post('/customers', { email: 'invalid-email' })
+        .reply(422, { errors: ['Email is invalid'] });
+
+      const result = await handlers.handleCreateCustomer({ email: 'invalid-email' });
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain('422');
+      expect(result.content[0].text).toContain('Email is invalid');
+    });
+
+    test('should handle 429 rate limit errors with retry', async () => {
+      nock(baseUrl)
+        .get('/customers/123')
+        .reply(429, { errors: ['Rate limit exceeded'] })
+        .get('/customers/123')
+        .reply(200, { customer: { id: '123', email: 'test@example.com' } });
+
+      const result = await handlers.handleGetCustomer({ customer_id: '123' });
+      expect(result.isError).toBeFalsy();
+      expect(result.content[0].text).toContain('"customer"');
+    });
+
+    test('should handle network timeouts', async () => {
+      nock(baseUrl)
+        .get('/customers/123')
+        .delay(6000) // Longer than timeout
+        .reply(200, {});
+
+      const result = await handlers.handleGetCustomer({ customer_id: '123' });
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain('timeout');
+    });
+  });
+});
