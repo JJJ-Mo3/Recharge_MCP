@@ -642,6 +642,41 @@ Below are examples of how to use each tool with sample parameters and expected r
 }
 ```
 
+#### Get Customer's Subscriptions
+```json
+{
+  "tool": "recharge_get_customer_subscriptions",
+  "arguments": {
+    "customer_id": "123456",
+    "status": "active",
+    "limit": 25
+  }
+}
+```
+
+#### Get Customer's Orders
+```json
+{
+  "tool": "recharge_get_customer_orders",
+  "arguments": {
+    "customer_id": "123456",
+    "limit": 25
+  }
+}
+```
+
+#### Get Customer's Charges
+```json
+{
+  "tool": "recharge_get_customer_charges",
+  "arguments": {
+    "customer_id": "123456",
+    "status": "success",
+    "limit": 25
+  }
+}
+```
+
 ### Subscription Management
 
 #### Get Subscriptions
@@ -693,6 +728,41 @@ Below are examples of how to use each tool with sample parameters and expected r
 }
 ```
 
+#### Get Subscription's Charges
+```json
+{
+  "tool": "recharge_get_subscription_charges",
+  "arguments": {
+    "subscription_id": "456789",
+    "status": "success",
+    "limit": 25
+  }
+}
+```
+
+#### Add Line Item to Subscription
+```json
+{
+  "tool": "recharge_create_subscription_line_item",
+  "arguments": {
+    "subscription_id": "456789",
+    "shopify_variant_id": "987654",
+    "quantity": 2
+  }
+}
+```
+
+#### Add Note to Subscription
+```json
+{
+  "tool": "recharge_create_subscription_note",
+  "arguments": {
+    "subscription_id": "456789",
+    "body": "Customer requested delivery on weekends only"
+  }
+}
+```
+
 ### Charge Management
 
 #### Skip Charge
@@ -733,6 +803,28 @@ Below are examples of how to use each tool with sample parameters and expected r
 }
 ```
 
+#### Get Charge Line Items
+```json
+{
+  "tool": "recharge_get_charge_line_items",
+  "arguments": {
+    "charge_id": "333444",
+    "limit": 25
+  }
+}
+```
+
+#### Get Charge Attempts
+```json
+{
+  "tool": "recharge_get_charge_attempts",
+  "arguments": {
+    "charge_id": "333444",
+    "limit": 25
+  }
+}
+```
+
 ### Address Management
 
 #### Create Address
@@ -767,6 +859,29 @@ Below are examples of how to use each tool with sample parameters and expected r
 }
 ```
 
+#### Get Address Subscriptions
+```json
+{
+  "tool": "recharge_get_address_subscriptions",
+  "arguments": {
+    "address_id": "789012",
+    "status": "active",
+    "limit": 25
+  }
+}
+```
+
+#### Get Address Charges
+```json
+{
+  "tool": "recharge_get_address_charges",
+  "arguments": {
+    "address_id": "789012",
+    "limit": 25
+  }
+}
+```
+
 ### Discount Management
 
 #### Create Discount
@@ -780,6 +895,28 @@ Below are examples of how to use each tool with sample parameters and expected r
     "status": "enabled",
     "usage_limit": 100,
     "applies_to": "checkout"
+  }
+}
+```
+
+#### Get Subscription Discounts
+```json
+{
+  "tool": "recharge_get_subscription_discounts",
+  "arguments": {
+    "subscription_id": "456789",
+    "limit": 25
+  }
+}
+```
+
+#### Get Charge Discounts
+```json
+{
+  "tool": "recharge_get_charge_discounts",
+  "arguments": {
+    "charge_id": "333444",
+    "limit": 25
   }
 }
 ```
@@ -847,55 +984,6 @@ Below are examples of how to use each tool with sample parameters and expected r
 }
 ```
 
-### Nested Resource Management
-
-#### Get Customer's Subscriptions
-```json
-{
-  "tool": "recharge_get_customer_subscriptions",
-  "arguments": {
-    "customer_id": "123456",
-    "status": "active",
-    "limit": 25
-  }
-}
-```
-
-#### Add Line Item to Subscription
-```json
-{
-  "tool": "recharge_create_subscription_line_item",
-  "arguments": {
-    "subscription_id": "456789",
-    "shopify_variant_id": "987654",
-    "quantity": 2
-  }
-}
-```
-
-#### Add Note to Subscription
-```json
-{
-  "tool": "recharge_create_subscription_note",
-  "arguments": {
-    "subscription_id": "456789",
-    "body": "Customer requested delivery on weekends only"
-  }
-}
-```
-
-#### Pause Subscription
-```json
-{
-  "tool": "recharge_pause_subscription",
-  "arguments": {
-    "subscription_id": "456789",
-    "pause_reason": "Customer vacation",
-    "resume_date": "2024-03-01T00:00:00Z"
-  }
-}
-```
-
 ### Collection Management
 
 #### Create Collection
@@ -936,6 +1024,40 @@ Below are examples of how to use each tool with sample parameters and expected r
   "tool": "recharge_bulk_skip_charges",
   "arguments": {
     "charge_ids": ["charge_123", "charge_456", "charge_789"]
+  }
+}
+```
+
+### Advanced Subscription Management
+
+#### Pause Subscription
+```json
+{
+  "tool": "recharge_pause_subscription",
+  "arguments": {
+    "subscription_id": "456789",
+    "pause_reason": "Customer vacation",
+    "resume_date": "2024-03-01T00:00:00Z"
+  }
+}
+```
+
+#### Resume Subscription
+```json
+{
+  "tool": "recharge_resume_subscription",
+  "arguments": {
+    "subscription_id": "456789"
+  }
+}
+```
+
+#### Get Subscription Delivery Schedule
+```json
+{
+  "tool": "recharge_get_subscription_delivery_schedule",
+  "arguments": {
+    "subscription_id": "456789"
   }
 }
 ```
@@ -1070,10 +1192,29 @@ NODE_ENV=development npm run dev
 
 - **"API key is required"**: Set `RECHARGE_API_KEY` environment variable or provide `api_key` parameter
 - **"Recharge API error 401"**: Invalid, expired, or wrong type of API key (ensure you're using an Admin API key from Private App integration)
-- **"Recharge API error 429"**: Rate limit exceeded (will auto-retry)
-- **"Request timeout"**: Increase `RECHARGE_API_TIMEOUT` or check network
+- **"Recharge API error 404"**: Resource not found (check IDs and ensure resource exists)
+- **"Recharge API error 422"**: Validation error (check required fields and data formats)
+- **"Recharge API error 429"**: Rate limit exceeded (will auto-retry with exponential backoff)
+- **"Request timeout"**: Increase `RECHARGE_API_TIMEOUT` or check network connectivity
 - **"Missing required fields"**: Check tool documentation for required parameters
 - **"Network request failed"**: Check internet connection and Recharge API status
+
+### API Endpoint Structure
+
+**Important**: The Recharge API v2021-11 uses a flat endpoint structure with query parameter filtering, not nested routes:
+
+✅ **Correct Structure:**
+- `/subscriptions?customer_id=123` - Get customer's subscriptions
+- `/charges?subscription_id=456` - Get subscription's charges
+- `/addresses?customer_id=123` - Get customer's addresses
+- `/line_items?subscription_id=456` - Get subscription's line items
+
+❌ **Incorrect Structure (will cause 404s):**
+- `/customers/123/subscriptions` - Does not exist
+- `/subscriptions/456/charges` - Does not exist
+- `/customers/123/addresses` - Does not exist
+
+This server handles the correct endpoint structure automatically, so you don't need to worry about these implementation details when using the tools.
 
 ### Validation
 
