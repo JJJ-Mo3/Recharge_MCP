@@ -814,7 +814,7 @@ export class RechargeClient {
   // Nested resource methods - Customer relationships
   async getCustomerAddresses(customerId, params = {}) {
     const searchParams = this.buildQueryParams(params);
-    return this.request(`/customers/${customerId}/addresses?${searchParams}`);
+    return this.request(`/addresses?customer_id=${customerId}&${searchParams}`);
   }
 
   async getCustomerSubscriptions(customerId, params = {}) {
@@ -835,65 +835,65 @@ export class RechargeClient {
   // Nested resource methods - Subscription relationships
   async getSubscriptionCharges(subscriptionId, params = {}) {
     const searchParams = this.buildQueryParams(params);
-    return this.request(`/subscriptions/${subscriptionId}/charges?${searchParams}`);
+    return this.request(`/charges?subscription_id=${subscriptionId}&${searchParams}`);
   }
 
   async createSubscriptionCharge(subscriptionId, chargeData) {
-    return this.request(`/subscriptions/${subscriptionId}/charges`, {
+    return this.request('/charges', {
       method: 'POST',
-      body: JSON.stringify(chargeData)
+      body: JSON.stringify({ ...chargeData, subscription_id: subscriptionId })
     });
   }
 
   // Nested resource methods - Address relationships
   async getAddressSubscriptions(addressId, params = {}) {
     const searchParams = this.buildQueryParams(params);
-    return this.request(`/addresses/${addressId}/subscriptions?${searchParams}`);
+    return this.request(`/subscriptions?address_id=${addressId}&${searchParams}`);
   }
 
   async getAddressCharges(addressId, params = {}) {
     const searchParams = this.buildQueryParams(params);
-    return this.request(`/addresses/${addressId}/charges?${searchParams}`);
+    return this.request(`/charges?address_id=${addressId}&${searchParams}`);
   }
 
   // Line item management
   async getSubscriptionLineItems(subscriptionId, params = {}) {
     const searchParams = this.buildQueryParams(params);
-    return this.request(`/subscriptions/${subscriptionId}/line_items?${searchParams}`);
+    return this.request(`/line_items?subscription_id=${subscriptionId}&${searchParams}`);
   }
 
   async createSubscriptionLineItem(subscriptionId, lineItemData) {
-    return this.request(`/subscriptions/${subscriptionId}/line_items`, {
+    return this.request('/line_items', {
       method: 'POST',
-      body: JSON.stringify(lineItemData)
+      body: JSON.stringify({ ...lineItemData, subscription_id: subscriptionId })
     });
   }
 
   async updateSubscriptionLineItem(subscriptionId, lineItemId, lineItemData) {
-    return this.request(`/subscriptions/${subscriptionId}/line_items/${lineItemId}`, {
+    return this.request(`/line_items/${lineItemId}`, {
       method: 'PUT',
       body: JSON.stringify(lineItemData)
     });
   }
 
   async deleteSubscriptionLineItem(subscriptionId, lineItemId) {
-    return this.request(`/subscriptions/${subscriptionId}/line_items/${lineItemId}`, {
+    return this.request(`/line_items/${lineItemId}`, {
       method: 'DELETE'
     });
   }
 
   async getOrderLineItems(orderId, params = {}) {
     const searchParams = this.buildQueryParams(params);
-    return this.request(`/orders/${orderId}/line_items?${searchParams}`);
+    return this.request(`/line_items?order_id=${orderId}&${searchParams}`);
   }
 
   async getChargeLineItems(chargeId, params = {}) {
     const searchParams = this.buildQueryParams(params);
-    return this.request(`/charges/${chargeId}/line_items?${searchParams}`);
+    return this.request(`/line_items?charge_id=${chargeId}&${searchParams}`);
   }
 
   async updateChargeLineItem(chargeId, lineItemId, lineItemData) {
-    return this.request(`/charges/${chargeId}/line_items/${lineItemId}`, {
+    return this.request(`/line_items/${lineItemId}`, {
       method: 'PUT',
       body: JSON.stringify(lineItemData)
     });
@@ -902,25 +902,25 @@ export class RechargeClient {
   // Subscription notes
   async getSubscriptionNotes(subscriptionId, params = {}) {
     const searchParams = this.buildQueryParams(params);
-    return this.request(`/subscriptions/${subscriptionId}/notes?${searchParams}`);
+    return this.request(`/notes?subscription_id=${subscriptionId}&${searchParams}`);
   }
 
   async createSubscriptionNote(subscriptionId, noteData) {
-    return this.request(`/subscriptions/${subscriptionId}/notes`, {
+    return this.request('/notes', {
       method: 'POST',
-      body: JSON.stringify(noteData)
+      body: JSON.stringify({ ...noteData, subscription_id: subscriptionId })
     });
   }
 
   async updateSubscriptionNote(subscriptionId, noteId, noteData) {
-    return this.request(`/subscriptions/${subscriptionId}/notes/${noteId}`, {
+    return this.request(`/notes/${noteId}`, {
       method: 'PUT',
       body: JSON.stringify(noteData)
     });
   }
 
   async deleteSubscriptionNote(subscriptionId, noteId) {
-    return this.request(`/subscriptions/${subscriptionId}/notes/${noteId}`, {
+    return this.request(`/notes/${noteId}`, {
       method: 'DELETE'
     });
   }
@@ -928,104 +928,133 @@ export class RechargeClient {
   // Customer payment sources
   async getCustomerPaymentSources(customerId, params = {}) {
     const searchParams = this.buildQueryParams(params);
-    return this.request(`/customers/${customerId}/payment_sources?${searchParams}`);
+    return this.request(`/payment_sources?customer_id=${customerId}&${searchParams}`);
   }
 
   async createCustomerPaymentSource(customerId, paymentSourceData) {
-    return this.request(`/customers/${customerId}/payment_sources`, {
+    return this.request('/payment_sources', {
       method: 'POST',
-      body: JSON.stringify(paymentSourceData)
+      body: JSON.stringify({ ...paymentSourceData, customer_id: customerId })
     });
   }
 
   async updateCustomerPaymentSource(customerId, paymentSourceId, paymentSourceData) {
-    return this.request(`/customers/${customerId}/payment_sources/${paymentSourceId}`, {
+    return this.request(`/payment_sources/${paymentSourceId}`, {
       method: 'PUT',
       body: JSON.stringify(paymentSourceData)
     });
   }
 
   async deleteCustomerPaymentSource(customerId, paymentSourceId) {
-    return this.request(`/customers/${customerId}/payment_sources/${paymentSourceId}`, {
+    return this.request(`/payment_sources/${paymentSourceId}`, {
       method: 'DELETE'
     });
   }
 
   // Subscription delivery schedules
   async getSubscriptionDeliverySchedule(subscriptionId) {
-    return this.request(`/subscriptions/${subscriptionId}/delivery_schedule`);
+    return this.request(`/delivery_schedules?subscription_id=${subscriptionId}`);
   }
 
   async updateSubscriptionDeliverySchedule(subscriptionId, scheduleData) {
-    return this.request(`/subscriptions/${subscriptionId}/delivery_schedule`, {
+    return this.request('/delivery_schedules', {
       method: 'PUT',
-      body: JSON.stringify(scheduleData)
+      body: JSON.stringify({ ...scheduleData, subscription_id: subscriptionId })
     });
   }
 
   // Charge attempts
   async getChargeAttempts(chargeId, params = {}) {
     const searchParams = this.buildQueryParams(params);
-    return this.request(`/charges/${chargeId}/charge_attempts?${searchParams}`);
+    return this.request(`/charge_attempts?charge_id=${chargeId}&${searchParams}`);
   }
 
   // Subscription pause/resume
   async pauseSubscription(subscriptionId, pauseData) {
-    return this.request(`/subscriptions/${subscriptionId}/pause`, {
+    return this.request(`/subscriptions/${subscriptionId}`, {
       method: 'POST',
-      body: JSON.stringify(pauseData)
+      body: JSON.stringify({ status: 'paused', ...pauseData })
     });
   }
 
   async resumeSubscription(subscriptionId) {
-    return this.request(`/subscriptions/${subscriptionId}/resume`, {
-      method: 'POST'
+    return this.request(`/subscriptions/${subscriptionId}`, {
+      method: 'PUT',
+      body: JSON.stringify({ status: 'active' })
     });
   }
   // Order discount methods
   async getOrderDiscounts(orderId, params = {}) {
     const searchParams = this.buildQueryParams(params);
-    return this.request(`/orders/${orderId}/discounts?${searchParams}`);
+    return this.request(`/discounts?order_id=${orderId}&${searchParams}`);
   }
 
   // Charge discount methods
   async getChargeDiscounts(chargeId, params = {}) {
     const searchParams = this.buildQueryParams(params);
-    return this.request(`/charges/${chargeId}/discounts?${searchParams}`);
+    return this.request(`/discounts?charge_id=${chargeId}&${searchParams}`);
   }
 
   async applyChargeDiscount(chargeId, discountData) {
-    return this.request(`/charges/${chargeId}/discounts`, {
+    return this.request('/discount_applications', {
       method: 'POST',
-      body: JSON.stringify(discountData)
+      body: JSON.stringify({ ...discountData, charge_id: chargeId })
     });
   }
 
   async removeChargeDiscount(chargeId, discountId) {
-    return this.request(`/charges/${chargeId}/discounts/${discountId}`, {
+    return this.request(`/discount_applications?charge_id=${chargeId}&discount_id=${discountId}`, {
+      method: 'DELETE'
+    });
+  }
+
+  // Subscription discount methods
+  async getSubscriptionDiscounts(subscriptionId, params = {}) {
+    const searchParams = this.buildQueryParams(params);
+    return this.request(`/discounts?subscription_id=${subscriptionId}&${searchParams}`);
+  }
+
+  async applySubscriptionDiscount(subscriptionId, discountData) {
+    return this.request('/discount_applications', {
+      method: 'POST',
+      body: JSON.stringify({ ...discountData, subscription_id: subscriptionId })
+    });
+  }
+
+  async removeSubscriptionDiscount(subscriptionId, discountId) {
+    return this.request(`/discount_applications?subscription_id=${subscriptionId}&discount_id=${discountId}`, {
       method: 'DELETE'
     });
   }
 
   // Bulk operation methods
   async bulkUpdateSubscriptions(subscriptionsData) {
-    return this.request('/subscriptions/bulk_update', {
+    return this.request('/async_batches', {
       method: 'POST',
-      body: JSON.stringify(subscriptionsData)
+      body: JSON.stringify({
+        batch_type: 'subscription_update',
+        requests: subscriptionsData.subscriptions
+      })
     });
   }
 
   async bulkSkipCharges(chargeIds) {
-    return this.request('/charges/bulk_skip', {
+    return this.request('/async_batches', {
       method: 'POST',
-      body: JSON.stringify({ charge_ids: chargeIds })
+      body: JSON.stringify({
+        batch_type: 'charge_skip',
+        requests: chargeIds.map(id => ({ charge_id: id }))
+      })
     });
   }
 
   async bulkUnskipCharges(chargeIds) {
-    return this.request('/charges/bulk_unskip', {
+    return this.request('/async_batches', {
       method: 'POST',
-      body: JSON.stringify({ charge_ids: chargeIds })
+      body: JSON.stringify({
+        batch_type: 'charge_unskip',
+        requests: chargeIds.map(id => ({ charge_id: id }))
+      })
     });
   }
 }
