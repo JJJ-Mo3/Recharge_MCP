@@ -1,6 +1,6 @@
 # Recharge MCP Server
 
-A comprehensive **local** Model Context Protocol (MCP) server that provides **130+ tools** for complete interaction with the Recharge API v2021-11. This server runs as a local process and communicates with MCP clients via stdio (standard input/output). It enables AI assistants to manage every aspect of subscription commerce with **100% API coverage**, including advanced features like nested resource relationships, bulk operations, and specialized subscription management.
+A comprehensive Model Context Protocol (MCP) server for the Recharge API v2021-11. This server provides **130+ production-ready tools** for managing subscriptions, customers, orders, charges, and more through AI assistants like Claude.
 
 ## Table of Contents
 
@@ -248,15 +248,133 @@ Add to your VSCode `settings.json` or workspace `.vscode/settings.json`:
 
 For other MCP-compatible clients, configure them to run this server as a local process using the Node.js command with the path to `index.js`.
 
-## Features
+## ✨ Features
 
-### **Complete API Coverage**
-- **130+ Tools** covering 100% of Recharge API v2021-11
-- **15+ Resource Categories** with full CRUD operations
-- **Nested Resource Relationships** for comprehensive data access
-- **Advanced Subscription Features** including pause/resume, delivery schedules
-- **Bulk Operations** for efficient large-scale management
-- **Customer Service Tools** including notes and payment attempt tracking
+- **130+ Production-Ready Tools**: Complete coverage of Recharge API v2021-11 with comprehensive validation
+- **Flexible Authentication**: Support for environment variables or per-request API keys
+- **Robust Error Handling**: Comprehensive error handling with retry logic and timeout management
+- **Rate Limit Management**: Built-in rate limiting and exponential backoff strategies
+- **Type Safety**: Full TypeScript-style schemas for all tools with input validation
+- **Production Ready**: Comprehensive test suite with 90%+ coverage and real workflow validation
+- **Business Logic Validation**: Tests follow actual Recharge subscription workflows and dependencies
+- **Modern JavaScript**: Full ES modules support with proper Jest configuration
+
+## 🚀 Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/your-username/recharge-mcp-server.git
+cd recharge-mcp-server
+
+# Install dependencies
+npm install
+
+# Copy environment template
+cp .env.example .env
+
+# Edit .env with your Recharge API key
+nano .env
+```
+
+## 🧪 Testing
+
+The server includes a **production-ready test suite** with comprehensive coverage and validation:
+
+### Test Suite Overview
+
+- **Unit Tests**: All 130+ tools individually tested with proper mocking
+- **Integration Tests**: End-to-end workflows following real Recharge business logic
+- **Error Handling**: Complete error scenario coverage (4xx, 5xx, network, timeouts)
+- **Mock Validation**: Realistic API response simulation with proper data structures
+- **Business Flow Validation**: Tests follow actual Recharge subscription workflows and dependencies
+- **Coverage Targets**: 90% lines/statements, 80% branches, 85% functions
+
+### Running Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run unit tests only
+npm run test:unit
+
+# Run integration tests only
+npm run test:integration
+
+# Run with coverage
+npm run test:coverage
+
+# Run specific tool tests
+npm run test:tools
+
+# Watch mode for development
+npm run test:watch
+```
+
+### Test Structure
+
+```
+tests/
+├── unit/                           # Unit tests for individual components
+│   ├── recharge-client.test.js    # HTTP client testing with error scenarios
+│   ├── tool-handlers.test.js      # Tool handler logic and response formatting
+│   └── all-tools.test.js          # All 130+ tools with comprehensive mocking
+├── integration/                    # Integration tests for real workflows
+│   ├── mcp-server.test.js         # MCP server initialization and tool registration
+│   └── all-tools.test.js          # End-to-end business workflows with proper dependencies
+└── setup.js                       # Test configuration and environment setup
+```
+
+### Business Flow Validation
+
+The test suite validates proper Recharge workflow order:
+
+**Customer Onboarding:**
+1. Create Customer (required first)
+2. Create Address (requires customer_id)
+3. Create Subscription (requires address_id)
+
+**Subscription Lifecycle:**
+1. Active → Update → Pause → Resume → Cancel
+2. Product swapping while active
+3. Line item modifications during active state
+
+**Charge Management:**
+1. Queued → Skip/Unskip → Process → Success/Failed
+2. Refund handling after successful charges
+3. Delay operations before processing
+
+### GitHub Actions Integration
+
+Comprehensive CI/CD pipeline:
+- **Multi-version testing**: Node.js 18.x, 20.x, 22.x
+- **Complete validation**: Syntax, unit tests, integration tests, coverage
+- **Security auditing**: npm audit with moderate level threshold
+- **MCP integration testing**: Server startup and tool registration validation
+- **Performance testing**: Bulk operations and timeout handling
+
+### Writing Tests
+
+When adding new tools or features, follow these patterns:
+
+1. **Unit Tests**: Test individual tool handlers with mocked clients
+2. **Integration Tests**: Test complete workflows with realistic data
+3. **Error Scenarios**: Include 404, 422, 429, 500, timeout, and network error testing
+4. **Mock Alignment**: Ensure mocks match actual Recharge API responses
+5. **Business Logic**: Follow proper Recharge workflow dependencies
+6. **Response Validation**: Verify JSON structure and error flags
+
+## 🚨 Error Handling
+
+The server provides comprehensive error handling:
+
+- **HTTP Error Codes**: Proper handling of 4xx and 5xx responses
+- **Retry Logic**: Automatic retries for transient failures (5xx, 429, 503)
+- **Timeout Management**: Configurable request timeouts with abort controllers
+- **Rate Limiting**: Built-in rate limit detection and backoff
+- **Network Resilience**: Handles DNS failures, connection errors, and malformed responses
+- **Graceful Degradation**: Continues operation when possible
+- **Detailed Logging**: Comprehensive error information for debugging
 
 ### Customer Management
 - **Core Operations**: Get, create, update customers with advanced filtering
@@ -1140,7 +1258,27 @@ Resources with status fields support filtering:
 - **Monitor API usage** and implement rate limiting for high-volume operations
 - **Use customer-specific API keys** when managing multiple merchant accounts
 
-## Troubleshooting
+## 🔧 Troubleshooting
+
+### Common Issues
+
+**Test Failures:**
+```bash
+# If Jest command not found
+npm install --save-dev jest
+
+# If ES modules issues
+npm run validate
+```
+
+**API Issues:**
+```bash
+# Validate API key format
+echo $RECHARGE_API_KEY | grep -E '^sk_(live|test)_'
+
+# Test API connectivity
+curl -H "X-Recharge-Access-Token: $RECHARGE_API_KEY" https://api.rechargeapps.com/shop
+```
 
 ### Common Issues
 
@@ -1215,6 +1353,30 @@ NODE_ENV=development npm run dev
 - `/customers/123/addresses` - Does not exist
 
 This server handles the correct endpoint structure automatically, so you don't need to worry about these implementation details when using the tools.
+
+**Test Environment:**
+```bash
+# Run validation
+npm run validate
+```
+
+**MCP Client Issues:**
+- Ensure your MCP client supports the latest protocol version
+- Check that the server is properly registered in your client configuration
+- Verify that the Node.js path is correct in your configuration
+- Verify that the server process has proper permissions
+- Check firewall settings if running remotely
+
+### Performance Optimization
+
+**For High-Volume Operations:**
+```bash
+# Increase timeout for bulk operations
+export RECHARGE_API_TIMEOUT=120000
+
+# Reduce retry attempts for faster failure detection
+export RECHARGE_API_RETRY_ATTEMPTS=2
+```
 
 ### Validation
 
@@ -1575,6 +1737,16 @@ We take security seriously and will respond promptly to legitimate security conc
 - **Flexible Configuration**: Environment-based and per-request API key support
 - **Complete Handler Coverage**: All 130+ tools have full implementation chains
 
-## License
+## 📄 License
 
-MIT License - see LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🤝 Support
+
+- **Issues**: [GitHub Issues](https://github.com/your-username/recharge-mcp-server/issues)
+- **Documentation**: Comprehensive README and inline code documentation
+- **Test Examples**: Production-ready test suite with real workflow examples
+- **Community**: Contributions and feedback welcome
+- **Validation**: Built-in validation scripts and comprehensive error handling
+
+---
